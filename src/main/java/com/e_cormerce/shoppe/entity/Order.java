@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
-import com.e_cormerce.shoppe.enums.Status;
+import com.e_cormerce.shoppe.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,21 +20,17 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
-    Status status;
+    OrderStatus order_Order_status;
     Date created_at;
     Date updated_at;
     double price_each;
     int quantity;
 
     @ManyToOne
-    @JoinColumn(name = "variant_id")
+    @JoinColumn(name = "variant_id", nullable = false)
     Variant variant;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    Product product;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }

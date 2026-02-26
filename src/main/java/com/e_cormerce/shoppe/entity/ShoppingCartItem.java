@@ -1,13 +1,12 @@
 package com.e_cormerce.shoppe.entity;
 
-import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Set;
-
 @Entity
+@Table(name = "shopping_cart_items",
+        indexes = {@Index(name = "idx_user", columnList = "user_id")})
 @Getter
 @Setter
 @Builder
@@ -15,19 +14,25 @@ import java.util.Set;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
-public class Variant {
+public class ShoppingCartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    double price;
     int quantity;
+    double price_each;
+    boolean is_deleted = false;
+    boolean is_Variant;
+
+    @ManyToOne
+    @JoinColumn(name = "variant_id")
+    Variant variant;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
     Product product;
 
-    @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL)
-    @Nullable
-    Set<VariantValue> variantValues;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
 }

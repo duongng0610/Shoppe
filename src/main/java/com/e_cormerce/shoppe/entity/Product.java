@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
+import com.e_cormerce.shoppe.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 import java.util.Set;
 
 @Entity
-@Table(name = "users",
-        indexes = {@Index(name = "idx_product", columnList = "product")}
+@Table(name = "products",
+        indexes = {@Index(name = "idx_category", columnList = "category_id")}
 )
 @Getter
 @Setter
@@ -27,12 +28,13 @@ public class Product {
     double origin_price;
     float discount_percentage;
     double total_quantity;
+    ProductStatus product_status;
 
     boolean has_Variant;
 
     // owner side
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = true)
     Category category;
 
     // inverse side

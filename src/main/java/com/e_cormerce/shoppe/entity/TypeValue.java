@@ -23,4 +23,5 @@ public class TypeValue {
     @JoinColumn(name = "type_id")
     Type type;
 
+
 }

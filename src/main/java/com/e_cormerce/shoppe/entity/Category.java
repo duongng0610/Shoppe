@@ -33,5 +33,5 @@ public class Category {
 
     // inverse side
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    Category category;
+    Set<Product> products;
 }

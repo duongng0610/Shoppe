@@ -5,33 +5,25 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
+@Table(name = "variant_values",
+        indexes = {@Index(name = "idx_variant", columnList = "variant_id")})
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
-public class ShoppingCart {
+public class VariantValue {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    int quantity;
-    double price_each;
-    boolean is_deleted = false;
-    boolean is_Variant;
 
+    // owner side
     @ManyToOne
     @JoinColumn(name = "variant_id")
     Variant variant;
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
-    Product product;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
-
+    @JoinColumn(name = "attribute_id")
+    TypeValue value;
 }

@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
+import com.e_cormerce.shoppe.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +27,7 @@ public class User {
     String avatar;
     Date birth;
     Date created_at;
+    UserStatus user_status;
 
     // owner side
     @OneToOne(fetch = FetchType.LAZY)
@@ -53,11 +55,11 @@ public class User {
     Set<Order> orders;
 
     // inverse side
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    Set<ShoppingCart> shoppingCarts;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<ShoppingCartItem> shoppingCartItems;
 
     // inverse side
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<PhoneNumber> phoneNumbers;
 
 

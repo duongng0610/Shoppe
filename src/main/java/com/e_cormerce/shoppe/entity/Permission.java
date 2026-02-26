@@ -1,10 +1,11 @@
 package com.e_cormerce.shoppe.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Set;
 
 @Entity
 @Getter
@@ -19,7 +20,4 @@ public class Permission {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String val;
-
-    @ManyToMany(mappedBy = "permissions")
-    Set<Role> roles;
 }
