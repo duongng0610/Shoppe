@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -18,11 +20,9 @@ public class Address {
     String id;
     String province;
     String ward;
-    String address_detail;
     boolean is_default;
 
-    @ManyToOne
-    @JoinColumn(name = "client_id")
-    User client;
-
+    // inverse side
+    @ManyToMany(mappedBy = "addresses")
+    Set<User> users;
 }

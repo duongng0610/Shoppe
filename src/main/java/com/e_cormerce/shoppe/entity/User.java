@@ -1,15 +1,16 @@
 package com.e_cormerce.shoppe.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Date;
+import java.util.Set;
 
 @Entity
+@Table(name = "users",
+        indexes = {@Index(name = "idx_username", columnList = "username"),
+                @Index(name = "idx_role", columnList = "role")})
 @Getter
 @Setter
 @Builder
@@ -25,4 +26,39 @@ public class User {
     String avatar;
     Date birth;
     Date created_at;
+
+    // owner side
+    @OneToOne(fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "id")
+    Account account;
+
+    // owner side
+    @ManyToMany
+    @JoinTable(
+            name = "user_address",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "address_id"),
+            indexes = {@Index(name = "idx_user", columnList = "user_id")}
+    )
+    Set<Address> addresses;
+
+    // owner side
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    Role role;
+
+    // inverse side
+    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    Set<Order> orders;
+
+    // inverse side
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    Set<ShoppingCart> shoppingCarts;
+
+    // inverse side
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    Set<PhoneNumber> phoneNumbers;
+
+
 }

@@ -19,8 +19,19 @@ public class ShoppingCart {
     int quantity;
     double price_each;
     boolean is_deleted = false;
+    boolean is_Variant;
 
     @ManyToOne
-    User user;
+    @JoinColumn(name = "variant_id")
+    Variant variant;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 
 }

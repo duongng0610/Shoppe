@@ -14,18 +14,20 @@ import java.util.Set;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
-public class Type {
+public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
     String val;
 
-    // inverse side
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    Product product;
-
     // owner side
-    @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<TypeValue> typeValues;
+    @ManyToMany
+    @JoinTable(
+            name = "role_permission",
+            joinColumns = @JoinColumn(name = "role_id"),
+            inverseJoinColumns = @JoinColumn(name = "permission_id"),
+            indexes = {@Index(name = "idx_role", columnList = "role_id")}
+    )
+    Set<Permission> permissions;
+
 }

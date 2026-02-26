@@ -1,13 +1,14 @@
 package com.e_cormerce.shoppe.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
+@Table(
+        name = "accounts",
+        indexes = {@Index(name = "idx_email", columnList = "email")}
+)
 @Getter
 @Setter
 @Builder
@@ -21,4 +22,8 @@ public class Account {
     String id;
     String email;
     String password;
+
+    // inverse side
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    User user;
 }

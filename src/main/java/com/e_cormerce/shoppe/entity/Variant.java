@@ -1,9 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -21,5 +18,9 @@ public class Variant {
     String id;
     double price;
     int quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    Product product;
 
 }

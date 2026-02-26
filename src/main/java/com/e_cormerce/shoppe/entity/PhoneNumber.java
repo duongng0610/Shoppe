@@ -1,9 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -20,4 +17,8 @@ public class PhoneNumber {
     String id;
     String val;
     String is_default;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    User user;
 }

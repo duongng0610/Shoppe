@@ -4,7 +4,12 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Entity
+@Table(name = "users",
+        indexes = {@Index(name = "idx_product", columnList = "product")}
+)
 @Getter
 @Setter
 @Builder
@@ -21,9 +26,21 @@ public class Product {
 
     double origin_price;
     float discount_percentage;
+    double total_quantity;
 
+    boolean has_Variant;
+
+    // owner side
     @ManyToOne
     @JoinColumn(name = "category_id")
     Category category;
+
+    // inverse side
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Type> types;
+
+    // inverse side
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Variant> variants;
 
 }

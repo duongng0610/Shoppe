@@ -1,10 +1,7 @@
 package com.e_cormerce.shoppe.entity;
 
 import com.e_cormerce.shoppe.enums.Status;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -28,4 +25,16 @@ public class Order {
     Date updated_at;
     double price_each;
     int quantity;
+
+    @ManyToOne
+    @JoinColumn(name = "variant_id")
+    Variant variant;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 }

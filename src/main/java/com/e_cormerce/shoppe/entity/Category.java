@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Entity
 @Getter
 @Setter
@@ -18,7 +20,18 @@ public class Category {
     String id;
     String name;
 
+    // owner side
     @ManyToOne
     @JoinColumn(name = "parent_id")
-    User client;
+    Category parent;
+
+    // inverse side
+    @OneToMany(mappedBy = "parent",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    Set<Category> children;
+
+    // inverse side
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    Category category;
 }
