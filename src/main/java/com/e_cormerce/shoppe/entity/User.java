@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
+import com.e_cormerce.shoppe.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +27,10 @@ public class User {
     String avatar;
     Date birth;
     Date created_at;
+    UserStatus status;
+
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
     // owner side
     @OneToOne(fetch = FetchType.LAZY)
@@ -39,7 +44,7 @@ public class User {
             name = "user_address",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "address_id"),
-            indexes = {@Index(name = "idx_user", columnList = "user_id")}
+            indexes = {@Index(name = "idx_user", columnList = "user_id"), @Index(name = "idx_address", columnList = "address_id")}
     )
     Set<Address> addresses;
 
@@ -53,12 +58,15 @@ public class User {
     Set<Order> orders;
 
     // inverse side
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    Set<ShoppingCart> shoppingCarts;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<ShoppingCartItem> shoppingCartItems;
 
     // inverse side
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<PhoneNumber> phoneNumbers;
 
+    //inverse side
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<Transaction> transactions;
 
 }

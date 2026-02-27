@@ -13,12 +13,17 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "categories", indexes = {@Index(name = "idx_parent", columnList = "parent_id")})
+@Table(name = "categories", indexes = {@Index(name = "idx_parent", columnList = "parent_id"),
+        @Index(name = "idx_val", columnList = "val")
+})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String name;
+    String val;
+
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
     // owner side
     @ManyToOne
@@ -32,6 +37,6 @@ public class Category {
     Set<Category> children;
 
     // inverse side
-    @OneToMany(mappedBy = "category", orphanRemoval = false)
+    @OneToMany(mappedBy = "category", cascade = CascadeType.PERSIST)
     Set<Product> products;
 }

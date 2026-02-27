@@ -3,6 +3,9 @@ package com.e_cormerce.shoppe.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.antlr.v4.runtime.misc.NotNull;
+
+import java.util.Date;
 
 @Entity
 @Table(
@@ -22,6 +25,23 @@ public class Account {
     String id;
     String email;
     String password;
+
+    @Column(name = "created_at", nullable = false)
+    @NotNull
+    Date created_at;
+
+    Date updated_at;
+
+    @NotNull
+    Date last_login_at;
+
+    @NotNull
+    Date last_active_at;
+    @NotNull
+    boolean is_active;
+
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
     // inverse side
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)

@@ -18,7 +18,11 @@ public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+    @Column(nullable = false, unique = true)
     String val;
+
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
     // owner side
     @ManyToMany

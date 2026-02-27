@@ -13,8 +13,8 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
-public class Type {
+@Table(name = "product_types", indexes = {@Index(name = "idx_product", columnList = "product_id")})
+public class ProductType {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
@@ -24,6 +24,9 @@ public class Type {
     @ManyToOne
     @JoinColumn(name = "product_id")
     Product product;
+
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
     // owner side
     @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
