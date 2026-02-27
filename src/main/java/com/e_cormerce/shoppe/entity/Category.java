@@ -13,7 +13,7 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
+@Table(name = "categories", indexes = {@Index(name = "idx_parent", columnList = "parent_id")})
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -32,6 +32,6 @@ public class Category {
     Set<Category> children;
 
     // inverse side
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
-    Category category;
+    @OneToMany(mappedBy = "category", orphanRemoval = false)
+    Set<Product> products;
 }

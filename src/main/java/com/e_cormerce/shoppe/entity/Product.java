@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +33,8 @@ public class Product {
 
     // owner side
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = true)
+    @Nullable
     Category category;
 
     // inverse side
