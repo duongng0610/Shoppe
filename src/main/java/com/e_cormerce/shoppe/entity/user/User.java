@@ -1,9 +1,9 @@
 package com.e_cormerce.shoppe.entity.user;
 
 import com.e_cormerce.shoppe.entity.Role;
+import com.e_cormerce.shoppe.entity.transaction.Transaction;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.ShoppingCartItem;
-import com.e_cormerce.shoppe.entity.transaction.Transaction;
 import com.e_cormerce.shoppe.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;

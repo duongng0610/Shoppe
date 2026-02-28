@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.antlr.v4.runtime.misc.NotNull;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -37,10 +38,11 @@ public class Account {
     Date updated_at;
 
     @NotNull
-    Date last_login_at;
+    LocalDateTime last_login_at;
 
     @NotNull
-    Date last_active_at;
+    LocalDateTime last_active_at;
+
     @NotNull
     boolean is_active;
 
