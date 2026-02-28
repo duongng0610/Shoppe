@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.transaction;
 
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.TargetTypeTransaction;
@@ -37,7 +37,7 @@ public class Transaction {
     @NotNull
     Date created_at;
 
-    @Column(name = "target_id", nullable = true)
+    @Column(name = "target_id", nullable = false)
     @NotNull
     String target_id;
 
