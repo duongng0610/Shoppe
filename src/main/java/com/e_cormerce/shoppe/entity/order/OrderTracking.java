@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.enums.OrderTrackingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -28,6 +29,10 @@ public class OrderTracking {
 
     @Column(nullable = false)
     LocalDateTime created_at;
+
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('PENDING', 'FAILED', 'SUCCEED')", nullable = false)
+    OrderTrackingStatus status;
 
     @ManyToOne
     @JoinColumn(name = "shipper_id", nullable = false)

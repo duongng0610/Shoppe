@@ -1,7 +1,6 @@
 package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.enums.OrderTransactionStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -30,7 +29,6 @@ public class OrderTransaction {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    OrderTransactionStatus status;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

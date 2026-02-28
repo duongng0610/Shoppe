@@ -27,7 +27,11 @@ public class Order {
     String id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(columnDefinition = "ENUM('PENDING','ACCEPTED','CANCELLED_BY_CLIENT'," +
+            "'CANCELLED_BY_SHIPPER','CANCELLED_BY_SELLER','SHIPPING','ARRIVED'," +
+            "'PAID','RETURN_REQUEST_BY_CLIENT','RETURN_REQUEST_BY_SHIPPER','RETURNED','BOMB')",
+            nullable = false)
+
     OrderStatus status;
 
     @Column(nullable = false)

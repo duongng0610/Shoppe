@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "order_refund_requests",
-        indexes = {@Index(name = "idx_resolver", columnList = "resolver_id")}
+        indexes = {@Index(name = "idx_seller", columnList = "seller_id")}
 )
 @Getter
 @Setter
@@ -37,11 +37,11 @@ public class OrderRefundRequest {
     LocalDateTime resolved_at;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(columnDefinition = "ENUM(CLIENT_REFUND, SHIPPER_REFUND)", nullable = false)
     OrderRefundType refund_type;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(columnDefinition = "ENUM('PENDING', 'REJECTED', 'APPROVED')" ,nullable = false)
     OrderRefundStatus status;
 
     @ManyToOne
@@ -50,7 +50,7 @@ public class OrderRefundRequest {
 
     @ManyToOne
     @JoinColumn(name = "resolver_id")
-    User resolver;
+    User seller;
 
     @ManyToOne
     @JoinColumn(name = "order_id")

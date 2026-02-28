@@ -48,7 +48,7 @@ public class Product {
     double total_quantity;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')", nullable = false)
     ProductStatus product_status;
 
     LocalDateTime created_at;

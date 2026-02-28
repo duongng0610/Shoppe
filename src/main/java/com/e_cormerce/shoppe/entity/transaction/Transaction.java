@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.transaction;
 
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.TargetTypeTransaction;
