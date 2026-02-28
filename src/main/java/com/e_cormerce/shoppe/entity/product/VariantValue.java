@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.product;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,10 +23,10 @@ public class VariantValue {
 
     // owner side
     @ManyToOne
-    @JoinColumn(name = "variant_id")
+    @JoinColumn(name = "variant_id", nullable = false)
     Variant variant;
 
     @ManyToOne
-    @JoinColumn(name = "attribute_id")
+    @JoinColumn(name = "attribute_id", nullable = false)
     TypeValue value;
 }

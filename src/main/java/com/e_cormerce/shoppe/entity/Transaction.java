@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
+import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.TargetTypeTransaction;
 import com.e_cormerce.shoppe.enums.TransactionStatus;
 import jakarta.persistence.*;

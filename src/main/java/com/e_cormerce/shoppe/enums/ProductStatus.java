@@ -1,4 +1,8 @@
 package com.e_cormerce.shoppe.enums;
 
 public enum ProductStatus {
+    BANNED,
+    PENDING,
+    APPROVED,
+    HIDDEN
 }

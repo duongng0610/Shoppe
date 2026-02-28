@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.user;
 
 import jakarta.persistence.*;
 import lombok.*;

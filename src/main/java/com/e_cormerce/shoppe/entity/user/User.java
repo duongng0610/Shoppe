@@ -1,11 +1,16 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.user;
 
+import com.e_cormerce.shoppe.entity.Role;
+import com.e_cormerce.shoppe.entity.Transaction;
+import com.e_cormerce.shoppe.entity.order.Order;
+import com.e_cormerce.shoppe.entity.product.ShoppingCartItem;
 import com.e_cormerce.shoppe.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Entity
@@ -23,14 +28,17 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String username;
-    String avatar;
-    Date birth;
-    Date created_at;
-    UserStatus status;
 
-    @Column(columnDefinition = "boolean default false")
-    boolean deleted;
+    @Column(nullable = false, unique = true)
+    String username;
+
+    String avatar;
+    LocalDate birth;
+    LocalDateTime created_at;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    UserStatus user_status;
 
     // owner side
     @OneToOne(fetch = FetchType.LAZY)
@@ -44,21 +52,21 @@ public class User {
             name = "user_address",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "address_id"),
-            indexes = {@Index(name = "idx_user", columnList = "user_id"), @Index(name = "idx_address", columnList = "address_id")}
+            indexes = {@Index(name = "idx_user", columnList = "user_id")}
     )
     Set<Address> addresses;
 
     // owner side
     @ManyToOne
-    @JoinColumn(name = "role_id")
+    @JoinColumn(name = "role_id", nullable = false)
     Role role;
 
     // inverse side
-    @OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     Set<Order> orders;
 
     // inverse side
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
     Set<ShoppingCartItem> shoppingCartItems;
 
     // inverse side

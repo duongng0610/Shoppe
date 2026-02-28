@@ -1,10 +1,11 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.product;
 
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Entity
@@ -19,7 +20,11 @@ public class Variant {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    double price;
+
+    @Column(precision = 15, scale = 2, nullable = false)
+    BigDecimal price;
+
+    @Column(nullable = false)
     int quantity;
     double discount_percentage;
 
@@ -28,7 +33,7 @@ public class Variant {
 
 
     @ManyToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     Product product;
 
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL)

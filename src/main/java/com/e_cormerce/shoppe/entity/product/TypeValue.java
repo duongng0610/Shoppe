@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.product;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,6 +16,8 @@ public class TypeValue {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+
+    @Column(nullable = false)
     String val;
 
     @Column(columnDefinition = "boolean default false")
@@ -24,7 +26,7 @@ public class TypeValue {
     // owner side
     @ManyToOne
     @JoinColumn(name = "type_id")
-    ProductType type;
+    Type type;
 
 
 }

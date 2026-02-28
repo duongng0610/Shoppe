@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.product;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,7 +20,9 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
-    String val;
+
+    @Column(nullable = false)
+    String name;
 
     @Column(columnDefinition = "boolean default false")
     boolean deleted;

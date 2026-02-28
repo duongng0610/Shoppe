@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.user;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -23,7 +23,11 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+
+    @Column(unique = true, nullable = false)
     String email;
+
+    @Column(nullable = false)
     String password;
 
     @Column(name = "created_at", nullable = false)

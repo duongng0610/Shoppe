@@ -1,10 +1,10 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.token;
 
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -18,6 +18,10 @@ public class RefreshToken {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
+
+    @Column(nullable = false, unique = true)
     String val;
-    Date date;
+
+    @Column(nullable = false)
+    LocalDate date;
 }
