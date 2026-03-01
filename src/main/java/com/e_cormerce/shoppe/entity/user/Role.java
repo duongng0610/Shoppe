@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity;
 
+import com.e_cormerce.shoppe.entity.user.Permission;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

@@ -41,7 +41,7 @@ public class Product {
 
     @Column(precision = 15, scale = 2, nullable = false)
     BigDecimal origin_price;
-
+    
     float discount_percentage;
 
     @Column(nullable = false)
