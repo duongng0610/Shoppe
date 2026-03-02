@@ -9,12 +9,11 @@ import lombok.experimental.FieldDefaults;
         indexes = {@Index(name = "idx_product", columnList = "product_id")}
 )
 @NoArgsConstructor
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class ProductExtraImage {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

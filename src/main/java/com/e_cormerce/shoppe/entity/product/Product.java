@@ -41,7 +41,7 @@ public class Product {
 
     @Column(precision = 15, scale = 2, nullable = false)
     BigDecimal origin_price;
-    
+
     float discount_percentage;
 
     @Column(nullable = false)
@@ -49,7 +49,7 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')", nullable = false)
-    ProductStatus product_status;
+    ProductStatus status;
 
     LocalDateTime created_at;
 

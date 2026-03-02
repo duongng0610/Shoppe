@@ -8,7 +8,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.experimental.NonFinal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -21,15 +20,21 @@ import java.io.IOException;
 @Component
 public class AuthFilter extends OncePerRequestFilter {
 
-    @Autowired
-    JwtService jwtService;
 
-    @Autowired
-    InvalidTokenRepository invalidTokenRepository;
+    private final JwtService jwtService;
+
+    private final InvalidTokenRepository invalidTokenRepository;
+
 
     @NonFinal
     @Value("${jwt.secret_access_token}")
     String SECRET_ACCESS_TOKEN;
+
+
+    public AuthFilter(JwtService jwtService, InvalidTokenRepository invalidTokenRepository) {
+        this.jwtService = jwtService;
+        this.invalidTokenRepository = invalidTokenRepository;
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

@@ -8,12 +8,10 @@ import lombok.experimental.FieldDefaults;
 @Table(name = "product_review_images",
         indexes = {@Index(name = "idx_product", columnList = "product_id")})
 @NoArgsConstructor
-@RequiredArgsConstructor
-@Getter
-@Setter
-@Builder
+@AllArgsConstructor
+@Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
+@Builder
 public class ProductReviewImage {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
