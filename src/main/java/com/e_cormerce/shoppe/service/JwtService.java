@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.time.Instant;
@@ -20,15 +21,16 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Component
 public class JwtService {
     @Value("${jwt.secret_access_token}")
-    String SECRET_ACCESS_TOKEN;
+    private String SECRET_ACCESS_TOKEN;
 
     @Value("${jwt.exp_access_token}")
     private long ACCESS_TOKEN_EXPIRATION_TIME;
 
     @Value("${jwt.secret_refresh_token}")
-    String SECRET_REFRESH_TOKEN;
+    private String SECRET_REFRESH_TOKEN;
 
     @Value("${jwt.exp_refresh_token}")
     private long REFRESH_TOKEN_EXPIRATION_TIME;

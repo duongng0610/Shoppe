@@ -37,11 +37,11 @@ public class OrderRefundRequest {
     LocalDateTime resolved_at;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM(CLIENT_REFUND, SHIPPER_REFUND)", nullable = false)
+    @Column(columnDefinition = "ENUM('CLIENT_REFUND', 'SHIPPER_REFUND')", nullable = false)
     OrderRefundType refund_type;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('PENDING', 'REJECTED', 'APPROVED')" ,nullable = false)
+    @Column(columnDefinition = "ENUM('PENDING', 'REJECTED', 'APPROVED')", nullable = false)
     OrderRefundStatus status;
 
     @ManyToOne
@@ -49,7 +49,7 @@ public class OrderRefundRequest {
     User requester;
 
     @ManyToOne
-    @JoinColumn(name = "resolver_id")
+    @JoinColumn(name = "seller_id")
     User seller;
 
     @ManyToOne

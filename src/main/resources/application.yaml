@@ -1,18 +1,20 @@
+server:
+  port: 3000
 spring:
-  application:
-    name: shoppe
   datasource:
-    url: jdbc:mysql://localhost:3306/ten_database
+    url: jdbc:mysql://localhost:3306/ecommerce
     username: root
-    password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-
-    jpa:
-      hibernate:
-        ddl-auto: update
-      show-sql: true
+    password: 23082006
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
 jwt:
   secret_access_token: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
   exp_access_token: 3600000
   secret_refresh_token: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
   exp_refresh_token: 86400000
+cloudinary:
+  cloud_name: dhwxpgxzl
+  api_key: 683161372337227
+  secret_key: eKL1dtmtWHG6NwYiw52-Ubnt4-U

@@ -1,9 +1,9 @@
 package com.e_cormerce.shoppe.entity.user;
 
 import com.e_cormerce.shoppe.entity.Role;
-import com.e_cormerce.shoppe.entity.transaction.Transaction;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.ShoppingCartItem;
+import com.e_cormerce.shoppe.entity.transaction.Transaction;
 import com.e_cormerce.shoppe.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -16,14 +16,13 @@ import java.util.Set;
 @Entity
 @Table(name = "users",
         indexes = {@Index(name = "idx_username", columnList = "username"),
-                @Index(name = "idx_role", columnList = "role")})
+                @Index(name = "idx_role", columnList = "role_id")})
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
