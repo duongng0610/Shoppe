@@ -10,11 +10,17 @@ spring:
       ddl-auto: update
     show-sql: true
 jwt:
-  secret_access_token: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
-  exp_access_token: 3600000
-  secret_refresh_token: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
-  exp_refresh_token: 86400000
+  access-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
+  access-token-expiration-time: 3600000
+  refresh-tokens-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
+  refresh-token-expiration-time: 86400000
 cloudinary:
-  cloud_name: dhwxpgxzl
-  api_key: 683161372337227
-  secret_key: eKL1dtmtWHG6NwYiw52-Ubnt4-U
+  cloud-name: dhwxpgxzl
+  api-key: 683161372337227
+  secret-key: eKL1dtmtWHG6NwYiw52-Ubnt4-U
+app:
+  security:
+    endpoints:
+      public-urls:
+        - /auth/login
+        - /auth/register

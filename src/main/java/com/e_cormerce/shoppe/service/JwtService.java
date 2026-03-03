@@ -1,39 +1,34 @@
 package com.e_cormerce.shoppe.service;
 
 import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@Component
+
+@Service
+@EnableConfigurationProperties({JwtProperties.class})
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JwtService {
-    @Value("${jwt.secret_access_token}")
-    private String SECRET_ACCESS_TOKEN;
-
-    @Value("${jwt.exp_access_token}")
-    private long ACCESS_TOKEN_EXPIRATION_TIME;
-
-    @Value("${jwt.secret_refresh_token}")
-    private String SECRET_REFRESH_TOKEN;
-
-    @Value("${jwt.exp_refresh_token}")
-    private long REFRESH_TOKEN_EXPIRATION_TIME;
+    JwtProperties jwtProperties;
 
     /**
      * Tạo access token.
@@ -42,7 +37,7 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("authorities", buildScope(user));
         claims.put("refreshTokenId", refreshTokenId);
-        return createToken(claims, user, ACCESS_TOKEN_EXPIRATION_TIME, SECRET_ACCESS_TOKEN);
+        return createToken(claims, user, jwtProperties.getAccessTokenExpirationTime(), jwtProperties.getAccessTokenSecret());
     }
 
     /**
@@ -50,7 +45,7 @@ public class JwtService {
      */
     public String generateRefreshToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, user, REFRESH_TOKEN_EXPIRATION_TIME, SECRET_REFRESH_TOKEN);
+        return createToken(claims, user, jwtProperties.getRefreshTokenExpirationTime(), jwtProperties.getRefreshTokenSecret());
     }
 
     private String createToken(Map<String, Object> claims, User user, long expiration, String secretKey) {
@@ -107,7 +102,7 @@ public class JwtService {
      * @return
      */
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(SECRET_ACCESS_TOKEN)).build().parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(jwtProperties.getAccessTokenSecret())).build().parseClaimsJws(token).getBody();
         List<GrantedAuthority> authorities = new ArrayList<>();
         claims.get("authorities", List.class).forEach(e -> {
             authorities.add(new SimpleGrantedAuthority(e.toString()));

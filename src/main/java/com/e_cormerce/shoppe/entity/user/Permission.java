@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "permissions")
+@Table(name = "permissions", indexes = {@Index(name = "idx_val", columnList = "val")})
 public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

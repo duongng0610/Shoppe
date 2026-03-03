@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.filter;
 
+import com.e_cormerce.shoppe.properties.JwtProperties;
 import com.e_cormerce.shoppe.repository.InvalidTokenRepository;
 import com.e_cormerce.shoppe.service.JwtService;
 import jakarta.servlet.FilterChain;
@@ -7,8 +8,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.experimental.NonFinal;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,23 +21,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+@EnableConfigurationProperties({JwtProperties.class})
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthFilter extends OncePerRequestFilter {
 
 
-    private final JwtService jwtService;
-
-    private final InvalidTokenRepository invalidTokenRepository;
-
-
-    @NonFinal
-    @Value("${jwt.secret_access_token}")
-    String SECRET_ACCESS_TOKEN;
-
-
-    public AuthFilter(JwtService jwtService, InvalidTokenRepository invalidTokenRepository) {
-        this.jwtService = jwtService;
-        this.invalidTokenRepository = invalidTokenRepository;
-    }
+    JwtService jwtService;
+    InvalidTokenRepository invalidTokenRepository;
+    JwtProperties jwtProperties;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -44,7 +39,7 @@ public class AuthFilter extends OncePerRequestFilter {
                 if (invalidTokenRepository.existsByVal(accessToken)) {
                     throw new BadCredentialsException("Token is invalid!");//ném lỗi này SpringSecurity tự động nhảy vào phần xử lí AuthenEntryPoint
                 }
-                jwtService.decode(accessToken, SECRET_ACCESS_TOKEN);
+                jwtService.decode(accessToken, jwtProperties.getAccessTokenSecret());
                 Authentication authentication = jwtService.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
