@@ -1,6 +1,5 @@
-package com.e_cormerce.shoppe.entity;
+package com.e_cormerce.shoppe.entity.user;
 
-import com.e_cormerce.shoppe.entity.user.Permission;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,7 +25,7 @@ public class Role {
     boolean deleted;
 
     // owner side
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.PERSIST)
     @JoinTable(
             name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),
