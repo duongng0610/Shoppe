@@ -19,8 +19,9 @@ public class SecurityConfig {
     private final AuthFilter authFilter;
     private final String[] PUBLIC_URLS = {
             "/",
-            "/login",
-            "/register",
+            "/auth/log-in",
+            "/auth/register",
+            "/auth/log-out",
             "/upload-image"
     };
 

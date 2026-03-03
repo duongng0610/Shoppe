@@ -37,7 +37,7 @@ public class User {
     LocalDateTime created_at;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    //@Column(nullable = false)
     UserStatus user_status;
 
     // owner side

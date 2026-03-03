@@ -39,15 +39,15 @@ public class AppConfig {
                 roleRepository.save(clientRole);
             }
             if (!roleRepository.existsByVal(RoleEnum.SELLER.getValue())) {
-                Role sellerRole = Role.builder().val(RoleEnum.SELLER.getValue()).permissions(createPermissionsOfClient()).build();
+                Role sellerRole = Role.builder().val(RoleEnum.SELLER.getValue()).permissions(createPermissionsOfSeller()).build();
                 roleRepository.save(sellerRole);
             }
             if (!roleRepository.existsByVal(RoleEnum.ADMIN.getValue())) {
-                Role adminRole = Role.builder().val(RoleEnum.ADMIN.getValue()).permissions(createPermissionsOfClient()).build();
+                Role adminRole = Role.builder().val(RoleEnum.ADMIN.getValue()).permissions(createPermissionsOfAdmin()).build();
                 roleRepository.save(adminRole);
             }
             if (!roleRepository.existsByVal(RoleEnum.SHIPPER.getValue())) {
-                Role shipperRole = Role.builder().val(RoleEnum.SHIPPER.getValue()).permissions(createPermissionsOfClient()).build();
+                Role shipperRole = Role.builder().val(RoleEnum.SHIPPER.getValue()).permissions(createPermissionsOfShipper()).build();
                 roleRepository.save(shipperRole);
             }
 
@@ -125,5 +125,4 @@ public class AppConfig {
 
     }
 
-    ;
 }

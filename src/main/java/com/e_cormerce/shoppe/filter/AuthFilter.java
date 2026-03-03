@@ -50,7 +50,7 @@ public class AuthFilter extends OncePerRequestFilter {
             }
             filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            throw new BadCredentialsException(ex.getMessage(), ex);//ném lỗi này SpringSecurity tự động nhảy vào phần xử lí AuthenEntryPoint
+            throw new BadCredentialsException(ex.getMessage(), ex); //ném lỗi này SpringSecurity tự động nhảy vào phần xử lí AuthenEntryPoint
         }
     }
 

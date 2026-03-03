@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.dto.request;
+package com.e_cormerce.shoppe.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,7 +9,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
-public class LogInRequest {
+public class LogInResponse {
     String email;
-    String password;
+    String hashedPassword;
+    String accessToken;
 }

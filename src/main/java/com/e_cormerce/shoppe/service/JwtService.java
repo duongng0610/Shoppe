@@ -1,13 +1,16 @@
 package com.e_cormerce.shoppe.service;
 
 import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.util.Constants;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,25 +18,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Component
 public class JwtService {
-    @Value("${jwt.secret_access_token}")
-    private String SECRET_ACCESS_TOKEN;
 
-    @Value("${jwt.exp_access_token}")
-    private long ACCESS_TOKEN_EXPIRATION_TIME;
-
-    @Value("${jwt.secret_refresh_token}")
-    private String SECRET_REFRESH_TOKEN;
-
-    @Value("${jwt.exp_refresh_token}")
-    private long REFRESH_TOKEN_EXPIRATION_TIME;
+    Constants constants;
 
     /**
      * Tạo access token.
@@ -42,7 +39,7 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("authorities", buildScope(user));
         claims.put("refreshTokenId", refreshTokenId);
-        return createToken(claims, user, ACCESS_TOKEN_EXPIRATION_TIME, SECRET_ACCESS_TOKEN);
+        return createToken(claims, user, constants.ACCESS_TOKEN_EXPIRATION_TIME, constants.SECRET_ACCESS_TOKEN);
     }
 
     /**
@@ -50,7 +47,7 @@ public class JwtService {
      */
     public String generateRefreshToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, user, REFRESH_TOKEN_EXPIRATION_TIME, SECRET_REFRESH_TOKEN);
+        return createToken(claims, user, constants.REFRESH_TOKEN_EXPIRATION_TIME, constants.SECRET_REFRESH_TOKEN);
     }
 
     private String createToken(Map<String, Object> claims, User user, long expiration, String secretKey) {
@@ -58,12 +55,11 @@ public class JwtService {
                 .setHeader(Map.of(
                         "typ", "JWT",
                         "alg", "HS256"))
-                .setClaims(claims)
+                .addClaims(claims)
                 .setSubject(user.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(Instant.now().plus(expiration, ChronoUnit.SECONDS).toEpochMilli()))
                 .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
-                .setId(UUID.randomUUID().toString())
                 .setIssuer("shoppe.com")
                 .compact();
     }
@@ -83,7 +79,7 @@ public class JwtService {
     /**
      * Chuyển secret-key -> bytes.
      */
-    private Key getKey(String secretKey) {
+    public Key getKey(String secretKey) {
         byte[] keyBytes = Decoders.BASE64URL.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);//dùng thuộc toán SHA nên phải đưa bề bằng hmacSha
     }
@@ -101,13 +97,26 @@ public class JwtService {
     }
 
     /**
+     * Lấy thông tin token
+     */
+
+    public Claims extractClaims(String token, String secretKey) {
+
+        return Jwts.parserBuilder()
+                .setSigningKey(getKey(secretKey))
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    /**
      * Lấy authentication(principle:token.subject(userId), ,authorities.
      *
      * @param token
      * @return
      */
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(SECRET_ACCESS_TOKEN)).build().parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(constants.SECRET_ACCESS_TOKEN)).build().parseClaimsJws(token).getBody();
         List<GrantedAuthority> authorities = new ArrayList<>();
         claims.get("authorities", List.class).forEach(e -> {
             authorities.add(new SimpleGrantedAuthority(e.toString()));

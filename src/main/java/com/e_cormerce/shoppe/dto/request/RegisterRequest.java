@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.dto.request;
 
+import com.e_cormerce.shoppe.enums.RoleEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -9,7 +10,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
-public class LogInRequest {
+public class RegisterRequest {
     String email;
     String password;
+    String username;
+    String role;
 }
