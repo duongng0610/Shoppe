@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     UNCATEGORIZED("Uncategorized", 999, HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHENTICATED("Unauthenticated", 1001, HttpStatus.UNAUTHORIZED),
+    INVALID_FILE_FORMAT("Invalid File Format", 1003, HttpStatus.BAD_REQUEST),
     UNAUTHORIZED("You don't have permission", 1002, HttpStatus.FORBIDDEN);
 
     String message;

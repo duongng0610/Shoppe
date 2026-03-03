@@ -4,7 +4,6 @@ package com.e_cormerce.shoppe.configuration;
 import com.e_cormerce.shoppe.exception.filter.AccessDeninedException;
 import com.e_cormerce.shoppe.exception.filter.JwtAuthEntryPoint;
 import com.e_cormerce.shoppe.filter.AuthFilter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,9 +15,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    AuthFilter authFilter;
 
+    private final AuthFilter authFilter;
+    private final String[] PUBLIC_URLS = {
+            "/",
+            "/login",
+            "/register",
+            "/upload-image"
+    };
+
+
+    public SecurityConfig(AuthFilter authFilter) {
+        this.authFilter = authFilter;
+    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -27,7 +36,9 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AccessDeninedException accessDeninedException, JwtAuthEntryPoint jwtAuthEntryPoint) throws Exception {
-        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().authenticated())
+        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .anyRequest().authenticated())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(e ->

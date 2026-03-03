@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Entity
 public class OrderTracking {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -39,7 +40,7 @@ public class OrderTracking {
     User shipper;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
-    Order order;
-    
+    @JoinColumn(name = "order_tracking_id", nullable = false)
+    OrderTracking order_tracking;
+
 }

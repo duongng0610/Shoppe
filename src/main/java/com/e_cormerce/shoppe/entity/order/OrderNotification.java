@@ -36,6 +36,7 @@ public class OrderNotification {
     @JoinColumn(name = "from_id", nullable = false)
     User from;
 
+    @ManyToOne
     @JoinColumn(name = "to_id", nullable = false)
     User to;
 }

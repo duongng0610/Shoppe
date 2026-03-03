@@ -22,7 +22,7 @@ public class Category {
     String id;
 
     @Column(nullable = false)
-    String name;
+    String val;
 
     @Column(columnDefinition = "boolean default false")
     boolean deleted;
