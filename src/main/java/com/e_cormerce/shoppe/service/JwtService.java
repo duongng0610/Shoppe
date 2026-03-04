@@ -1,7 +1,7 @@
 package com.e_cormerce.shoppe.service;
 
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.util.Constants;
+import com.e_cormerce.shoppe.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -10,27 +10,25 @@ import io.jsonwebtoken.security.Keys;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 @RequiredArgsConstructor
+@EnableConfigurationProperties({JwtProperties.class})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Component
 public class JwtService {
 
-    Constants constants;
+    JwtProperties jwtProperties;
 
     /**
      * Tạo access token.
@@ -39,7 +37,7 @@ public class JwtService {
         Map<String, Object> claims = new HashMap<>();
         claims.put("authorities", buildScope(user));
         claims.put("refreshTokenId", refreshTokenId);
-        return createToken(claims, user, constants.ACCESS_TOKEN_EXPIRATION_TIME, constants.SECRET_ACCESS_TOKEN);
+        return createToken(claims, user, jwtProperties.getAccessTokenExpirationTime(),jwtProperties.getAccessTokenSecret());
     }
 
     /**
@@ -47,7 +45,7 @@ public class JwtService {
      */
     public String generateRefreshToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, user, constants.REFRESH_TOKEN_EXPIRATION_TIME, constants.SECRET_REFRESH_TOKEN);
+        return createToken(claims, user, jwtProperties.getRefreshTokenExpirationTime(), jwtProperties.getRefreshTokenSecret());
     }
 
     private String createToken(Map<String, Object> claims, User user, long expiration, String secretKey) {
@@ -116,7 +114,7 @@ public class JwtService {
      * @return
      */
     public Authentication getAuthentication(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(constants.SECRET_ACCESS_TOKEN)).build().parseClaimsJws(token).getBody();
+        Claims claims = Jwts.parserBuilder().setSigningKey(getKey(jwtProperties.getAccessTokenSecret())).build().parseClaimsJws(token).getBody();
         List<GrantedAuthority> authorities = new ArrayList<>();
         claims.get("authorities", List.class).forEach(e -> {
             authorities.add(new SimpleGrantedAuthority(e.toString()));

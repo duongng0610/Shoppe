@@ -4,6 +4,11 @@ package com.e_cormerce.shoppe.configuration;
 import com.e_cormerce.shoppe.exception.filter.AccessDeninedException;
 import com.e_cormerce.shoppe.exception.filter.JwtAuthEntryPoint;
 import com.e_cormerce.shoppe.filter.AuthFilter;
+import com.e_cormerce.shoppe.properties.EndpointProperties;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -13,22 +18,16 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableConfigurationProperties({EndpointProperties.class})
+@RequiredArgsConstructor
+@FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class SecurityConfig {
 
 
-    private final AuthFilter authFilter;
-    private final String[] PUBLIC_URLS = {
-            "/",
-            "/auth/log-in",
-            "/auth/register",
-            "/auth/log-out",
-            "/upload-image"
-    };
+    AuthFilter authFilter;
 
+    EndpointProperties endpointProperties;
 
-    public SecurityConfig(AuthFilter authFilter) {
-        this.authFilter = authFilter;
-    }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
@@ -38,7 +37,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, AccessDeninedException accessDeninedException, JwtAuthEntryPoint jwtAuthEntryPoint) throws Exception {
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers(endpointProperties.getPublicUrls().toArray(new String[0])).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable)

@@ -12,13 +12,14 @@ import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.properties.JwtProperties;
 import com.e_cormerce.shoppe.repository.*;
-import com.e_cormerce.shoppe.util.Constants;
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +29,7 @@ import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
+@EnableConfigurationProperties({JwtProperties.class})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 
@@ -42,7 +44,7 @@ public class AuthService {
     JwtService jwtService;
     TokenService tokenService;
 
-    Constants constants;
+    JwtProperties jwtProperties;
 
 
     public LogInResponse logIn(LogInRequest request) {
@@ -108,7 +110,7 @@ public class AuthService {
     }
 
     public LogOutResponse logOut(LogOutRequest request) {
-        Claims accessTokenClaims = jwtService.extractClaims(request.getAccessToken(), constants.SECRET_ACCESS_TOKEN);
+        Claims accessTokenClaims = jwtService.extractClaims(request.getAccessToken(), jwtProperties.getAccessTokenSecret());
 
         String refreshTokenId = (String) accessTokenClaims.get("refreshTokenId");
 
