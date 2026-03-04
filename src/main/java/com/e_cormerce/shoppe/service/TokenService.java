@@ -3,6 +3,7 @@ package com.e_cormerce.shoppe.service;
 import com.e_cormerce.shoppe.entity.token.RefreshToken;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.repository.RefreshTokenRepository;
+import com.e_cormerce.shoppe.util.HashUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -24,7 +25,7 @@ public class TokenService {
 
     public String generateAccessToken(User user) {
         RefreshToken refreshToken = RefreshToken.builder()
-                .val(jwtService.generateRefreshToken(user))
+                .val(HashUtil.sha256(jwtService.generateRefreshToken(user)))
                 .date(LocalDate.now())
                 .build();
 

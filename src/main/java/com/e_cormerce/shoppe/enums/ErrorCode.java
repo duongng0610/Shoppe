@@ -20,7 +20,8 @@ public enum ErrorCode {
     EXISTED_ACCOUNT("This account is existed", 1005, HttpStatus.BAD_REQUEST),
     INVALID_ROLE("Your role is invalid", 1006, HttpStatus.BAD_REQUEST),
     INVALID_USERNAME("Your username is invalid", 1007, HttpStatus.BAD_REQUEST),
-    INVALID_REFRESH_TOKEN("Your refresh token is invalid", 1008, HttpStatus.BAD_REQUEST)
+    INVALID_REFRESH_TOKEN("Your refresh token is invalid", 1008, HttpStatus.BAD_REQUEST),
+    NOT_EXISTED_USER("User is not existed", 1009, HttpStatus.BAD_REQUEST)
     ;
 
     String message;

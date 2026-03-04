@@ -13,6 +13,6 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, String> {
     @Query(value = "SELECT * FROM accounts WHERE email = :email",
             nativeQuery = true)
-    Account findByEmail(@Param("email") String email);
+    Optional <Account> findByEmail(@Param("email") String email);
     boolean existsByEmail(String email);
 }

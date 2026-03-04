@@ -4,24 +4,29 @@ import com.e_cormerce.shoppe.dto.request.LogInRequest;
 import com.e_cormerce.shoppe.dto.request.LogOutRequest;
 import com.e_cormerce.shoppe.dto.request.RegisterRequest;
 import com.e_cormerce.shoppe.dto.response.LogInResponse;
-import com.e_cormerce.shoppe.dto.response.LogOutResponse;
 import com.e_cormerce.shoppe.dto.response.RegisterResponse;
+import com.e_cormerce.shoppe.dto.response.VerifyResponse;
 import com.e_cormerce.shoppe.entity.token.InvalidToken;
 import com.e_cormerce.shoppe.entity.token.RefreshToken;
 import com.e_cormerce.shoppe.entity.user.Account;
+import com.e_cormerce.shoppe.entity.user.Role;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.properties.JwtProperties;
 import com.e_cormerce.shoppe.repository.*;
+import com.e_cormerce.shoppe.util.HashUtil;
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -48,11 +53,8 @@ public class AuthService {
 
 
     public LogInResponse logIn(LogInRequest request) {
-        var account = accountRepository.findByEmail(request.getEmail());
-
-        if(account == null) {
-            throw new AppException(ErrorCode.INVALID_ACCOUNT);
-        }
+        Account account = accountRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_ACCOUNT));
 
         boolean authenticated = bCryptPasswordEncoder.matches(request.getPassword(), account.getPassword());
 
@@ -83,11 +85,8 @@ public class AuthService {
                 .password(bCryptPasswordEncoder.encode(request.getPassword()))
                 .build();
 
-        var role = roleRepository.findByVal(request.getRole());
-
-        if (role == null) {
-            throw new AppException(ErrorCode.INVALID_ROLE);
-        }
+        Role role = roleRepository.findByVal(request.getRole())
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
 
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new AppException(ErrorCode.INVALID_USERNAME);
@@ -101,6 +100,7 @@ public class AuthService {
                 .build();
 
         userRepository.save(user);
+
         return RegisterResponse.builder()
                 .email(request.getEmail())
                 .username(request.getUsername())
@@ -109,23 +109,47 @@ public class AuthService {
                 .build();
     }
 
-    public LogOutResponse logOut(LogOutRequest request) {
+    @Transactional(timeout = 5)
+    public void logOut(LogOutRequest request) {
+
         Claims accessTokenClaims = jwtService.extractClaims(request.getAccessToken(), jwtProperties.getAccessTokenSecret());
 
         String refreshTokenId = (String) accessTokenClaims.get("refreshTokenId");
 
-        RefreshToken refreshToken = refreshTokenRepository.findById(refreshTokenId)
-                .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
-
         InvalidToken invalidToken = InvalidToken.builder()
-                .val(refreshToken.getVal())
+                .val(HashUtil.sha256(request.getAccessToken()))
                 .invalid_date(LocalDate.now())
                 .build();
 
         invalidTokenRepository.save(invalidToken);
 
-        return LogOutResponse.builder()
-                .message("logout successfully")
+//        try {
+//            Thread.sleep(6000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+
+        RefreshToken refreshToken = refreshTokenRepository.findById(refreshTokenId)
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+        refreshToken.setRevoked(true);
+        refreshTokenRepository.save(refreshToken);
+
+
+    }
+
+    public VerifyResponse verify() {
+        Authentication authentication = SecurityContextHolder
+                                    .getContext()
+                                    .getAuthentication();
+
+        String userId = (String) authentication.getPrincipal();
+
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
+
+        return VerifyResponse.builder()
+                .username(user.getUsername())
                 .build();
     }
 

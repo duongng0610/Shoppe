@@ -3,6 +3,8 @@ package com.e_cormerce.shoppe.filter;
 import com.e_cormerce.shoppe.properties.JwtProperties;
 import com.e_cormerce.shoppe.repository.InvalidTokenRepository;
 import com.e_cormerce.shoppe.service.JwtService;
+import com.e_cormerce.shoppe.util.HashUtil;
+import com.e_cormerce.shoppe.util.TokenCookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -34,9 +36,9 @@ public class AuthFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            String accessToken = extractTokenFromCookie(request);
+            String accessToken = TokenCookieUtil.getAccessToken(request);
             if (accessToken != null) {//nếu ko tìm thấy accessToken thì nhảy xuống luôn doFilter
-                if (invalidTokenRepository.existsByVal(accessToken)) {
+                if (invalidTokenRepository.existsByVal(HashUtil.sha256(accessToken))) {
                     throw new BadCredentialsException("Token is invalid!");//ném lỗi này SpringSecurity tự động nhảy vào phần xử lí AuthenEntryPoint
                 }
                 jwtService.decode(accessToken, jwtProperties.getAccessTokenSecret());
@@ -49,15 +51,5 @@ public class AuthFilter extends OncePerRequestFilter {
         }
     }
 
-    private String extractTokenFromCookie(HttpServletRequest request) {
-        if (request.getCookies() == null) {
-            return null;
-        }
-        for (Cookie cookie : request.getCookies()) {
-            if ("access_token".equals(cookie.getName())) {
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
+
 }

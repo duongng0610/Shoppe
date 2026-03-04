@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse> UncategorizedException(Exception e) {
         return ResponseEntity.
                 status(ErrorCode.UNCATEGORIZED.getHttpStatus()).
-                body(ApiResponse.builder().success(false).message(ErrorCode.UNAUTHORIZED.getMessage()).build());
+                body(ApiResponse.builder().success(false).message(ErrorCode.UNCATEGORIZED.getMessage()).build());
     }
 
     /**

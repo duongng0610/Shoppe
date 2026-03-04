@@ -24,4 +24,7 @@ public class RefreshToken {
 
     @Column(nullable = false)
     LocalDate date;
+
+    @Column(columnDefinition = "boolean default false")
+    boolean isRevoked;
 }
