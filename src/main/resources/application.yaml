@@ -12,7 +12,7 @@ spring:
 jwt:
   access-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
   access-token-expiration-time: 3600000
-  refresh-tokens-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
+  refresh-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
   refresh-token-expiration-time: 86400000
 cloudinary:
   cloud-name: dhwxpgxzl
@@ -24,3 +24,6 @@ app:
       public-urls:
         - /auth/login
         - /auth/register
+cookie:
+  access-token:
+   expiration-time: 7200
