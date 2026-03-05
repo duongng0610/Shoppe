@@ -1,10 +1,10 @@
 server:
-  port: 3600
+  port: 3000
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3307/shoppe
+    url: jdbc:mysql://localhost:3306/ecommerce
     username: root
-    password: root
+    password: 23082006
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,7 +12,7 @@ spring:
 jwt:
   access-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
   access-token-expiration-time: 3600000
-  refresh-tokens-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
+  refresh-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
   refresh-token-expiration-time: 86400000
 cloudinary:
   cloud-name: dhwxpgxzl
@@ -24,3 +24,24 @@ app:
       public-urls:
         - /auth/login
         - /auth/register
+    cors:
+      allowed-origins:
+        - http://localhost:5173
+      allowed-headers:
+        - Authorization
+        - Content-Type
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      credentials: true
+  cookie:
+    access-token:
+      expiration-time: 7200
+      same-site: none
+      secure: true
+      http-only: true
+      path: /
+
+

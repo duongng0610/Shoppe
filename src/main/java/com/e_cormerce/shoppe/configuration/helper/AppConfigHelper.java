@@ -134,35 +134,34 @@ public class AppConfigHelper {
     }
 
     public void createAdmin(String email, String password, String username) {
-            if(accountRepository.existsByEmail("admin")) {
-                log.error("Email for admin is existed");
-                throw new AppException(ErrorCode.EXISTED_ACCOUNT);
+            if(!accountRepository.existsByEmail("admin")) {
+
+
+                Account adminAccount = Account.builder()
+                        .email(email)
+                        .password(passwordEncoder.encode(password))
+                        .created_at(new Date())
+                        .build();
+
+                Role adminRole = roleRepository.findByVal(RoleEnum.ADMIN.toString())
+                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
+
+                if (userRepository.existsByUsername(username)) {
+                    log.error("Username for admin is invalid");
+                    throw new AppException(ErrorCode.INVALID_USERNAME);
+                }
+
+                User admin = User.builder()
+                        .account(adminAccount)
+                        .role(adminRole)
+                        .username(username)
+                        .build();
+
+                userRepository.save(admin);
+
+                log.warn("Admin has been created with email: -" + email
+                        + "- password: -" + password
+                        + "- username: -" + username + "-");
             }
-
-            Account adminAccount = Account.builder()
-                    .email(email)
-                    .password(passwordEncoder.encode(password))
-                    .created_at(new Date())
-                    .build();
-
-            Role adminRole = roleRepository.findByVal(RoleEnum.ADMIN.toString())
-                    .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
-
-            if (userRepository.existsByUsername(username)) {
-                log.error("Username for admin is invalid");
-                throw new AppException(ErrorCode.INVALID_USERNAME);
-            }
-
-            User admin = User.builder()
-                    .account(adminAccount)
-                    .role(adminRole)
-                    .username(username)
-                    .build();
-
-            userRepository.save(admin);
-
-            log.warn("Admin has been created with email: -" + email
-                    + "- password: -" + password
-                    + "- username: -" + username + "-" );
     }
 }
