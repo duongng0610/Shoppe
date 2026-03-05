@@ -24,6 +24,24 @@ app:
       public-urls:
         - /auth/login
         - /auth/register
-cookie:
-  access-token:
-   expiration-time: 7200
+    cors:
+      allowed-origins:
+        - http://localhost:5173
+      allowed-headers:
+        - Authorization
+        - Content-Type
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      credentials: true
+  cookie:
+    access-token:
+      expiration-time: 7200
+      same-site: none
+      secure: true
+      http-only: true
+      path: /
+
+

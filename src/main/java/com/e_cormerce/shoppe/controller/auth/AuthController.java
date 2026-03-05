@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.controller;
+package com.e_cormerce.shoppe.controller.auth;
 
 import com.e_cormerce.shoppe.dto.request.LogInRequest;
 import com.e_cormerce.shoppe.dto.request.LogOutRequest;
@@ -9,14 +9,15 @@ import com.e_cormerce.shoppe.dto.response.RegisterResponse;
 import com.e_cormerce.shoppe.dto.response.VerifyResponse;
 import com.e_cormerce.shoppe.properties.CookieTokenProperties;
 import com.e_cormerce.shoppe.service.AuthService;
-import com.e_cormerce.shoppe.util.TokenCookieUtil;
-import jakarta.servlet.http.Cookie;
+import com.e_cormerce.shoppe.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,21 +25,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class AuthController {
+
     AuthService authService;
     CookieTokenProperties cookieTokenProperties;
+    CookieUtil cookieUtil;
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<ApiResponse<LogInResponse>> logIn(@RequestBody  LogInRequest request, HttpServletResponse response) {
         var result = authService.logIn(request);
-
-        Cookie cookie = new Cookie("access_token", result.getAccessToken());
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(cookieTokenProperties.getExpirationTime());
-        response.addCookie(cookie);
+        ResponseCookie cookie =  cookieUtil.generateCookie("access_token",result.getAccessToken(),cookieTokenProperties.getExpirationTime());
 
 
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
         return ResponseEntity.ok(ApiResponse.<LogInResponse>builder()
                         .data(result)
                         .success(true)
@@ -61,12 +60,12 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Void>> logOut(HttpServletRequest request,HttpServletResponse response) {
 
         authService.logOut(LogOutRequest.builder()
-                            .accessToken(TokenCookieUtil.getAccessToken(request))
+                            .accessToken(cookieUtil.getAccessToken(request))
                             .build());
 
-        Cookie cookie = new Cookie("accessToken", "0");
+        ResponseCookie cookie = cookieUtil.generateCookie("access_token","0",0);
 
-        response.addCookie(cookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         return ResponseEntity.ok(ApiResponse.<Void>builder()
                         .success(true)
