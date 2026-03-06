@@ -20,9 +20,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -33,24 +38,40 @@ public class SellerService {
 
     ProductRepository productRepository;
     UserRepository userRepository;
-
+    CloudinaryService cloudinaryService;
+    ProductExtraImageRepository productExtraImageRepository;
     @Transactional
-    public CreateProductResponse createProduct(CreateProductRequest request) {
-
+    public CreateProductResponse createProduct(CreateProductRequest request,
+                                               MultipartFile thumbnail,
+                                               boolean hasExtraImages ,
+                                               List<MultipartFile> extraImages,
+                                               boolean hasVariant ,
+                                               List<MultipartFile> variantImages) {
+        var thumnailUrl = cloudinaryService.uploadImage(thumbnail);
         Product product = Product.builder()
                 .name(request.getName())
-                .reason(request.getReason())
+                .description(request.getReason())
                 .originPrice(request.getOriginPrice())
                 .status(ProductStatus.PENDING)
                 .created_at(LocalDateTime.now())
-                .thumbnail("123.png")
+                .thumbnail(thumnailUrl)
                 .build();
 
-        product.setSeller(getSeller());
+        if(hasExtraImages){
+            product.setProductExtraImages(
+                    this.createExtraImages(cloudinaryService.uploadImageList(extraImages), product)
+            );
+        }
 
-        if (request.getTypes() != null) {
+
+       product.setSeller(getSeller());
+
+        if (hasVariant) {
             product.setTypes(createTypes(request.getTypes(), product));
-            product.setVariants(createVariants(request.getVariantRequests(), product));
+            product.setVariants(createVariants(request.getVariantRequests(), product, cloudinaryService.uploadImageList(variantImages)));
+        }
+        else{
+            product.setVariants(createDefaultVariant(product));
         }
 
         productRepository.save(product);
@@ -71,19 +92,38 @@ public class SellerService {
                 .getContext()
                 .getAuthentication();
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
-        String username = userDetails.getUsername();
 
-        User seller = userRepository.findByUsername(username)
+        User seller = userRepository.findById(authentication.getPrincipal().toString())
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
 
         return seller;
     }
 
+    private List<Variant> createDefaultVariant(Product product){
+        List<Variant> variants = new ArrayList<>();
+        variants.add(Variant.builder()
+                .product(product)
+                .thumbnail(product.getThumbnail())
+                .quantity(product.getTotal_quantity())
+                .price(product.getOriginPrice())
+                .build());
+        return variants;
+    }
 
-    private Set<Type> createTypes(Set<TypeRequest> typeRequests, Product product) {
-        Set<Type> types = new HashSet<>();
+    private List<ProductExtraImage> createExtraImages(List<String> extraImageUrls, Product product) {
+        return extraImageUrls.stream()
+                .map(url -> ProductExtraImage
+                        .builder()
+                        .url(url)
+                        .product(product)
+                        .build())
+                .toList();
+    }
+
+
+    private List<Type> createTypes(List<TypeRequest> typeRequests, Product product) {
+        List<Type> types = new ArrayList<>();
         for (TypeRequest typeRequest: typeRequests) {
             Type type = Type.builder()
                     .val(typeRequest.getTypeName())
@@ -95,8 +135,8 @@ public class SellerService {
         return types;
     }
 
-    private Set<TypeValue> createTypeValues(TypeRequest typeRequest, Type type) {
-        Set<TypeValue> typeValues = new HashSet<>();
+    private List<TypeValue> createTypeValues(TypeRequest typeRequest, Type type) {
+        List<TypeValue> typeValues = new ArrayList<>();
 
         for (String typeValueVal : typeRequest.getTypeValues()) {
             TypeValue typeValue = TypeValue.builder()
@@ -112,19 +152,20 @@ public class SellerService {
 
 
 
-    private Set<Variant> createVariants(Set<VariantRequest> variantRequests, Product product) {
-        Set<Variant> variants = new HashSet<>();
-        for(VariantRequest variantRequest : variantRequests) {
+    private List<Variant> createVariants(List<VariantRequest> variantRequests, Product product, List<String>  variantImageUrls) {
+        List<Variant> variants = new ArrayList<>();
+        for(int i=0; i<variantRequests.size(); i++) {
 
             Variant variant = Variant.builder()
                     .product(product)
-                    .price(variantRequest.getPrice())
-                    .quantity(variantRequest.getQuantity())
+                    .price(variantRequests.get(i).getPrice())
+                    .quantity(variantRequests.get(i).getQuantity())
+                    .thumbnail(variantImageUrls.get(i))
                     .build();
 
-            Set<VariantValue> variantValues = new HashSet<>();
+            List<VariantValue> variantValues = new ArrayList<>();
 
-            for(VariantValueRequest variantValueRequest : variantRequest.getVariantValues()) {
+            for(VariantValueRequest variantValueRequest : variantRequests.get(i).getVariantValues()) {
                 Type type = findType(variantValueRequest.getTypeName(), product);
 
                 VariantValue variantValue = VariantValue.builder()
@@ -137,7 +178,6 @@ public class SellerService {
 
             variant.setVariantValues(variantValues);
             variants.add(variant);
-
         }
 
         return variants;

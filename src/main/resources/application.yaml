@@ -24,7 +24,8 @@ app:
       public-urls:
         - /auth/login
         - /auth/register
-        - /test
+        - /seller/product
+        - /upload-image
     cors:
       allowed-origins:
         - http://localhost:5173

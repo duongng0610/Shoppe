@@ -27,6 +27,6 @@ public class CreateProductResponse {
     LocalDateTime created_at;
     int total_quantity;
 
-    Set<Type> types;
-    Set<Variant> variants;
+   List<Type> types;
+    List<Variant> variants;
 }

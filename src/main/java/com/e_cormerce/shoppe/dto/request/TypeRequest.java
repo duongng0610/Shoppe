@@ -3,6 +3,7 @@ package com.e_cormerce.shoppe.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -14,5 +15,5 @@ import java.util.Set;
 
 public class TypeRequest {
     String typeName;
-    Set<String> typeValues;
+    List<String> typeValues;
 }
