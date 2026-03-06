@@ -4,16 +4,13 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
-public class TypeRequest {
-    String typeName;
-    List<String> typeValues;
+public class TypeProduct {
+    String name;
+    List<String> values;
 }

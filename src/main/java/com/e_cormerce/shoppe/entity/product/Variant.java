@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,7 +27,11 @@ public class Variant {
     BigDecimal price;
 
     @Column(nullable = false)
-    int quantity;
+    String thumbnail;
+
+    @Column(nullable = false)
+    double quantity;
+
     double discount_percentage;
 
     @Column(columnDefinition = "boolean default false")
@@ -40,6 +45,6 @@ public class Variant {
 
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL)
     @Nullable
-    Set<VariantValue> variantValues;
+    List<VariantValue> variantValues;
 
 }

@@ -21,6 +21,6 @@ public class CreateProductRequest {
     boolean hasVariant;
     int totalQuantity;
 
-    Set<TypeRequest> types;
-    Set<VariantRequest> variantRequests;
+    List<TypeRequest> types;
+    List<VariantRequest> variantRequests;
 }

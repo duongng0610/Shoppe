@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-//@Table(name = "products",
-//        indexes = {
-//                @Index(name = "idx_category", columnList = "category_id"),
-//                @Index(name = "idx_seller", columnList = "seller_id"),
-//                @Index(name = "idx_seller_status", columnList = "seller_id, status")
-//        }
-//)
+@Table(name = "products",
+        indexes = {
+                @Index(name = "idx_category", columnList = "category_id"),
+                @Index(name = "idx_seller", columnList = "seller_id"),
+                @Index(name = "idx_seller_status", columnList = "seller_id, status")
+        }
+)
 @Getter
 @Setter
 @Builder
@@ -37,7 +37,7 @@ public class Product {
     String thumbnail;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    String reason;
+    String description;
 
     @Column(precision = 15, scale = 2, nullable = false)
     BigDecimal originPrice;
@@ -62,11 +62,11 @@ public class Product {
 
     // inverse side
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Type> types;
+    List<Type> types;
 
     // inverse side
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<Variant> variants;
+    List<Variant> variants;
 
     //inverse side
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
