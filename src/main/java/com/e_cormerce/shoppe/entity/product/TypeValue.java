@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +27,7 @@ public class TypeValue {
     // owner side
     @ManyToOne
     @JoinColumn(name = "type_id")
+    @JsonIgnore
     Type type;
 
 

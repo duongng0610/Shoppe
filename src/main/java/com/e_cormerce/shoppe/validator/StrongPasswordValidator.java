@@ -6,6 +6,6 @@ import jakarta.validation.ConstraintValidatorContext;
 public class StrongPasswordValidator implements ConstraintValidator<StrongPassword, String> {
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
-        return s.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-z]).{}");
+        return s.matches("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-z]).{8,}$");
     }
 }

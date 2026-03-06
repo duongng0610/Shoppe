@@ -12,9 +12,11 @@ import com.e_cormerce.shoppe.service.AuthService;
 import com.e_cormerce.shoppe.util.CookieUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -32,7 +34,7 @@ public class AuthController {
     CookieUtil cookieUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LogInResponse>> logIn(@RequestBody  LogInRequest request, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse<LogInResponse>> logIn(@Valid @RequestBody  LogInRequest request, HttpServletResponse response) {
         var result = authService.logIn(request);
         ResponseCookie cookie =  cookieUtil.generateCookie("access_token",result.getAccessToken(),cookieTokenProperties.getExpirationTime());
 
@@ -46,7 +48,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<ApiResponse<RegisterResponse>> register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<ApiResponse<RegisterResponse>> register(@Valid @RequestBody RegisterRequest request) {
         var result = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.<RegisterResponse>builder()

@@ -1,8 +1,11 @@
 package com.e_cormerce.shoppe.entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.Set;
 
 @Entity
 @Getter
@@ -26,5 +29,10 @@ public class Type {
     // owner side
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnore
     Product product;
+
+    // inverse side
+    @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
+    Set<TypeValue> typeValues;
 }
