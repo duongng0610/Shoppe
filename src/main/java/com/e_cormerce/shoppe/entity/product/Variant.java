@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.*;
@@ -34,6 +35,7 @@ public class Variant {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnore
     Product product;
 
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL)

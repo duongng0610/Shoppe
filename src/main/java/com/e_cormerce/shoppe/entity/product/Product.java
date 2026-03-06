@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "products",
-        indexes = {
-                @Index(name = "idx_category", columnList = "category_id"),
-                @Index(name = "idx_seller", columnList = "seller_id"),
-                @Index(name = "idx_seller_status", columnList = "seller_id, status")
-        }
-)
+//@Table(name = "products",
+//        indexes = {
+//                @Index(name = "idx_category", columnList = "category_id"),
+//                @Index(name = "idx_seller", columnList = "seller_id"),
+//                @Index(name = "idx_seller_status", columnList = "seller_id, status")
+//        }
+//)
 @Getter
 @Setter
 @Builder
@@ -40,7 +40,7 @@ public class Product {
     String reason;
 
     @Column(precision = 15, scale = 2, nullable = false)
-    BigDecimal origin_price;
+    BigDecimal originPrice;
 
     float discount_percentage;
 
@@ -48,8 +48,8 @@ public class Product {
     double total_quantity;
 
     @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')", nullable = false)
-    ProductStatus status;
+    @Column(columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')")//, nullable = false)
+    ProductStatus status = ProductStatus.PENDING;
 
     LocalDateTime created_at;
 
@@ -57,7 +57,7 @@ public class Product {
 
     // owner side
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = true)
+    @JoinColumn(name = "category_id")
     Category category;
 
     // inverse side

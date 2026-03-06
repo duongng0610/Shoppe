@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,5 +11,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
 public class LogOutRequest {
+    @NotNull
     String accessToken;
 }

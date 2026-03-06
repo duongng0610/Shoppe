@@ -59,7 +59,7 @@ public class AuthService {
         boolean authenticated = bCryptPasswordEncoder.matches(request.getPassword(), account.getPassword());
 
         if(!authenticated) {
-            throw new AppException(ErrorCode.INVALID_PASSWORD);
+            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
         }
 
         var user = account.getUser();

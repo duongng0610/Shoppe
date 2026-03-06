@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +25,7 @@ public class VariantValue {
     // owner side
     @ManyToOne
     @JoinColumn(name = "variant_id", nullable = false)
+    @JsonIgnore
     Variant variant;
 
     @ManyToOne

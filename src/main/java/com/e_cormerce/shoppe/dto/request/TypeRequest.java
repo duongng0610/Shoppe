@@ -1,17 +1,18 @@
 package com.e_cormerce.shoppe.dto.request;
 
-import com.e_cormerce.shoppe.validator.StrongPassword;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
+
 @Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 
-public class LogInRequest {
-    String email;
-    String password;
+public class TypeRequest {
+    String typeName;
+    Set<String> typeValues;
 }

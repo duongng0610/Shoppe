@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.user;
 
+import com.e_cormerce.shoppe.validator.StrongPassword;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +30,7 @@ public class Account {
     String email;
 
     @Column(nullable = false)
+    @StrongPassword
     String password;
 
     @Column(name = "created_at", nullable = false)

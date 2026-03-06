@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Component
+
 public class CookieUtil {
     CookieTokenProperties cookieTokenProperties;
     public  String getAccessToken(HttpServletRequest request) {
