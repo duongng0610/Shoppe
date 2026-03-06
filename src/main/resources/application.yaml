@@ -24,6 +24,7 @@ app:
       public-urls:
         - /auth/login
         - /auth/register
+        - /test
     cors:
       allowed-origins:
         - http://localhost:5173
