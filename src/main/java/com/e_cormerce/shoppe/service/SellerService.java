@@ -1,78 +1,111 @@
 package com.e_cormerce.shoppe.service;
 
 import com.e_cormerce.shoppe.dto.request.CreateProductRequest;
-import com.e_cormerce.shoppe.dto.request.VariantRequest;
 import com.e_cormerce.shoppe.dto.request.TypeRequest;
-import com.e_cormerce.shoppe.dto.request.VariantValueRequest;
+import com.e_cormerce.shoppe.dto.request.VariantRequest;
 import com.e_cormerce.shoppe.dto.response.CreateProductResponse;
-import com.e_cormerce.shoppe.entity.product.*;
-import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.entity.product.Product;
+import com.e_cormerce.shoppe.entity.product.ProductExtraImage;
+import com.e_cormerce.shoppe.entity.product.Type;
+import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.ProductStatus;
-import com.e_cormerce.shoppe.enums.RoleEnum;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.repository.*;
+import com.e_cormerce.shoppe.repository.ProductExtraImageRepository;
+import com.e_cormerce.shoppe.repository.ProductRepository;
+import com.e_cormerce.shoppe.repository.UserRepository;
+import com.e_cormerce.shoppe.service.seller.helper.CreateProductHelper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-
 public class SellerService {
-
+    CreateProductHelper createProductHelper;
     ProductRepository productRepository;
     UserRepository userRepository;
-    CloudinaryService cloudinaryService;
+    ImageService imageService;
     ProductExtraImageRepository productExtraImageRepository;
-    @Transactional
+    AuthService authService;
+    CloudinaryService cloudinaryService;
+
+    @Transactional(timeout = 15, isolation = Isolation.READ_UNCOMMITTED)
     public CreateProductResponse createProduct(CreateProductRequest request,
                                                MultipartFile thumbnail,
-                                               boolean hasExtraImages ,
+                                               boolean hasExtraImages,
                                                List<MultipartFile> extraImages,
-                                               boolean hasVariant ,
+                                               boolean hasVariant,
                                                List<MultipartFile> variantImages) {
-        var thumnailUrl = cloudinaryService.uploadImage(thumbnail);
+
+        /**
+         * Đẩy task upload thumbnail vào thread pool .
+         */
+        CompletableFuture<String> thumbnailFuture = this.cloudinaryService.uploadFile(thumbnail);
+
+        /**
+         * Đẩy task upload extra_images vào thread pool (đẩy upload từng item).
+         */
+        CompletableFuture<List<String>> extraImagesFuture = (extraImages != null && !extraImages.isEmpty()) ?
+                this.imageService.uploadImageList(extraImages) :
+                CompletableFuture.completedFuture(new ArrayList<>());
+
+        /**
+         * Đẩy task upload variantsImage vào thread pool (đẩy upload từng item).
+         */
+        CompletableFuture<List<String>> variantImagesFuture = (variantImages != null && !variantImages.isEmpty()) ?
+                this.imageService.uploadImageList(variantImages) :
+                CompletableFuture.completedFuture(new ArrayList<>());
+
+        /**
+         * Dùng allOf để chờ các task cùng join xong thì trả về 1 collect , có thể dùng hàm thenApply , thenLog ...
+         */
+        CompletableFuture.allOf(thumbnailFuture, extraImagesFuture, variantImagesFuture).join();
+
+        /**
+         * Lấy kết quả đã join.
+         */
+        String thumbnailUrl = thumbnailFuture.join();
+        List<String> extraImagesUrl = extraImagesFuture.join();
+        List<String> variantImagesUrl = variantImagesFuture.join();
+
+
         Product product = Product.builder()
                 .name(request.getName())
                 .description(request.getReason())
                 .originPrice(request.getOriginPrice())
                 .status(ProductStatus.PENDING)
                 .created_at(LocalDateTime.now())
-                .thumbnail(thumnailUrl)
+                .thumbnail(thumbnailUrl)
+                .seller(authService.getUserThroughAuthentication())
                 .build();
 
-        if(hasExtraImages){
-            product.setProductExtraImages(
-                    this.createExtraImages(cloudinaryService.uploadImageList(extraImages), product)
-            );
+
+        if (extraImagesUrl != null && !extraImagesUrl.isEmpty()) {
+            product.setProductExtraImages(extraImagesUrl.stream().map(url -> ProductExtraImage.builder().product(product).url(url).build()).toList());
         }
-
-
-       product.setSeller(getSeller());
-
+        if (request.getTypes() != null && !request.getTypes().isEmpty()) {
+            product.setTypes(this.createTypes(request.getTypes(), product));
+        }
         if (hasVariant) {
-            product.setTypes(createTypes(request.getTypes(), product));
-            product.setVariants(createVariants(request.getVariantRequests(), product, cloudinaryService.uploadImageList(variantImages)));
+            if (variantImages.size() != request.getVariantRequests().size()) {//nếu số lượng ảnh ko giống nhau.
+                throw new AppException(ErrorCode.INVALID_CREATE_VARIANTS);
+            }
+            product.setVariants(this.createVariants(request.getVariantRequests(), product, variantImagesUrl));
+        } else {
+            product.setVariants(this.createProductHelper.createDefaultVariant(product));
         }
-        else{
-            product.setVariants(createDefaultVariant(product));
-        }
+
 
         productRepository.save(product);
 
@@ -87,117 +120,42 @@ public class SellerService {
                 .build();
     }
 
-    private User getSeller() {
-        Authentication authentication = SecurityContextHolder
-                .getContext()
-                .getAuthentication();
-
-
-
-        User seller = userRepository.findById(authentication.getPrincipal().toString())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
-
-        return seller;
+    /**
+     * Cần hàm gọi hàm Async ở  1 bean khác thì mới tạo đyocwj async.
+     *
+     * @param variantRequests
+     * @param product
+     * @param variantImageUrls
+     * @return
+     */
+    private List<Variant> createVariants(List<VariantRequest> variantRequests, Product product, List<String> variantImageUrls) {
+        List<CompletableFuture<Variant>> variantFutures = new ArrayList<>();
+        for (int i = 0; i < variantRequests.size(); i++) {
+            variantFutures.add(this.createProductHelper.createVariantFuture(variantRequests.get(i), product, variantImageUrls.get(i)));
+        }
+        /**
+         allOff : chờ tất cả cùng join xong thì lấy : success khi tất cả success , lỗi khi có ít nhất 1 thằng exception
+         -Có thể dùng thenApply( logging) ...
+         */
+        CompletableFuture.allOf(variantFutures.toArray(new CompletableFuture[0])).join();
+        return variantFutures.stream().map(CompletableFuture::join).toList();
     }
 
-    private List<Variant> createDefaultVariant(Product product){
-        List<Variant> variants = new ArrayList<>();
-        variants.add(Variant.builder()
-                .product(product)
-                .thumbnail(product.getThumbnail())
-                .quantity(product.getTotal_quantity())
-                .price(product.getOriginPrice())
-                .build());
-        return variants;
-    }
-
-    private List<ProductExtraImage> createExtraImages(List<String> extraImageUrls, Product product) {
-        return extraImageUrls.stream()
-                .map(url -> ProductExtraImage
-                        .builder()
-                        .url(url)
-                        .product(product)
-                        .build())
-                .toList();
-    }
-
-
+    /**
+     * Cần hàm gọi hàm Async ở  1 bean khác thì mới tạo đyocwj async.
+     *
+     * @return
+     */
     private List<Type> createTypes(List<TypeRequest> typeRequests, Product product) {
-        List<Type> types = new ArrayList<>();
-        for (TypeRequest typeRequest: typeRequests) {
-            Type type = Type.builder()
-                    .val(typeRequest.getTypeName())
-                    .product(product)
-                    .build();
-            type.setTypeValues(createTypeValues(typeRequest, type));
-            types.add(type);
-        }
-        return types;
-    }
+        List<CompletableFuture<Type>> typeFutures = typeRequests.stream().map(typeRequest -> this.createProductHelper.createType(typeRequest, product)).toList();
+        /**
+         allOff : chờ tất cả cùng join xong thì lấy : success khi tất cả success , lỗi khi có ít nhất 1 thằng exception
+         -Có thể dùng thenApply( logging) ...
+         */
+        CompletableFuture.allOf(typeFutures.toArray(new CompletableFuture[0])).join();
 
-    private List<TypeValue> createTypeValues(TypeRequest typeRequest, Type type) {
-        List<TypeValue> typeValues = new ArrayList<>();
-
-        for (String typeValueVal : typeRequest.getTypeValues()) {
-            TypeValue typeValue = TypeValue.builder()
-                    .val(typeValueVal)
-                    .type(type)
-                    .build();
-
-            typeValues.add(typeValue);
-        }
-
-        return typeValues;
+        return typeFutures.stream().map(CompletableFuture::join).toList();
     }
 
 
-
-    private List<Variant> createVariants(List<VariantRequest> variantRequests, Product product, List<String>  variantImageUrls) {
-        List<Variant> variants = new ArrayList<>();
-        for(int i=0; i<variantRequests.size(); i++) {
-
-            Variant variant = Variant.builder()
-                    .product(product)
-                    .price(variantRequests.get(i).getPrice())
-                    .quantity(variantRequests.get(i).getQuantity())
-                    .thumbnail(variantImageUrls.get(i))
-                    .build();
-
-            List<VariantValue> variantValues = new ArrayList<>();
-
-            for(VariantValueRequest variantValueRequest : variantRequests.get(i).getVariantValues()) {
-                Type type = findType(variantValueRequest.getTypeName(), product);
-
-                VariantValue variantValue = VariantValue.builder()
-                        .value(findTypeValue(variantValueRequest.getTypeValue(), type))
-                        .variant(variant)
-                        .build();
-
-                variantValues.add(variantValue);
-            }
-
-            variant.setVariantValues(variantValues);
-            variants.add(variant);
-        }
-
-        return variants;
-    }
-
-    private Type findType(String typeName, Product product) {
-        for (Type type : product.getTypes()) {
-            if (type.getVal().equals(typeName)) {
-                return type;
-            }
-        }
-        return null;
-    }
-
-    private TypeValue findTypeValue(String typeValueVal, Type type) {
-        for (TypeValue typeValue : type.getTypeValues()) {
-            if(typeValue.getVal().equals(typeValueVal)) {
-                return typeValue;
-            }
-        }
-        return null;
-    }
 }

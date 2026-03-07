@@ -47,7 +47,7 @@ public class User {
     Account account;
 
     // owner side
-    @ManyToMany
+    @ManyToMany( fetch = FetchType.LAZY)
     @JoinTable(
             name = "user_address",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -61,20 +61,13 @@ public class User {
     @JoinColumn(name = "role_id", nullable = false)
     Role role;
 
-    // inverse side
-    @OneToMany(mappedBy = "client", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    Set<Order> orders;
 
     // inverse side
-    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true)
-    Set<ShoppingCartItem> shoppingCartItems;
-
-    // inverse side
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     Set<PhoneNumber> phoneNumbers;
 
     //inverse side
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch =  FetchType.LAZY)
     Set<Transaction> transactions;
 
 }
