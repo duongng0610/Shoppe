@@ -23,7 +23,9 @@ public enum ErrorCode {
     INVALID_REFRESH_TOKEN("Your refresh token is invalid", 1008, HttpStatus.BAD_REQUEST),
     NOT_EXISTED_USER("User is not existed", 1009, HttpStatus.BAD_REQUEST),
     INVALID_EMAIL("Your email is invalid", 1010, HttpStatus.BAD_REQUEST),
-    INVALID_CREATE_PASSWORD("Your password created is invalid", 1011, HttpStatus.BAD_REQUEST)
+    INVALID_CREATE_PASSWORD("Your password created is invalid", 1011, HttpStatus.BAD_REQUEST),
+    //Create_Product
+    INVALID_CREATE_VARIANTS("Your variants and variant images not match",1012, HttpStatus.BAD_REQUEST)
     ;
 
     String message;

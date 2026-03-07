@@ -139,18 +139,21 @@ public class AuthService {
     }
 
     public VerifyResponse verify() {
-        Authentication authentication = SecurityContextHolder
-                                    .getContext()
-                                    .getAuthentication();
-
-        String userId = (String) authentication.getPrincipal();
-
-        var user = userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
+        var user =this.getUserThroughAuthentication();
 
         return VerifyResponse.builder()
                 .username(user.getUsername())
                 .build();
+    }
+
+    public User getUserThroughAuthentication() {
+        Authentication authentication = SecurityContextHolder
+                .getContext()
+                .getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
     }
 
 }

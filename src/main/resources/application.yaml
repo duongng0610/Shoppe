@@ -18,6 +18,9 @@ cloudinary:
   cloud-name: dhwxpgxzl
   api-key: 683161372337227
   secret-key: eKL1dtmtWHG6NwYiw52-Ubnt4-U
+  image-width: 200
+  image-height: 200
+  crop: fit
 app:
   security:
     endpoints:

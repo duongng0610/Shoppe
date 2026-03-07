@@ -17,5 +17,7 @@ public class CloudinaryProperties {
     String cloudName;
     String apiKey;
     String secretKey;
-
+    int imageWidth;
+    int imageHeight;
+    String crop;
 }

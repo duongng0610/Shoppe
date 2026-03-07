@@ -32,8 +32,18 @@ public class SellerController {
     JwtService jwtService;
     JwtProperties jwtProperties;
 
-
-    @PostMapping(path = "/product", consumes = "multipart/form-data")
+    /**
+     * POST: /seller/products.
+     * -Tạo sản phẩm với request gửi lên phải có content-type:multipart/ form-data.
+     * @param product
+     * @param thumbnail
+     * @param hasExtraImages
+     * @param extraImages
+     * @param hasVariant
+     * @param variantImages
+     * @return
+     */
+    @PostMapping(path = "/products", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<CreateProductResponse>> create(
             @RequestPart CreateProductRequest product,
             @RequestPart MultipartFile thumbnail,
