@@ -8,6 +8,6 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class VariantValueRequest {
-    String typeName;
-    String typeValue;
+  String typeName;
+  String typeValue;
 }

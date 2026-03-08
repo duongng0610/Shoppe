@@ -7,18 +7,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-/**
- * Định nghĩa lỗi trong ứng dụng.
- */
+/** Định nghĩa lỗi trong ứng dụng. */
 @Data
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AppException extends RuntimeException {
-    ErrorCode errorCode;
+  ErrorCode errorCode;
 
-    public AppException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = errorCode;
-    }
+  public AppException(ErrorCode errorCode) {
+    super(errorCode.getMessage());
+    this.errorCode = errorCode;
+  }
 }

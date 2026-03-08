@@ -1,7 +1,5 @@
 package com.e_cormerce.shoppe.dto.request;
 
-import com.e_cormerce.shoppe.validator.StrongPassword;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,8 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class LogInRequest {
-    String email;
-    String password;
+  String email;
+  String password;
 }

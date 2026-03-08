@@ -11,28 +11,26 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
 @Configuration
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @EnableConfigurationProperties({CorsProperties.class})
 public class CorsConfig {
-    CorsProperties corsProperties;
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
+  CorsProperties corsProperties;
 
-        config.setAllowedOriginPatterns(corsProperties.getAllowedOrigins());
-        config.setAllowedMethods(corsProperties.getAllowedMethods());
-        config.setAllowedHeaders(corsProperties.getAllowedHeaders());
-        config.setAllowCredentials(corsProperties.isCredentials());
+  @Bean
+  public CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration config = new CorsConfiguration();
 
-        UrlBasedCorsConfigurationSource source =
-                new UrlBasedCorsConfigurationSource();
+    config.setAllowedOriginPatterns(corsProperties.getAllowedOrigins());
+    config.setAllowedMethods(corsProperties.getAllowedMethods());
+    config.setAllowedHeaders(corsProperties.getAllowedHeaders());
+    config.setAllowCredentials(corsProperties.isCredentials());
 
-        source.registerCorsConfiguration("/**", config);
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 
-        return source;
-    }
+    source.registerCorsConfiguration("/**", config);
+
+    return source;
+  }
 }

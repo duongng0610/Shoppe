@@ -1,4 +1,3 @@
 package com.e_cormerce.shoppe.enums;
 
-public enum TransactionStatus {
-}
+public enum TransactionStatus {}

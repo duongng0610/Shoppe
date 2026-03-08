@@ -1,10 +1,9 @@
 package com.e_cormerce.shoppe.entity.token;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -13,17 +12,17 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(name = "invalid_tokens", indexes = {@Index(name = "idx_token", columnList = "val")})
+@Table(
+    name = "invalid_tokens",
+    indexes = {@Index(name = "idx_token", columnList = "val")})
 public class InvalidToken {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(nullable = false, unique = true)
-    String val;
+  @Column(nullable = false, unique = true)
+  String val;
 
-    @Column(nullable = false)
-    LocalDate invalid_date;
-
-
+  @Column(nullable = false)
+  LocalDate invalid_date;
 }

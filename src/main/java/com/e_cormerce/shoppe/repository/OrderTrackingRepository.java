@@ -1,10 +1,8 @@
 package com.e_cormerce.shoppe.repository;
 
+import com.e_cormerce.shoppe.entity.order.OrderTracking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.e_cormerce.shoppe.entity.order.OrderTracking;
-
 @Repository
-public interface OrderTrackingRepository extends JpaRepository<OrderTracking, String> {
-}
+public interface OrderTrackingRepository extends JpaRepository<OrderTracking, String> {}

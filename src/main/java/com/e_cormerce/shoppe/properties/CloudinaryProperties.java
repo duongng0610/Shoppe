@@ -12,12 +12,11 @@ import org.springframework.stereotype.Component;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Component
-
 public class CloudinaryProperties {
-    String cloudName;
-    String apiKey;
-    String secretKey;
-    int imageWidth;
-    int imageHeight;
-    String crop;
+  String cloudName;
+  String apiKey;
+  String secretKey;
+  int imageWidth;
+  int imageHeight;
+  String crop;
 }

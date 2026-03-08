@@ -6,17 +6,15 @@ import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.stereotype.Component;
 
 @ConfigurationProperties(prefix = "jwt")
 @Getter
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ComponentScan
-
 public class JwtProperties {
-    String accessTokenSecret;
-    String refreshTokenSecret;
-    Long accessTokenExpirationTime;
-    Long refreshTokenExpirationTime;
+  String accessTokenSecret;
+  String refreshTokenSecret;
+  Long accessTokenExpirationTime;
+  Long refreshTokenExpirationTime;
 }

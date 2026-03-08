@@ -12,23 +12,20 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class TypeValue {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(nullable = false)
-    String val;
+  @Column(nullable = false)
+  String val;
 
-    @Column(columnDefinition = "boolean default false")
-    boolean deleted;
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
-    // owner side
-    @ManyToOne
-    @JoinColumn(name = "type_id")
-    @JsonIgnore
-    Type type;
-
-
+  // owner side
+  @ManyToOne
+  @JoinColumn(name = "type_id")
+  @JsonIgnore
+  Type type;
 }

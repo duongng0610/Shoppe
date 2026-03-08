@@ -1,10 +1,8 @@
 package com.e_cormerce.shoppe.repository;
 
+import com.e_cormerce.shoppe.entity.product.ProductReviewImage;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.e_cormerce.shoppe.entity.product.ProductReviewImage;
-
 @Repository
-public interface ProductReviewImageRepository extends JpaRepository<ProductReviewImage, String> {
-}
+public interface ProductReviewImageRepository extends JpaRepository<ProductReviewImage, String> {}

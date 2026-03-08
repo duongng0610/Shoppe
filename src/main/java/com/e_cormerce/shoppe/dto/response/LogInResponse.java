@@ -8,9 +8,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class LogInResponse {
-    String email;
-    String hashedPassword;
-    String accessToken;
+  String email;
+  String hashedPassword;
+  String accessToken;
 }

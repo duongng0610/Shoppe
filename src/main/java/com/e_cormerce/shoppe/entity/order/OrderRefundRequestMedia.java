@@ -5,9 +5,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
-@Table(name = "order_refund_request_medias",
-        indexes = {@Index(name = "idx_order_refund_request", columnList = "order_refund_request_id")}
-)
+@Table(
+    name = "order_refund_request_medias",
+    indexes = {@Index(name = "idx_order_refund_request", columnList = "order_refund_request_id")})
 @Getter
 @Setter
 @Builder
@@ -15,14 +15,14 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderRefundRequestMedia {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(nullable = false)
-    String url;
+  @Column(nullable = false)
+  String url;
 
-    @ManyToOne
-    @JoinColumn(name = "order_refund_request_id")
-    OrderRefundRequest orderRefundRequest;
+  @ManyToOne
+  @JoinColumn(name = "order_refund_request_id")
+  OrderRefundRequest orderRefundRequest;
 }

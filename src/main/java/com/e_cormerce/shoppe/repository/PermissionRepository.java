@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PermissionRepository extends JpaRepository<Permission, String> {
-    boolean existsByVal(String val);
+  boolean existsByVal(String val);
 
-    Permission findByVal(String val);
+  Permission findByVal(String val);
 }

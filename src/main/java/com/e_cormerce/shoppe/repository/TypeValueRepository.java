@@ -1,10 +1,8 @@
 package com.e_cormerce.shoppe.repository;
 
+import com.e_cormerce.shoppe.entity.product.TypeValue;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.e_cormerce.shoppe.entity.product.TypeValue;
-
 @Repository
-public interface TypeValueRepository extends JpaRepository<TypeValue, String> {
-}
+public interface TypeValueRepository extends JpaRepository<TypeValue, String> {}

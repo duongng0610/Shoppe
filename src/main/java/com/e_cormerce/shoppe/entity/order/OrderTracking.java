@@ -3,12 +3,11 @@ package com.e_cormerce.shoppe.entity.order;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.OrderTrackingStatus;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
@@ -18,29 +17,28 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Entity
 public class OrderTracking {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(precision = 15, scale = 2, nullable = false)
-    BigDecimal ship_cost;
+  @Column(precision = 15, scale = 2, nullable = false)
+  BigDecimal ship_cost;
 
-    @Column(nullable = false)
-    LocalDate required_date;
+  @Column(nullable = false)
+  LocalDate required_date;
 
-    @Column(nullable = false)
-    LocalDateTime created_at;
+  @Column(nullable = false)
+  LocalDateTime created_at;
 
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('PENDING', 'FAILED', 'SUCCEED')", nullable = false)
-    OrderTrackingStatus status;
+  @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "ENUM('PENDING', 'FAILED', 'SUCCEED')", nullable = false)
+  OrderTrackingStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "shipper_id", nullable = false)
-    User shipper;
+  @ManyToOne
+  @JoinColumn(name = "shipper_id", nullable = false)
+  User shipper;
 
-    @ManyToOne
-    @JoinColumn(name = "order_tracking_id", nullable = false)
-    OrderTracking order_tracking;
-
+  @ManyToOne
+  @JoinColumn(name = "order_tracking_id", nullable = false)
+  OrderTracking order_tracking;
 }
