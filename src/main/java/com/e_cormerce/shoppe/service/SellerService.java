@@ -15,9 +15,11 @@ import com.e_cormerce.shoppe.repository.ProductExtraImageRepository;
 import com.e_cormerce.shoppe.repository.ProductRepository;
 import com.e_cormerce.shoppe.repository.UserRepository;
 import com.e_cormerce.shoppe.service.seller.helper.CreateProductHelper;
+import com.e_cormerce.shoppe.service.seller.helper.UploadUrls;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 
 @Service
 @RequiredArgsConstructor
@@ -34,13 +36,13 @@ import java.util.concurrent.CompletableFuture;
 public class SellerService {
     CreateProductHelper createProductHelper;
     ProductRepository productRepository;
-    UserRepository userRepository;
     ImageService imageService;
-    ProductExtraImageRepository productExtraImageRepository;
     AuthService authService;
     CloudinaryService cloudinaryService;
 
-    @Transactional(timeout = 15, isolation = Isolation.READ_UNCOMMITTED)
+    @Qualifier("uploadExecutor")
+    Executor imageUploadExecutor;
+
     public CreateProductResponse createProduct(CreateProductRequest request,
                                                MultipartFile thumbnail,
                                                boolean hasExtraImages,
@@ -48,37 +50,80 @@ public class SellerService {
                                                boolean hasVariant,
                                                List<MultipartFile> variantImages) {
 
+
+        if (hasVariant && variantImages != null &&
+                variantImages.size() != request.getVariantRequests().size()) {
+            throw new AppException(ErrorCode.INVALID_CREATE_VARIANTS);
+        }
+
+        UploadUrls urls = uploadAllImages(thumbnail, extraImages, variantImages);
+
+        return persistProduct(request, urls, hasVariant);
+    }
+
+
+
+    private UploadUrls uploadAllImages(
+            MultipartFile thumbnail,
+            List<MultipartFile> extraImages,
+            List<MultipartFile> variantImages) {
+
         /**
          * Đẩy task upload thumbnail vào thread pool .
          */
-        CompletableFuture<String> thumbnailFuture = this.cloudinaryService.uploadFile(thumbnail);
+        CompletableFuture<String> thumbnailFuture = cloudinaryService.uploadFile(thumbnail)
+                .exceptionally((e) -> { throw new AppException(ErrorCode.UPLOAD_FAILED); });
 
         /**
          * Đẩy task upload extra_images vào thread pool (đẩy upload từng item).
          */
-        CompletableFuture<List<String>> extraImagesFuture = (extraImages != null && !extraImages.isEmpty()) ?
-                this.imageService.uploadImageList(extraImages) :
-                CompletableFuture.completedFuture(new ArrayList<>());
+        CompletableFuture<List<String>> extraImagesFuture =
+                (extraImages != null && !extraImages.isEmpty())
+                        ? imageService.uploadImageList(extraImages)
+                        .exceptionally(e -> { throw new AppException(ErrorCode.UPLOAD_FAILED); })
+                        : CompletableFuture.completedFuture(List.of());
+
 
         /**
          * Đẩy task upload variantsImage vào thread pool (đẩy upload từng item).
          */
-        CompletableFuture<List<String>> variantImagesFuture = (variantImages != null && !variantImages.isEmpty()) ?
-                this.imageService.uploadImageList(variantImages) :
-                CompletableFuture.completedFuture(new ArrayList<>());
+        CompletableFuture<List<String>> variantImagesFuture =
+                (variantImages != null && !variantImages.isEmpty())
+                        ? imageService.uploadImageList(variantImages)
+                        .exceptionally(e -> { throw new AppException(ErrorCode.UPLOAD_FAILED); })
+                        : CompletableFuture.completedFuture(List.of());
 
-        /**
-         * Dùng allOf để chờ các task cùng join xong thì trả về 1 collect , có thể dùng hàm thenApply , thenLog ...
-         */
-        CompletableFuture.allOf(thumbnailFuture, extraImagesFuture, variantImagesFuture).join();
+        try {
+            /**
+             * limit time of join (avoid deadlock when cloudinary is lag)
+             *
+             */
+            CompletableFuture.allOf(thumbnailFuture, extraImagesFuture, variantImagesFuture)
+                    .get(30, TimeUnit.SECONDS);
 
-        /**
-         * Lấy kết quả đã join.
-         */
-        String thumbnailUrl = thumbnailFuture.join();
-        List<String> extraImagesUrl = extraImagesFuture.join();
-        List<String> variantImagesUrl = variantImagesFuture.join();
+        } catch(TimeoutException e) {
+            throw new AppException(ErrorCode.UPLOAD_TIMEOUT);
 
+        } catch (ExecutionException e) {
+            throw new AppException(ErrorCode.UPLOAD_FAILED);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AppException(ErrorCode.UPLOAD_FAILED);
+        }
+
+        return new UploadUrls(
+                thumbnailFuture.join(),
+                extraImagesFuture.join(),
+                variantImagesFuture.join()
+        );
+    }
+
+    @Transactional(isolation = Isolation.READ_COMMITTED, timeout = 10)
+    protected CreateProductResponse persistProduct(
+            CreateProductRequest request,
+            UploadUrls urls,
+            boolean hasVariant) {
 
         Product product = Product.builder()
                 .name(request.getName())
@@ -86,26 +131,28 @@ public class SellerService {
                 .originPrice(request.getOriginPrice())
                 .status(ProductStatus.PENDING)
                 .created_at(LocalDateTime.now())
-                .thumbnail(thumbnailUrl)
+                .thumbnail(urls.getThumbnailUrl())
                 .seller(authService.getUserThroughAuthentication())
                 .build();
 
-
-        if (extraImagesUrl != null && !extraImagesUrl.isEmpty()) {
-            product.setProductExtraImages(extraImagesUrl.stream().map(url -> ProductExtraImage.builder().product(product).url(url).build()).toList());
+        if (!urls.getExtraImageUrls().isEmpty()) {
+            product.setProductExtraImages(
+                    urls.getExtraImageUrls().stream()
+                            .map(url -> ProductExtraImage.builder().product(product).url(url).build())
+                            .toList()
+            );
         }
+
         if (request.getTypes() != null && !request.getTypes().isEmpty()) {
-            product.setTypes(this.createTypes(request.getTypes(), product));
-        }
-        if (hasVariant) {
-            if (variantImages.size() != request.getVariantRequests().size()) {//nếu số lượng ảnh ko giống nhau.
-                throw new AppException(ErrorCode.INVALID_CREATE_VARIANTS);
-            }
-            product.setVariants(this.createVariants(request.getVariantRequests(), product, variantImagesUrl));
-        } else {
-            product.setVariants(this.createProductHelper.createDefaultVariant(product));
+            product.setTypes(createProductHelper.createType(request.getTypes(), product));
         }
 
+        if (hasVariant) {
+            product.setVariants(createProductHelper.createVariants(request.getVariantRequests(),
+                    product, urls.getVariantImageUrls()));
+        } else {
+            product.setVariants(createProductHelper.createDefaultVariant(product));
+        }
 
         productRepository.save(product);
 
@@ -118,43 +165,6 @@ public class SellerService {
                 .types(product.getTypes())
                 .variants(product.getVariants())
                 .build();
-    }
-
-    /**
-     * Cần hàm gọi hàm Async ở  1 bean khác thì mới tạo đyocwj async.
-     *
-     * @param variantRequests
-     * @param product
-     * @param variantImageUrls
-     * @return
-     */
-    private List<Variant> createVariants(List<VariantRequest> variantRequests, Product product, List<String> variantImageUrls) {
-        List<CompletableFuture<Variant>> variantFutures = new ArrayList<>();
-        for (int i = 0; i < variantRequests.size(); i++) {
-            variantFutures.add(this.createProductHelper.createVariantFuture(variantRequests.get(i), product, variantImageUrls.get(i)));
-        }
-        /**
-         allOff : chờ tất cả cùng join xong thì lấy : success khi tất cả success , lỗi khi có ít nhất 1 thằng exception
-         -Có thể dùng thenApply( logging) ...
-         */
-        CompletableFuture.allOf(variantFutures.toArray(new CompletableFuture[0])).join();
-        return variantFutures.stream().map(CompletableFuture::join).toList();
-    }
-
-    /**
-     * Cần hàm gọi hàm Async ở  1 bean khác thì mới tạo đyocwj async.
-     *
-     * @return
-     */
-    private List<Type> createTypes(List<TypeRequest> typeRequests, Product product) {
-        List<CompletableFuture<Type>> typeFutures = typeRequests.stream().map(typeRequest -> this.createProductHelper.createType(typeRequest, product)).toList();
-        /**
-         allOff : chờ tất cả cùng join xong thì lấy : success khi tất cả success , lỗi khi có ít nhất 1 thằng exception
-         -Có thể dùng thenApply( logging) ...
-         */
-        CompletableFuture.allOf(typeFutures.toArray(new CompletableFuture[0])).join();
-
-        return typeFutures.stream().map(CompletableFuture::join).toList();
     }
 
 

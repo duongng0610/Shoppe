@@ -30,21 +30,21 @@ public class CreateProductHelper {
     }
 
 
-    /**
-     * Hàm bất đồng bộ tạo 1 type Product.
-     *
-     * @return
-     */
-    @Async
-    public CompletableFuture<Type> createType(TypeRequest typeRequest, Product product) {
+    public List<Type> createType(List<TypeRequest> typeRequests, Product product) {
 
 
-        Type type = Type.builder()
-                .val(typeRequest.getTypeName())
-                .product(product)
-                .build();
-        type.setTypeValues(createTypeValues(typeRequest, type));
-        return CompletableFuture.completedFuture(type);
+        List<Type> types = typeRequests.stream()
+                .map(typeRequest -> {
+                    Type type = Type.builder()
+                            .product(product)
+                            .val(typeRequest.getTypeName())
+                            .build();
+
+                    type.setTypeValues(createTypeValues(typeRequest, type));
+                    return type;
+                }).toList();
+
+        return types;
 
 
     }
@@ -64,24 +64,31 @@ public class CreateProductHelper {
         return typeValues;
     }
 
+    public List<Variant> createVariants(
+            List<VariantRequest> variantRequests,
+            Product product,
+            List<String> variantImageUrls) {
 
-    /**
-     * Hàm bất đồng bộ tạo 1 variant.
-     *
-     * @param variantRequest
-     * @param product
-     * @param variantImageUrl
-     * @return
-     */
-    @Async
-    public CompletableFuture<Variant> createVariantFuture(VariantRequest variantRequest, Product product, String variantImageUrl) {
+        List<Variant> variants = new ArrayList<>();
+        for (int i = 0; i < variantRequests.size(); i++) {
+            variants.add(
+                    createVariant(variantRequests.get(i), product, variantImageUrls.get(i))
+            );
+        }
+        return variants;
+    }
+
+
+    private Variant createVariant(VariantRequest variantRequest, Product product, String variantImageUrl) {
         Variant variant = Variant.builder()
                 .product(product)
                 .price(variantRequest.getPrice())
                 .quantity(variantRequest.getQuantity())
                 .thumbnail(variantImageUrl)
                 .build();
+
         List<VariantValue> variantValues = new ArrayList<>();
+
         for (VariantValueRequest variantValueRequest : variantRequest.getVariantValues()) {
             Type type = findType(variantValueRequest.getTypeName(), product);
 
@@ -93,7 +100,7 @@ public class CreateProductHelper {
         }
 
         variant.setVariantValues(variantValues);
-        return CompletableFuture.completedFuture(variant);
+        return variant;
 
     }
 

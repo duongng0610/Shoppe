@@ -25,7 +25,9 @@ public enum ErrorCode {
     INVALID_EMAIL("Your email is invalid", 1010, HttpStatus.BAD_REQUEST),
     INVALID_CREATE_PASSWORD("Your password created is invalid", 1011, HttpStatus.BAD_REQUEST),
     //Create_Product
-    INVALID_CREATE_VARIANTS("Your variants and variant images not match",1012, HttpStatus.BAD_REQUEST)
+    INVALID_CREATE_VARIANTS("Your variants and variant images not match",1012, HttpStatus.BAD_REQUEST),
+    UPLOAD_FAILED("Your image can not upload", 1013, HttpStatus.BAD_REQUEST),
+    UPLOAD_TIMEOUT("Your image upload too long", 1014, HttpStatus.BAD_REQUEST)
     ;
 
     String message;

@@ -51,16 +51,15 @@ public class CloudinaryService {
      * @param file
      * @return
      */
-    @Async
+    @Async("uploadExecutor")
     public CompletableFuture<String> uploadFile(MultipartFile file) {
         try {
             Map<String, Object> data = this.cloudinary.uploader().upload(file.getBytes(), this.getParams());
             return CompletableFuture.completedFuture(data.get("secure_url").toString());
         } catch (IOException ioe) {
-            throw new AppException(ErrorCode.INVALID_FILE_FORMAT);
+            // neu de app exception se bi wrap lai do dang chay trong luong rieng theo co che async
+            return CompletableFuture.failedFuture(new AppException(ErrorCode.INVALID_FILE_FORMAT));
         }
-
     }
-
 
 }

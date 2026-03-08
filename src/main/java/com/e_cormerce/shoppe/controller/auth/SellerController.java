@@ -43,7 +43,7 @@ public class SellerController {
      * @param variantImages
      * @return
      */
-    @PostMapping(path = "/products", consumes = "multipart/form-data")
+    @PostMapping(path = "/product", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<CreateProductResponse>> create(
             @RequestPart CreateProductRequest product,
             @RequestPart MultipartFile thumbnail,
