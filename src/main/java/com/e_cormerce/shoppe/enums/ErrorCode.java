@@ -28,7 +28,8 @@ public enum ErrorCode {
   INVALID_CREATE_VARIANTS(
       "Your variants and variant images not match", 1012, HttpStatus.BAD_REQUEST),
   UPLOAD_FAILED("Your image can not upload", 1013, HttpStatus.BAD_REQUEST),
-  UPLOAD_TIMEOUT("Your image upload too long", 1014, HttpStatus.BAD_REQUEST);
+  UPLOAD_TIMEOUT("Your image upload too long", 1014, HttpStatus.BAD_REQUEST),
+    INVALID_PARENT_CATEGORY("Your parent category is in invalid", 1015, HttpStatus.BAD_REQUEST);
 
   String message;
   int code;

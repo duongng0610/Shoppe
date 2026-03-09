@@ -1,16 +1,15 @@
-package com.e_cormerce.shoppe.dto.request;
+package com.e_cormerce.shoppe.dto.request.Admin;
 
-import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TypeRequest {
-  String typeName;
-  List<String> typeValues;
+
+public class CreateCategoryRequest {
+    String name;
+    String parent_id;
 }

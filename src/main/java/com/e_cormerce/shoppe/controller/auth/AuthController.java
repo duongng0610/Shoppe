@@ -1,8 +1,8 @@
 package com.e_cormerce.shoppe.controller.auth;
 
-import com.e_cormerce.shoppe.dto.request.LogInRequest;
-import com.e_cormerce.shoppe.dto.request.LogOutRequest;
-import com.e_cormerce.shoppe.dto.request.RegisterRequest;
+import com.e_cormerce.shoppe.dto.request.Auth.LogInRequest;
+import com.e_cormerce.shoppe.dto.request.Auth.LogOutRequest;
+import com.e_cormerce.shoppe.dto.request.Auth.RegisterRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.LogInResponse;
 import com.e_cormerce.shoppe.dto.response.RegisterResponse;

@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.configuration.helper;
 
+import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.Permission;
 import com.e_cormerce.shoppe.entity.user.Role;
@@ -9,6 +10,7 @@ import com.e_cormerce.shoppe.enums.PermissionEnum;
 import com.e_cormerce.shoppe.enums.RoleEnum;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.AccountRepository;
+import com.e_cormerce.shoppe.repository.CategoryRepository;
 import com.e_cormerce.shoppe.repository.RoleRepository;
 import com.e_cormerce.shoppe.repository.UserRepository;
 import java.util.Date;
@@ -32,6 +34,7 @@ public class AppConfigHelper {
   RoleRepository roleRepository;
   UserRepository userRepository;
   AccountRepository accountRepository;
+  CategoryRepository categoryRepository;
 
   private Set<Permission> createPermissionsOfClient() {
     Set<Permission> clientPermissions = new HashSet<>();
@@ -170,37 +173,90 @@ public class AppConfigHelper {
   }
 
   public void createAdmin(String email, String password, String username) {
-    if (!accountRepository.existsByEmail("admin")) {
+      if (!accountRepository.existsByEmail(email)) {
 
-      Account adminAccount =
-          Account.builder()
-              .email(email)
-              .password(passwordEncoder.encode(password))
-              .created_at(new Date())
-              .build();
+          Account adminAccount =
+                  Account.builder()
+                          .email(email)
+                          .password(passwordEncoder.encode(password))
+                          .created_at(new Date())
+                          .build();
 
-      Role adminRole =
-          roleRepository
-              .findByVal(RoleEnum.ADMIN.toString())
-              .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
+          Role adminRole =
+                  roleRepository
+                          .findByVal(RoleEnum.ADMIN.toString())
+                          .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
 
-      if (userRepository.existsByUsername(username)) {
-        log.error("Username for admin is invalid");
-        throw new AppException(ErrorCode.INVALID_USERNAME);
+          if (userRepository.existsByUsername(username)) {
+              log.error("Username for admin is invalid");
+              throw new AppException(ErrorCode.INVALID_USERNAME);
+          }
+
+          User admin = User.builder().account(adminAccount).role(adminRole).username(username).build();
+
+          userRepository.save(admin);
+
+          log.warn(
+                  "Admin has been created with email: -"
+                          + email
+                          + "- password: -"
+                          + password
+                          + "- username: -"
+                          + username
+                          + "-");
       }
-
-      User admin = User.builder().account(adminAccount).role(adminRole).username(username).build();
-
-      userRepository.save(admin);
-
-      log.warn(
-          "Admin has been created with email: -"
-              + email
-              + "- password: -"
-              + password
-              + "- username: -"
-              + username
-              + "-");
-    }
   }
+
+    public void createSeller(String email, String password, String username) {
+        if (!accountRepository.existsByEmail(email)) {
+
+            Account adminAccount =
+                    Account.builder()
+                            .email(email)
+                            .password(passwordEncoder.encode(password))
+                            .created_at(new Date())
+                            .build();
+
+            Role sellerRole =
+                    roleRepository
+                            .findByVal(RoleEnum.SELLER.toString())
+                            .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
+
+            if (userRepository.existsByUsername(username)) {
+                log.error("Username for seller is invalid");
+                throw new AppException(ErrorCode.INVALID_USERNAME);
+            }
+
+            User admin = User.builder().account(adminAccount).role(sellerRole).username(username).build();
+
+            userRepository.save(admin);
+
+            log.warn(
+                    "Seller has been created with email: -"
+                            + email
+                            + "- password: -"
+                            + password
+                            + "- username: -"
+                            + username
+                            + "-");
+        }
+    }
+
+    public void createDefaultCategories() {
+      createDefaultCategory("Fashion");
+      createDefaultCategory("Technology devices");
+      createDefaultCategory("Book");
+      createDefaultCategory("household appliances");
+    }
+
+    private void createDefaultCategory(String name) {
+      if (!categoryRepository.existsByVal(name)) {
+          Category category = Category.builder()
+                  .val(name)
+                  .build();
+
+          categoryRepository.save(category);
+      }
+    }
+
 }

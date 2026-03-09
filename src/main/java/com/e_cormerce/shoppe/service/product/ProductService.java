@@ -1,11 +1,14 @@
 package com.e_cormerce.shoppe.service.product;
 
-import com.e_cormerce.shoppe.dto.request.CreateProductRequest;
+import com.e_cormerce.shoppe.dto.request.Seller.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.CreateProductResponse;
+import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.entity.product.ProductExtraImage;
 import com.e_cormerce.shoppe.enums.ProductStatus;
 import com.e_cormerce.shoppe.repository.ProductRepository;
+import com.e_cormerce.shoppe.service.Category.CategoryService;
+import com.e_cormerce.shoppe.service.Category.helper.CreateCategoryHelper;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.helper.CreateProductHelper;
 import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
@@ -24,6 +27,7 @@ public class ProductService {
   AuthService authService;
   CreateProductHelper createProductHelper;
   ProductRepository productRepository;
+  CreateCategoryHelper createCategoryHelper;
 
   @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
   public CreateProductResponse persistProduct(
@@ -32,7 +36,7 @@ public class ProductService {
     Product product =
         Product.builder()
             .name(request.getName())
-            .description(request.getReason())
+            .description(request.getDescription())
             .originPrice(request.getOriginPrice())
             .status(ProductStatus.PENDING)
             .created_at(LocalDateTime.now())
@@ -59,11 +63,13 @@ public class ProductService {
       product.setVariants(createProductHelper.createDefaultVariant(product));
     }
 
+    product.setCategory(createCategoryHelper.findById(request.getCategory_id()));
+
     productRepository.save(product);
 
     return CreateProductResponse.builder()
         .name(request.getName())
-        .reason(request.getReason())
+        .description(request.getDescription())
         .originPrice(request.getOriginPrice())
         .created_at(LocalDateTime.now())
         .total_quantity(request.getTotalQuantity())

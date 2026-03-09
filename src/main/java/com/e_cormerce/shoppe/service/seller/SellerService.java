@@ -1,7 +1,8 @@
 package com.e_cormerce.shoppe.service.seller;
 
-import com.e_cormerce.shoppe.dto.request.CreateProductRequest;
+import com.e_cormerce.shoppe.dto.request.Seller.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.CreateProductResponse;
+import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.service.product.ProductService;
@@ -40,6 +41,7 @@ public class SellerService {
 
     ProductImagesUrl urls =
         uploadProductImagesHelper.uploadImagesOfProduct(thumbnail, extraImages, variantImages);
+
 
     return productService.persistProduct(request, urls, hasVariant);
   }

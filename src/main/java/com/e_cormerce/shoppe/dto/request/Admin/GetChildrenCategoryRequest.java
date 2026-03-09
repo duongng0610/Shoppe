@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.dto.request;
+package com.e_cormerce.shoppe.dto.request.Admin;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LogInRequest {
-  String email;
-  String password;
+
+public class GetChildrenCategoryRequest {
+    String id;
 }

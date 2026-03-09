@@ -1,14 +1,16 @@
-package com.e_cormerce.shoppe.dto.request;
+package com.e_cormerce.shoppe.dto.common;
 
-import jakarta.validation.constraints.NotNull;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class LogOutRequest {
-  @NotNull String accessToken;
+public class TypeRequest {
+  String typeName;
+  List<String> typeValues;
 }

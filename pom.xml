@@ -131,7 +131,9 @@
                 <version>2.43.0</version>
                 <configuration>
                     <java>
-                        <googleJavaFormat/>
+                        <googleJavaFormat>
+                            <version>1.19.2</version>
+                        </googleJavaFormat>
                     </java>
                 </configuration>
             </plugin>

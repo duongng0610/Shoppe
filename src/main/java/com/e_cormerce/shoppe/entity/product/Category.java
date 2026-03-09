@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.product;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.Set;
 import lombok.*;
@@ -29,16 +30,21 @@ public class Category {
   @Column(columnDefinition = "boolean default false")
   boolean deleted;
 
+  String thumbnail;
+
   // owner side
   @ManyToOne
   @JoinColumn(name = "parent_id")
+  @JsonIgnore
   Category parent;
 
   // inverse side
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+  @JsonIgnore
   Set<Category> children;
 
   // inverse side
   @OneToMany(mappedBy = "category", cascade = CascadeType.PERSIST)
+  @JsonIgnore
   Set<Product> products;
 }

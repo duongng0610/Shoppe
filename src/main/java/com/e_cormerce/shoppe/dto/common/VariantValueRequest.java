@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.dto.request;
+package com.e_cormerce.shoppe.dto.common;
 
 import lombok.*;
 

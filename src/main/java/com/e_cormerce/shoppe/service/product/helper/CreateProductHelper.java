@@ -1,8 +1,8 @@
 package com.e_cormerce.shoppe.service.product.helper;
 
-import com.e_cormerce.shoppe.dto.request.TypeRequest;
-import com.e_cormerce.shoppe.dto.request.VariantRequest;
-import com.e_cormerce.shoppe.dto.request.VariantValueRequest;
+import com.e_cormerce.shoppe.dto.common.TypeRequest;
+import com.e_cormerce.shoppe.dto.common.VariantRequest;
+import com.e_cormerce.shoppe.dto.common.VariantValueRequest;
 import com.e_cormerce.shoppe.entity.product.*;
 import java.util.ArrayList;
 import java.util.List;

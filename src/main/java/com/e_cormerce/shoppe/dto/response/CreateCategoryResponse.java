@@ -1,6 +1,4 @@
-package com.e_cormerce.shoppe.dto.request;
-
-import java.util.List;
+package com.e_cormerce.shoppe.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +8,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Test {
-  List<TypeProduct> items;
+
+public class CreateCategoryResponse {
+    String name;
+    String thumbnail;
+    String parent_id;
 }

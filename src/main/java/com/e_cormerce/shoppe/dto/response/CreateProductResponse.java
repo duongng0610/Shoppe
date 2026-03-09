@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.dto.response;
 
+import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.entity.product.Type;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import java.math.BigDecimal;
@@ -15,11 +16,13 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateProductResponse {
   String name;
-  String reason;
+  String description;
   BigDecimal originPrice;
 
   LocalDateTime created_at;
   int total_quantity;
+
+  String category_id;
 
   List<Type> types;
   List<Variant> variants;
