@@ -1,7 +1,6 @@
 package com.e_cormerce.shoppe.repository;
 
 import com.e_cormerce.shoppe.entity.product.Category;
-import com.e_cormerce.shoppe.entity.product.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,4 +20,5 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
     @Query(value = "SELECT * FROM categories WHERE parent_id = :id ", nativeQuery = true)
     List<Category> findChildren(@Param("id") String id);
+    
 }

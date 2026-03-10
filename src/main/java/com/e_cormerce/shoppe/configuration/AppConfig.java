@@ -1,13 +1,12 @@
 package com.e_cormerce.shoppe.configuration;
 
 import com.e_cormerce.shoppe.configuration.helper.AppConfigHelper;
-import com.e_cormerce.shoppe.properties.AppConfigProperties;
+import com.e_cormerce.shoppe.properties.AdminProperties;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,18 +16,17 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class AppConfig {
 
-  AppConfigHelper appConfigHelper;
-  AppConfigProperties appConfigProperties;
+    AppConfigHelper appConfigHelper;
+    AdminProperties appConfigProperties;
 
-  @Bean
-  CommandLineRunner initData() {
-    return args -> {
-      appConfigHelper.createRoles();
-      appConfigHelper.createAdmin(appConfigProperties.getAdmin_email(),
-              appConfigProperties.getAdmin_password(), appConfigProperties.getAdmin_username());
-      appConfigHelper.createSeller(appConfigProperties.getSeller_email(),
-              appConfigProperties.getSeller_password(), appConfigProperties.getSeller_username());
-      appConfigHelper.createDefaultCategories();
-    };
-  }
+    @Bean
+    CommandLineRunner initData() {
+        return args -> {
+            appConfigHelper.createRoles();
+            appConfigHelper.createAdmin(appConfigProperties.getEmail(),
+                    appConfigProperties.getPassword(), appConfigProperties.getUsername());
+            appConfigHelper.createSeller("seller", "seller", "seller");//test
+            appConfigHelper.createDefaultCategories();
+        };
+    }
 }

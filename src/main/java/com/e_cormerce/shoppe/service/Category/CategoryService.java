@@ -6,19 +6,18 @@ import com.e_cormerce.shoppe.dto.response.CreateCategoryResponse;
 import com.e_cormerce.shoppe.dto.response.GetChildrenCategoryResponse;
 import com.e_cormerce.shoppe.dto.response.GetDefaultCategoryResponse;
 import com.e_cormerce.shoppe.entity.product.Category;
+import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.CategoryRepository;
 import com.e_cormerce.shoppe.service.Category.helper.CreateCategoryHelper;
 import com.e_cormerce.shoppe.service.media.CloudinaryService;
-import com.e_cormerce.shoppe.service.media.ImageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -30,21 +29,19 @@ public class CategoryService {
     CategoryRepository categoryRepository;
 
     public CreateCategoryResponse create(CreateCategoryRequest request, MultipartFile thumbnail) {
-
-        CompletableFuture<String> thumbnailFuture =
-                cloudinaryService.uploadFile(thumbnail);
-
-        CompletableFuture<Category> parentFuture =
-                createCategoryHelper.findParent(request.getParent_id());
-
-        CompletableFuture.allOf(thumbnailFuture, parentFuture).join();
-
+        if (categoryRepository.existsByVal(request.getName())) {
+            throw new AppException(ErrorCode.EXISTED_CATEGORY);
+        }
         Category category = Category.builder()
                 .val(request.getName())
-                .parent(parentFuture.join())
-                .thumbnail(thumbnailFuture.join())
+                .thumbnail(cloudinaryService.uploadFileSync(thumbnail))
                 .build();
-
+        /**
+         * nếu khác null thì mơi theem parent , còn ko thì vẫn tạo với mức mặc định  .
+         */
+        if (request.getParent_id() != null) {
+            category.setParent(createCategoryHelper.findById(request.getParent_id()));
+        }
         categoryRepository.save(category);
 
         return CreateCategoryResponse.builder()
@@ -54,19 +51,15 @@ public class CategoryService {
                 .build();
     }
 
-    public List<Category> getDefaults() {
-         return createCategoryHelper.findDefault();
 
-    }
-
-    public GetChildrenCategoryResponse getChildren(GetChildrenCategoryRequest request) {
+    public GetChildrenCategoryResponse getDirectChildren(GetChildrenCategoryRequest request) {
         List<Category> children = createCategoryHelper.findChildren(request.getId());
         return GetChildrenCategoryResponse.builder()
                 .children(children)
                 .build();
     }
 
-    public GetDefaultCategoryResponse getChildren() {
+    public GetDefaultCategoryResponse getDirectChildren() {
         List<Category> defaults = createCategoryHelper.findDefault();
         return GetDefaultCategoryResponse.builder()
                 .defaults(defaults)
