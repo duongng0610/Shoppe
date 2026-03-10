@@ -2,7 +2,10 @@ package com.e_cormerce.shoppe.controller.admin;
 
 import com.e_cormerce.shoppe.dto.request.Admin.CreateCategoryRequest;
 import com.e_cormerce.shoppe.dto.request.Admin.GetChildrenCategoryRequest;
-import com.e_cormerce.shoppe.dto.response.*;
+import com.e_cormerce.shoppe.dto.response.ApiResponse;
+import com.e_cormerce.shoppe.dto.response.CreateCategoryResponse;
+import com.e_cormerce.shoppe.dto.response.GetChildrenCategoryResponse;
+import com.e_cormerce.shoppe.dto.response.GetDefaultCategoryResponse;
 import com.e_cormerce.shoppe.service.Category.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +40,7 @@ public class AdminController {
 
     @GetMapping("/categories/children")
     public ResponseEntity<ApiResponse<GetChildrenCategoryResponse>> getChildren(@RequestBody GetChildrenCategoryRequest request) {
-        var result = categoryService.getChildren(request);
+        var result = categoryService.getDirectChildren(request);
         return ResponseEntity.ok(
                 ApiResponse.<GetChildrenCategoryResponse>builder()
                         .data(result)
@@ -48,7 +51,7 @@ public class AdminController {
 
     @GetMapping("/categories/default")
     public ResponseEntity<ApiResponse<GetDefaultCategoryResponse>> getChildren() {
-        var result = categoryService.getChildren();
+        var result = categoryService.getDirectChildren();
         return ResponseEntity.ok(
                 ApiResponse.<GetDefaultCategoryResponse>builder()
                         .data(result)
