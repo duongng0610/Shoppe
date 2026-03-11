@@ -43,7 +43,7 @@ public class Product {
   float discount_percentage;
 
   @Column(nullable = false)
-  double total_quantity;
+  int total_quantity;
 
   @Enumerated(EnumType.STRING)
   @Column(

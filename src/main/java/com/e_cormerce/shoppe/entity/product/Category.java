@@ -14,30 +14,28 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(
-        name = "categories",
-        indexes = {
-                @Index(name = "idx_parent", columnList = "parent_id"),
-                @Index(name = "idx_val", columnList = "val")
-        })
+    name = "categories",
+    indexes = {
+      @Index(name = "idx_parent", columnList = "parent_id"),
+      @Index(name = "idx_val", columnList = "val")
+    })
 public class Category {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(nullable = false)
-    String val;
+  @Column(nullable = false)
+  String val;
 
-    @Column(columnDefinition = "boolean default false")
-    boolean deleted;
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
-    String thumbnail;
+  String thumbnail;
 
-    // owner side
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    @Nullable
-    @JsonIgnore
-    Category parent;
-
-
+  // owner side
+  @ManyToOne
+  @JoinColumn(name = "parent_id")
+  @Nullable
+  @JsonIgnore
+  Category parent;
 }

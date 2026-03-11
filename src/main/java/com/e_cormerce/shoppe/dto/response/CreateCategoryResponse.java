@@ -8,9 +8,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class CreateCategoryResponse {
-    String name;
-    String thumbnail;
-    String parent_id;
+  String name;
+  String thumbnail;
+  String parent_id;
 }

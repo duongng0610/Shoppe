@@ -1,8 +1,8 @@
 package com.e_cormerce.shoppe.service.product.helper;
 
-import com.e_cormerce.shoppe.dto.common.TypeRequest;
-import com.e_cormerce.shoppe.dto.common.VariantRequest;
-import com.e_cormerce.shoppe.dto.common.VariantValueRequest;
+import com.e_cormerce.shoppe.dto.common.TypeDTO;
+import com.e_cormerce.shoppe.dto.common.VariantDTO;
+import com.e_cormerce.shoppe.dto.common.VariantValueDTO;
 import com.e_cormerce.shoppe.entity.product.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,16 +26,15 @@ public class CreateProductHelper {
     return variants;
   }
 
-  public List<Type> createType(List<TypeRequest> typeRequests, Product product) {
+  public List<Type> createType(List<TypeDTO> typeDTOS, Product product) {
 
     List<Type> types =
-        typeRequests.stream()
+        typeDTOS.stream()
             .map(
-                typeRequest -> {
-                  Type type =
-                      Type.builder().product(product).val(typeRequest.getTypeName()).build();
+                typeDTO -> {
+                  Type type = Type.builder().product(product).val(typeDTO.getTypeName()).build();
 
-                  type.setTypeValues(createTypeValues(typeRequest, type));
+                  type.setTypeValues(createTypeValues(typeDTO, type));
                   return type;
                 })
             .toList();
@@ -43,10 +42,10 @@ public class CreateProductHelper {
     return types;
   }
 
-  private List<TypeValue> createTypeValues(TypeRequest typeRequest, Type type) {
+  private List<TypeValue> createTypeValues(TypeDTO typeDTO, Type type) {
     List<TypeValue> typeValues = new ArrayList<>();
 
-    for (String typeValueVal : typeRequest.getTypeValues()) {
+    for (String typeValueVal : typeDTO.getTypeValues()) {
       TypeValue typeValue = TypeValue.builder().val(typeValueVal).type(type).build();
 
       typeValues.add(typeValue);
@@ -56,33 +55,32 @@ public class CreateProductHelper {
   }
 
   public List<Variant> createVariants(
-      List<VariantRequest> variantRequests, Product product, List<String> variantImageUrls) {
+      List<VariantDTO> variantDTOS, Product product, List<String> variantImageUrls) {
 
     List<Variant> variants = new ArrayList<>();
-    for (int i = 0; i < variantRequests.size(); i++) {
-      variants.add(createVariant(variantRequests.get(i), product, variantImageUrls.get(i)));
+    for (int i = 0; i < variantDTOS.size(); i++) {
+      variants.add(createVariant(variantDTOS.get(i), product, variantImageUrls.get(i)));
     }
     return variants;
   }
 
-  private Variant createVariant(
-      VariantRequest variantRequest, Product product, String variantImageUrl) {
+  private Variant createVariant(VariantDTO variantDTO, Product product, String variantImageUrl) {
     Variant variant =
         Variant.builder()
             .product(product)
-            .price(variantRequest.getPrice())
-            .quantity(variantRequest.getQuantity())
+            .price(variantDTO.getPrice())
+            .quantity(variantDTO.getQuantity())
             .thumbnail(variantImageUrl)
             .build();
 
     List<VariantValue> variantValues = new ArrayList<>();
 
-    for (VariantValueRequest variantValueRequest : variantRequest.getVariantValues()) {
-      Type type = findType(variantValueRequest.getTypeName(), product);
+    for (VariantValueDTO variantValueDTO : variantDTO.getVariantValues()) {
+      Type type = findType(variantValueDTO.getTypeName(), product);
 
       VariantValue variantValue =
           VariantValue.builder()
-              .value(findTypeValue(variantValueRequest.getTypeValue(), type))
+              .value(findTypeValue(variantValueDTO.getTypeValue(), type))
               .variant(variant)
               .build();
       variantValues.add(variantValue);
