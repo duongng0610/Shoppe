@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/admin")
+
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 
@@ -25,7 +25,7 @@ public class AdminController {
     CategoryService categoryService;
 
     @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(path = "/categories", consumes = "multipart/form-data")
+    @PostMapping(path = "admin/categories", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<CreateCategoryResponse>> create(
             @RequestPart CreateCategoryRequest request,
             @RequestPart MultipartFile thumbnail) {
