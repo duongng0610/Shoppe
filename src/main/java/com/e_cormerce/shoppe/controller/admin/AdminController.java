@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.controller.admin;
 
-import com.e_cormerce.shoppe.dto.request.Admin.CreateCategoryRequest;
+import com.e_cormerce.shoppe.dto.request.admin.CreateCategoryRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.CreateCategoryResponse;
 import com.e_cormerce.shoppe.service.category.CategoryService;

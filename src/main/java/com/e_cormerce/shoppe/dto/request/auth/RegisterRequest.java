@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.dto.request.Auth;
+package com.e_cormerce.shoppe.dto.request.auth;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.*;

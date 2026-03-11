@@ -1,9 +1,8 @@
 package com.e_cormerce.shoppe.service.product.helper;
 
-import com.e_cormerce.shoppe.dto.common.TypeDTO;
-import com.e_cormerce.shoppe.dto.common.VariantDTO;
-import com.e_cormerce.shoppe.dto.common.VariantValueDTO;
+import com.e_cormerce.shoppe.dto.common.*;
 import com.e_cormerce.shoppe.entity.product.*;
+import com.e_cormerce.shoppe.mapper.product.VariantMapper;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -13,6 +12,8 @@ import org.springframework.stereotype.Component;
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateProductHelper {
+
+  VariantMapper variantMapper;
 
   public List<Variant> createDefaultVariant(Product product) {
     List<Variant> variants = new ArrayList<>();
@@ -26,15 +27,16 @@ public class CreateProductHelper {
     return variants;
   }
 
-  public List<Type> createType(List<TypeDTO> typeDTOS, Product product) {
+  public List<Type> createType(List<TypeRequest> typeRequests, Product product) {
 
     List<Type> types =
-        typeDTOS.stream()
+        typeRequests.stream()
             .map(
-                typeDTO -> {
-                  Type type = Type.builder().product(product).val(typeDTO.getTypeName()).build();
+                typeRequest -> {
+                  Type type =
+                      Type.builder().product(product).val(typeRequest.getTypeName()).build();
 
-                  type.setTypeValues(createTypeValues(typeDTO, type));
+                  type.setTypeValues(createTypeValues(typeRequest, type));
                   return type;
                 })
             .toList();
@@ -42,10 +44,10 @@ public class CreateProductHelper {
     return types;
   }
 
-  private List<TypeValue> createTypeValues(TypeDTO typeDTO, Type type) {
+  private List<TypeValue> createTypeValues(TypeRequest typeRequest, Type type) {
     List<TypeValue> typeValues = new ArrayList<>();
 
-    for (String typeValueVal : typeDTO.getTypeValues()) {
+    for (String typeValueVal : typeRequest.getTypeValues()) {
       TypeValue typeValue = TypeValue.builder().val(typeValueVal).type(type).build();
 
       typeValues.add(typeValue);
@@ -55,27 +57,28 @@ public class CreateProductHelper {
   }
 
   public List<Variant> createVariants(
-      List<VariantDTO> variantDTOS, Product product, List<String> variantImageUrls) {
+      List<VariantRequest> variantRequests, Product product, List<String> variantImageUrls) {
 
     List<Variant> variants = new ArrayList<>();
-    for (int i = 0; i < variantDTOS.size(); i++) {
-      variants.add(createVariant(variantDTOS.get(i), product, variantImageUrls.get(i)));
+    for (int i = 0; i < variantRequests.size(); i++) {
+      variants.add(createVariant(variantRequests.get(i), product, variantImageUrls.get(i)));
     }
     return variants;
   }
 
-  private Variant createVariant(VariantDTO variantDTO, Product product, String variantImageUrl) {
+  private Variant createVariant(
+      VariantRequest variantRequest, Product product, String variantImageUrl) {
     Variant variant =
         Variant.builder()
             .product(product)
-            .price(variantDTO.getPrice())
-            .quantity(variantDTO.getQuantity())
+            .price(variantRequest.getPrice())
+            .quantity(variantRequest.getQuantity())
             .thumbnail(variantImageUrl)
             .build();
 
     List<VariantValue> variantValues = new ArrayList<>();
 
-    for (VariantValueDTO variantValueDTO : variantDTO.getVariantValues()) {
+    for (VariantValueDTO variantValueDTO : variantRequest.getVariantValues()) {
       Type type = findType(variantValueDTO.getTypeName(), product);
 
       VariantValue variantValue =
@@ -106,5 +109,50 @@ public class CreateProductHelper {
       }
     }
     return null;
+  }
+
+  public List<TypeResponse> createTypesResponse(List<Type> types) {
+    List<TypeResponse> typeResponses = new ArrayList<>();
+    for (Type type : types) {
+
+      List<TypeValueResponse> typeValueResponses =
+          type.getTypeValues().stream()
+              .map(
+                  typeValue -> {
+                    TypeValueResponse typeValueResponse =
+                        TypeValueResponse.builder().name(typeValue.getVal()).build();
+                    return typeValueResponse;
+                  })
+              .toList();
+
+      TypeResponse response =
+          TypeResponse.builder().name(type.getVal()).typeValues(typeValueResponses).build();
+    }
+
+    return typeResponses;
+  }
+
+  public List<VariantDetailResponse> createVariantDetail(List<Variant> variants) {
+    List<VariantDetailResponse> responses = new ArrayList<>();
+
+    for (Variant variant : variants) {
+      List<VariantValueDTO> variantValues =
+          variant.getVariantValues().stream()
+              .map(
+                  variantValue -> {
+                    VariantValueDTO variantValueDTO =
+                        VariantValueDTO.builder()
+                            .typeValue(variantValue.getValue().getVal())
+                            .typeName(variantValue.getValue().getType().getVal())
+                            .build();
+
+                    return variantValueDTO;
+                  })
+              .toList();
+
+      VariantDetailResponse response = variantMapper.toVariantDetailResponse(variant);
+      response.setVariantValues(variantValues);
+    }
+    return responses;
   }
 }

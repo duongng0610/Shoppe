@@ -1,7 +1,7 @@
-package com.e_cormerce.shoppe.dto.request.Seller;
+package com.e_cormerce.shoppe.dto.request.seller;
 
-import com.e_cormerce.shoppe.dto.common.TypeDTO;
-import com.e_cormerce.shoppe.dto.common.VariantDTO;
+import com.e_cormerce.shoppe.dto.common.TypeRequest;
+import com.e_cormerce.shoppe.dto.common.VariantRequest;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,6 +23,6 @@ public class CreateProductRequest {
 
   String category_id;
 
-  List<TypeDTO> types;
-  List<VariantDTO> variantDTOS;
+  List<TypeRequest> types;
+  List<VariantRequest> variantRequests;
 }

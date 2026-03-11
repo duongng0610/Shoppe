@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class VariantDTO {
+public class VariantRequest {
   List<VariantValueDTO> variantValues;
   BigDecimal price;
   int quantity;

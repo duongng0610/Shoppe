@@ -6,19 +6,19 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-@Service
-@RequestMapping("/categories")
+@RestController
+@RequestMapping(path = "/categories")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryController {
   CategoryService categoryService;
 
-  @GetMapping("/children")
+  @GetMapping("{id}/children")
   public ResponseEntity<ApiResponse> getChildren(@RequestParam String id) {
     var result = categoryService.getChildren(id);
     return ResponseEntity.ok(
@@ -30,7 +30,7 @@ public class CategoryController {
   }
 
   @GetMapping("/default")
-  public ResponseEntity<ApiResponse> getChildren() {
+  public ResponseEntity<ApiResponse> getDefault() {
     var result = categoryService.getDefault();
     return ResponseEntity.ok(
         ApiResponse.builder()

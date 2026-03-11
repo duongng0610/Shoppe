@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.controller.seller;
 
-import com.e_cormerce.shoppe.dto.request.Seller.CreateProductRequest;
+import com.e_cormerce.shoppe.dto.request.seller.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.CreateProductResponse;
 import com.e_cormerce.shoppe.properties.JwtProperties;
