@@ -24,7 +24,7 @@ public class TypeValue {
   boolean deleted;
 
   // owner side
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "type_id")
   @JsonIgnore
   Type type;

@@ -10,6 +10,10 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TypeRepository extends JpaRepository<Type, String> {
-  @Query(value = "SELECT * FROM type WHERE product_id = :product_id", nativeQuery = true)
+  @Query("""
+SELECT DISTINCT t
+FROM Type t
+WHERE t.product.id = :product_id
+""")
   CompletableFuture<List<Type>> findTypeOfProduct(@Param("product_id") String product_id);
 }

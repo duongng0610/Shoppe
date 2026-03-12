@@ -3,17 +3,23 @@ package com.e_cormerce.shoppe.service.product.helper;
 import com.e_cormerce.shoppe.dto.common.*;
 import com.e_cormerce.shoppe.entity.product.*;
 import com.e_cormerce.shoppe.mapper.product.VariantMapper;
+import com.e_cormerce.shoppe.repository.TypeValueRepository;
+import com.e_cormerce.shoppe.repository.VariantValueRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CreateProductHelper {
 
   VariantMapper variantMapper;
+  TypeValueRepository typeValueRepository;
+  VariantValueRepository variantValueRepository;
 
   public List<Variant> createDefaultVariant(Product product) {
     List<Variant> variants = new ArrayList<>();
@@ -116,7 +122,7 @@ public class CreateProductHelper {
     for (Type type : types) {
 
       List<TypeValueResponse> typeValueResponses =
-          type.getTypeValues().stream()
+          typeValueRepository.findValueOfType(type.getId()).stream()
               .map(
                   typeValue -> {
                     TypeValueResponse typeValueResponse =
@@ -127,6 +133,8 @@ public class CreateProductHelper {
 
       TypeResponse response =
           TypeResponse.builder().name(type.getVal()).typeValues(typeValueResponses).build();
+
+      typeResponses.add(response);
     }
 
     return typeResponses;
@@ -137,7 +145,7 @@ public class CreateProductHelper {
 
     for (Variant variant : variants) {
       List<VariantValueDTO> variantValues =
-          variant.getVariantValues().stream()
+          variantValueRepository.findValueOfVariant(variant.getId()).stream()
               .map(
                   variantValue -> {
                     VariantValueDTO variantValueDTO =
@@ -152,6 +160,7 @@ public class CreateProductHelper {
 
       VariantDetailResponse response = variantMapper.toVariantDetailResponse(variant);
       response.setVariantValues(variantValues);
+      responses.add(response);
     }
     return responses;
   }

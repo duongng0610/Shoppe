@@ -9,6 +9,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TypeValueRepository extends JpaRepository<TypeValue, String> {
-  @Query(value = "SELECT * FROM type WHERE product_id = :product_id", nativeQuery = true)
+  @Query(value = "SELECT * FROM type_value WHERE type_id = :type_id", nativeQuery = true)
   List<TypeValue> findValueOfType(@Param("type_id") String type_id);
 }

@@ -1,6 +1,8 @@
 package com.e_cormerce.shoppe.repository;
 
+import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.entity.product.Product;
+import com.e_cormerce.shoppe.entity.user.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -18,13 +20,13 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
   @Query(
       value =
-          "SELECT c.val FROM categories c JOIN products p ON p.category_id = c.id WHERE p.id = :product_id",
+          "SELECT c.* FROM categories c JOIN products p ON p.category_id = c.id WHERE p.id = :product_id",
       nativeQuery = true)
-  CompletableFuture<String> findCategoryOfProduct(@Param("product_id") String productId);
+  CompletableFuture<Category> findCategoryOfProduct(@Param("product_id") String productId);
 
   @Query(
       value =
-          "SELECT u.username FROM users u JOIN products p ON p.seller_id = u.id WHERE p.id = :product_id",
+          "SELECT u.* FROM users u JOIN products p ON p.seller_id = u.id WHERE p.id = :product_id",
       nativeQuery = true)
-  CompletableFuture<String> findSellerOfProduct(@Param("product_id") String productId);
+  CompletableFuture<User> findSellerOfProduct(@Param("product_id") String productId);
 }

@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class VariantRequest {
+  String id;
   List<VariantValueDTO> variantValues;
   BigDecimal price;
   int quantity;

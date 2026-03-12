@@ -1,7 +1,9 @@
 package com.e_cormerce.shoppe.service.product.helper;
 
+import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.entity.product.Type;
 import com.e_cormerce.shoppe.entity.product.Variant;
+import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.repository.*;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -25,12 +27,12 @@ public class ProductQueryDBHelper {
   }
 
   @Async("queryDBExecutor")
-  public CompletableFuture<String> getCategory(String product_id) {
+  public CompletableFuture<Category> getCategory(String product_id) {
     return productRepository.findCategoryOfProduct(product_id);
   }
 
   @Async("queryDBExecutor")
-  public CompletableFuture<String> getSeller(String product_id) {
+  public CompletableFuture<User> getSeller(String product_id) {
     return productRepository.findSellerOfProduct(product_id);
   }
 

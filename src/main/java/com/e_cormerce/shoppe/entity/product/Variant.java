@@ -42,7 +42,7 @@ public class Variant {
   @JsonIgnore
   Product product;
 
-  @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @Nullable
   List<VariantValue> variantValues;
 }

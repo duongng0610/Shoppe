@@ -10,6 +10,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VariantRepository extends JpaRepository<Variant, String> {
-  @Query(value = "SELECT * FROM variants WHERE product_id = :product_id", nativeQuery = true)
+  @Query(
+      """
+SELECT DISTINCT v
+FROM Variant v
+LEFT JOIN FETCH v.variantValues
+WHERE v.product.id = :product_id
+""")
   CompletableFuture<List<Variant>> findVariantsOfProduct(@Param("product_id") String product_id);
 }
