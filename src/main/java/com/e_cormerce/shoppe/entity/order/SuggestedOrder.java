@@ -26,14 +26,14 @@ public class SuggestedOrder {
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
 
-  @Column(precision = 15, scale = 2, nullable = false)
-  BigDecimal shipping_cost;
+  @Column(name = "shipping_cost", precision = 15, scale = 2, nullable = false)
+  BigDecimal shippingCost;
 
-  @Column(nullable = false)
-  LocalDate required_date;
+  @Column(name = "required_date", nullable = false)
+  LocalDate requiredDate;
 
-  @Column(nullable = false)
-  LocalDateTime created_at;
+  @Column(name = "created_at", nullable = false)
+  LocalDateTime createdAt;
 
   @ManyToOne
   @JoinColumn(name = "order_id", nullable = false)

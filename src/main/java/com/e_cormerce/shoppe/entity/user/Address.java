@@ -33,7 +33,8 @@ public class Address {
   @Column(nullable = false)
   String ward;
 
-  boolean is_default = false;
+  @Column(name = "is_default")
+  boolean isDefault = false;
 
   // inverse side
   @ManyToMany(mappedBy = "addresses")

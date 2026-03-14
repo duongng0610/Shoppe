@@ -32,7 +32,8 @@ public class Variant {
   @Column(nullable = false)
   double quantity;
 
-  double discount_percentage;
+  @Column(name = "discount_percentage")
+  double discountPercentage;
 
   @Column(columnDefinition = "boolean default false")
   boolean deleted;

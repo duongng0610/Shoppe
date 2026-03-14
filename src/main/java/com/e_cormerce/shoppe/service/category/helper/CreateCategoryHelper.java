@@ -3,7 +3,7 @@ package com.e_cormerce.shoppe.service.category.helper;
 import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.repository.CategoryRepository;
+import com.e_cormerce.shoppe.repository.product.CategoryRepository;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import lombok.AccessLevel;

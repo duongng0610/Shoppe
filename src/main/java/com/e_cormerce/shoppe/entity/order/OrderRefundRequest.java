@@ -1,8 +1,8 @@
 package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.enums.OrderRefundStatus;
-import com.e_cormerce.shoppe.enums.OrderRefundType;
+import com.e_cormerce.shoppe.enums.order.OrderRefundStatus;
+import com.e_cormerce.shoppe.enums.order.OrderRefundType;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -27,17 +27,21 @@ public class OrderRefundRequest {
   @Column(nullable = false, columnDefinition = "TEXT")
   String reason;
 
-  @Column(nullable = false)
+  @Column(name = "refund_amount", nullable = false)
   BigDecimal refundAmount;
 
-  @Column(nullable = false)
-  LocalDateTime created_at;
+  @Column(name = "created_at", nullable = false)
+  LocalDateTime createdAt;
 
-  LocalDateTime resolved_at;
+  @Column(name = "resolved_at")
+  LocalDateTime resolvedAt;
 
   @Enumerated(EnumType.STRING)
-  @Column(columnDefinition = "ENUM('CLIENT_REFUND', 'SHIPPER_REFUND')", nullable = false)
-  OrderRefundType refund_type;
+  @Column(
+      name = "refund_type",
+      columnDefinition = "ENUM('CLIENT_REFUND', 'SHIPPER_REFUND')",
+      nullable = false)
+  OrderRefundType refundType;
 
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "ENUM('PENDING', 'REJECTED', 'APPROVED')", nullable = false)

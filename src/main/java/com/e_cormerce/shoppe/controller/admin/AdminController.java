@@ -21,19 +21,19 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminController {
-    CategoryService categoryService;
+  CategoryService categoryService;
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @PostMapping(path = "/categories", consumes = "multipart/form-data")
-    public ResponseEntity<ApiResponse<CreateCategoryResponse>> create(
-            @RequestPart CreateCategoryRequest request, @RequestPart MultipartFile thumbnail) {
-        var result = categoryService.create(request, thumbnail);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(
-                        ApiResponse.<CreateCategoryResponse>builder()
-                                .data(result)
-                                .success(true)
-                                .message("create category successfully")
-                                .build());
-    }
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping(path = "/categories", consumes = "multipart/form-data")
+  public ResponseEntity<ApiResponse<CreateCategoryResponse>> create(
+      @RequestPart CreateCategoryRequest request, @RequestPart MultipartFile thumbnail) {
+    var result = categoryService.create(request, thumbnail);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            ApiResponse.<CreateCategoryResponse>builder()
+                .data(result)
+                .success(true)
+                .message("create category successfully")
+                .build());
+  }
 }

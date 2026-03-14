@@ -27,8 +27,8 @@ public class OrderNotification {
   @Column(nullable = false)
   String message;
 
-  @Column(nullable = false)
-  LocalDateTime created_at;
+  @Column(name = "created_at", nullable = false)
+  LocalDateTime createdAt;
 
   @ManyToOne
   @JoinColumn(name = "from_id", nullable = false)

@@ -14,7 +14,11 @@ import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.properties.JwtProperties;
-import com.e_cormerce.shoppe.repository.*;
+import com.e_cormerce.shoppe.repository.token.InvalidTokenRepository;
+import com.e_cormerce.shoppe.repository.token.RefreshTokenRepository;
+import com.e_cormerce.shoppe.repository.user.AccountRepository;
+import com.e_cormerce.shoppe.repository.user.RoleRepository;
+import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.util.HashUtil;
 import io.jsonwebtoken.Claims;
 import java.time.LocalDate;
@@ -98,7 +102,7 @@ public class AuthService {
             .account(account)
             .username(request.getUsername())
             .role(role)
-            .created_at(LocalDateTime.now())
+            .createdAt(LocalDateTime.now())
             .build();
 
     userRepository.save(user);
@@ -122,7 +126,7 @@ public class AuthService {
     InvalidToken invalidToken =
         InvalidToken.builder()
             .val(HashUtil.sha256(request.getAccessToken()))
-            .invalid_date(LocalDate.now())
+            .invalidDate(LocalDate.now())
             .build();
 
     invalidTokenRepository.save(invalidToken);

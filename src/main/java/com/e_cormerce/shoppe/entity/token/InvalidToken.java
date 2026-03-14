@@ -23,6 +23,6 @@ public class InvalidToken {
   @Column(nullable = false, unique = true)
   String val;
 
-  @Column(nullable = false)
-  LocalDate invalid_date;
+  @Column(name = "invalid_date", nullable = false)
+  LocalDate invalidDate;
 }

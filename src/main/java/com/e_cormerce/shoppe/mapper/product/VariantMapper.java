@@ -8,6 +8,5 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface VariantMapper {
   @Mapping(target = "variantValues", ignore = true)
-  @Mapping(target = "discountPercentage", source = "discount_percentage")
   VariantDetailResponse toVariantDetailResponse(Variant variant);
 }
