@@ -1,13 +1,13 @@
 package com.e_cormerce.shoppe.service.category;
 
-import com.e_cormerce.shoppe.dto.request.Admin.CreateCategoryRequest;
+import com.e_cormerce.shoppe.dto.request.admin.CreateCategoryRequest;
 import com.e_cormerce.shoppe.dto.response.CreateCategoryResponse;
 import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.CategoryRepository;
 import com.e_cormerce.shoppe.service.category.helper.CreateCategoryHelper;
-import com.e_cormerce.shoppe.service.media.CloudinaryService;
+import com.e_cormerce.shoppe.service.media.ImageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,7 +22,7 @@ import java.util.List;
 public class CategoryService {
 
     CreateCategoryHelper createCategoryHelper;
-    CloudinaryService cloudinaryService;
+    ImageService imageService;
     CategoryRepository categoryRepository;
 
     public CreateCategoryResponse create(CreateCategoryRequest request, MultipartFile thumbnail) {
@@ -32,7 +32,7 @@ public class CategoryService {
         Category category =
                 Category.builder()
                         .val(request.getName())
-                        .thumbnail(cloudinaryService.uploadFileSync(thumbnail))
+                        .thumbnail(imageService.uploadSingleImage(thumbnail))
                         .build();
         /** nếu khác null thì mơi theem parent , còn ko thì vẫn tạo với mức mặc định. */
         if (request.getParent_id() != null) {

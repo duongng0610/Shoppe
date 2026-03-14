@@ -31,6 +31,10 @@ public class Type {
   Product product;
 
   // inverse side
-  @OneToMany(mappedBy = "type", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "type",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
   List<TypeValue> typeValues;
 }

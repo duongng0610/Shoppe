@@ -1,14 +1,20 @@
 package com.e_cormerce.shoppe.dto.response;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.e_cormerce.shoppe.dto.common.*;
+import java.util.List;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GetProductDetailResponse {
+  String id;
+  String description;
+  CategoryDTO category;
+  SellerDTO seller;
+  List<VariantDetailResponse> variants;
+  List<TypeResponse> types;
 }

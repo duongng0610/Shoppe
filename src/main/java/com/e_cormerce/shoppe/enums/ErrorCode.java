@@ -31,7 +31,8 @@ public enum ErrorCode {
   UPLOAD_TIMEOUT("Your image upload too long", 1014, HttpStatus.BAD_REQUEST),
   INVALID_PARENT_CATEGORY("Your parent category is in invalid", 1015, HttpStatus.BAD_REQUEST),
   NOT_EXISTED_CATEGORY("Category didn't exist", 1016, HttpStatus.BAD_REQUEST),
-  EXISTED_CATEGORY("Category didn't exist", 1017, HttpStatus.BAD_REQUEST);
+  EXISTED_CATEGORY("Category didn't exist", 1017, HttpStatus.BAD_REQUEST),
+  NOT_EXISTED_PRODUCT("Your product is not existed", 1018, HttpStatus.BAD_REQUEST);
   String message;
   int code;
   HttpStatus httpStatus;
