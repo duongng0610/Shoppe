@@ -10,6 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class LogInRequest {
-    @NotNull String email;
-    @NotNull String password;
+  @NotNull String email;
+  @NotNull String password;
 }

@@ -12,10 +12,8 @@ import org.springframework.stereotype.Component;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Component
-
 public class AdminProperties {
-    String email;
-    String password;
-    String username;
-
+  String email;
+  String password;
+  String username;
 }

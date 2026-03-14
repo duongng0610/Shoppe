@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class VariantValueRequest {
+public class VariantValueDTO {
   String typeName;
   String typeValue;
 }

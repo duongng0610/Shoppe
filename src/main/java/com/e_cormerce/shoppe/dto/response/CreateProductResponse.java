@@ -1,6 +1,5 @@
 package com.e_cormerce.shoppe.dto.response;
 
-import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.entity.product.Type;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import java.math.BigDecimal;

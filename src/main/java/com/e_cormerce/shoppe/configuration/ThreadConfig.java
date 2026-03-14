@@ -47,22 +47,22 @@ public class ThreadConfig {
     return executor;
   }
 
-    @Bean("queryDBExecutor")
-    public Executor queryDBExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+  @Bean("queryDBExecutor")
+  public Executor queryDBExecutor() {
+    ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
-        executor.setCorePoolSize(20);
-        executor.setMaxPoolSize(40);
-        executor.setQueueCapacity(50);
+    executor.setCorePoolSize(20);
+    executor.setMaxPoolSize(40);
+    executor.setQueueCapacity(50);
 
-        executor.setKeepAliveSeconds(60);
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.setWaitForTasksToCompleteOnShutdown(true);
-        executor.setAwaitTerminationSeconds(30);
+    executor.setKeepAliveSeconds(60);
+    executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+    executor.setWaitForTasksToCompleteOnShutdown(true);
+    executor.setAwaitTerminationSeconds(30);
 
-        executor.setThreadNamePrefix("queryDBExecutor-");
-        executor.initialize();
+    executor.setThreadNamePrefix("queryDBExecutor-");
+    executor.initialize();
 
-        return executor;
-    }
+    return executor;
+  }
 }

@@ -1,15 +1,12 @@
-package com.e_cormerce.shoppe.service.Category;
+package com.e_cormerce.shoppe.service.category;
 
 import com.e_cormerce.shoppe.dto.request.Admin.CreateCategoryRequest;
-import com.e_cormerce.shoppe.dto.request.Admin.GetChildrenCategoryRequest;
 import com.e_cormerce.shoppe.dto.response.CreateCategoryResponse;
-import com.e_cormerce.shoppe.dto.response.GetChildrenCategoryResponse;
-import com.e_cormerce.shoppe.dto.response.GetDefaultCategoryResponse;
 import com.e_cormerce.shoppe.entity.product.Category;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.CategoryRepository;
-import com.e_cormerce.shoppe.service.Category.helper.CreateCategoryHelper;
+import com.e_cormerce.shoppe.service.category.helper.CreateCategoryHelper;
 import com.e_cormerce.shoppe.service.media.CloudinaryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +29,12 @@ public class CategoryService {
         if (categoryRepository.existsByVal(request.getName())) {
             throw new AppException(ErrorCode.EXISTED_CATEGORY);
         }
-        Category category = Category.builder()
-                .val(request.getName())
-                .thumbnail(cloudinaryService.uploadFileSync(thumbnail))
-                .build();
-        /**
-         * nếu khác null thì mơi theem parent , còn ko thì vẫn tạo với mức mặc định  .
-         */
+        Category category =
+                Category.builder()
+                        .val(request.getName())
+                        .thumbnail(cloudinaryService.uploadFileSync(thumbnail))
+                        .build();
+        /** nếu khác null thì mơi theem parent , còn ko thì vẫn tạo với mức mặc định. */
         if (request.getParent_id() != null) {
             category.setParent(createCategoryHelper.findById(request.getParent_id()));
         }
@@ -51,20 +47,13 @@ public class CategoryService {
                 .build();
     }
 
-
-    public GetChildrenCategoryResponse getDirectChildren(GetChildrenCategoryRequest request) {
-        List<Category> children = createCategoryHelper.findChildren(request.getId());
-        return GetChildrenCategoryResponse.builder()
-                .children(children)
-                .build();
+    public List<Category> getChildren(String id) {
+        List<Category> children = createCategoryHelper.findChildren(id);
+        return children;
     }
 
-    public GetDefaultCategoryResponse getDirectChildren() {
+    public List<Category> getDefault() {
         List<Category> defaults = createCategoryHelper.findDefault();
-        return GetDefaultCategoryResponse.builder()
-                .defaults(defaults)
-                .build();
+        return defaults;
     }
-
-
 }

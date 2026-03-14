@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class ProductService {
     CreateProductHelper createProductHelper;
     ProductRepository productRepository;
     CategoryRepository categoryRepository;
+
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
     public CreateProductResponse persistProduct(
@@ -59,12 +61,15 @@ public class ProductService {
         if (hasVariant) {
             product.setVariants(
                     createProductHelper.createVariants(
-                            request.getVariantRequests(), product, urls.getVariantImageUrls()));
+                            request.getVariantDTOS(), product, urls.getVariantImageUrls()));
         } else {
             product.setVariants(createProductHelper.createDefaultVariant(product));
         }
 
-        product.setCategory(categoryRepository.findById(request.getCategory_id()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_CATEGORY)));
+        product.setCategory(
+                categoryRepository
+                        .findById(request.getCategory_id())
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_CATEGORY)));
 
         productRepository.save(product);
 
@@ -77,5 +82,10 @@ public class ProductService {
                 .types(product.getTypes())
                 .variants(product.getVariants())
                 .build();
+    }
+
+    public List<Product> getProductForHome(int limit, int offset) {
+        List<Product> products = productRepository.findProductForHome(limit, offset);
+        return products;
     }
 }

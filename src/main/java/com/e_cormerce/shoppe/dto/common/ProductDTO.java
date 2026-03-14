@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.dto.common;
 
-import java.util.List;
+import java.math.BigDecimal;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,7 +10,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TypeRequest {
-  String typeName;
-  List<String> typeValues;
+public class ProductDTO {
+  String id;
+  String name;
+  String thumbnail;
+  BigDecimal originPrice;
+  float discount_percentage;
+  int total_quantity;
 }
