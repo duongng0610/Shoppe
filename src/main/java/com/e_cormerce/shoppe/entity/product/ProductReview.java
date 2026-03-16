@@ -30,8 +30,8 @@ public class ProductReview {
   @Column(columnDefinition = "TEXT", nullable = false)
   String description;
 
-  @Column(nullable = false)
-  LocalDateTime created_at;
+  @Column(name = "created_at", nullable = false)
+  LocalDateTime createdAt;
 
   @ManyToOne
   @JoinColumn(name = "client_id", nullable = false)

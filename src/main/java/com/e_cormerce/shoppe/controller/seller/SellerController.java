@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.controller.seller;
 
-import com.e_cormerce.shoppe.dto.request.Seller.CreateProductRequest;
+import com.e_cormerce.shoppe.dto.request.seller.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.CreateProductResponse;
 import com.e_cormerce.shoppe.properties.JwtProperties;
@@ -35,9 +35,7 @@ public class SellerController {
    *
    * @param product
    * @param thumbnail
-   * @param hasExtraImages
    * @param extraImages
-   * @param hasVariant
    * @param variantImages
    * @return
    */
@@ -46,13 +44,9 @@ public class SellerController {
   public ResponseEntity<ApiResponse<CreateProductResponse>> create(
       @RequestPart CreateProductRequest product,
       @RequestPart MultipartFile thumbnail,
-      @RequestPart boolean hasExtraImages,
       @RequestParam List<MultipartFile> extraImages,
-      @RequestPart boolean hasVariant,
       @RequestParam List<MultipartFile> variantImages) {
-    var result =
-        sellerService.createProduct(
-            product, thumbnail, hasExtraImages, extraImages, hasVariant, variantImages);
+    var result = sellerService.createProduct(product, thumbnail, extraImages, variantImages);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(
             ApiResponse.<CreateProductResponse>builder()

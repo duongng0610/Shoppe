@@ -1,18 +1,27 @@
 package com.e_cormerce.shoppe.service.product.helper;
 
-import com.e_cormerce.shoppe.dto.common.TypeDTO;
-import com.e_cormerce.shoppe.dto.common.VariantDTO;
+import com.e_cormerce.shoppe.dto.common.TypeRequest;
+import com.e_cormerce.shoppe.dto.common.VariantRequest;
 import com.e_cormerce.shoppe.dto.common.VariantValueDTO;
 import com.e_cormerce.shoppe.entity.product.*;
+import com.e_cormerce.shoppe.mapper.product.VariantMapper;
+import com.e_cormerce.shoppe.repository.product.TypeValueRepository;
+import com.e_cormerce.shoppe.repository.product.VariantValueRepository;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CreateProductHelper {
+
+  VariantMapper variantMapper;
+  TypeValueRepository typeValueRepository;
+  VariantValueRepository variantValueRepository;
 
   public List<Variant> createDefaultVariant(Product product) {
     List<Variant> variants = new ArrayList<>();
@@ -20,21 +29,22 @@ public class CreateProductHelper {
         Variant.builder()
             .product(product)
             .thumbnail(product.getThumbnail())
-            .quantity(product.getTotal_quantity())
+            .quantity(product.getTotalQuantity())
             .price(product.getOriginPrice())
             .build());
     return variants;
   }
 
-  public List<Type> createType(List<TypeDTO> typeDTOS, Product product) {
+  public List<Type> createType(List<TypeRequest> typeRequests, Product product) {
 
     List<Type> types =
-        typeDTOS.stream()
+        typeRequests.stream()
             .map(
-                typeDTO -> {
-                  Type type = Type.builder().product(product).val(typeDTO.getTypeName()).build();
+                typeRequest -> {
+                  Type type =
+                      Type.builder().product(product).val(typeRequest.getTypeName()).build();
 
-                  type.setTypeValues(createTypeValues(typeDTO, type));
+                  type.setTypeValues(createTypeValues(typeRequest, type));
                   return type;
                 })
             .toList();
@@ -42,10 +52,10 @@ public class CreateProductHelper {
     return types;
   }
 
-  private List<TypeValue> createTypeValues(TypeDTO typeDTO, Type type) {
+  private List<TypeValue> createTypeValues(TypeRequest typeRequest, Type type) {
     List<TypeValue> typeValues = new ArrayList<>();
 
-    for (String typeValueVal : typeDTO.getTypeValues()) {
+    for (String typeValueVal : typeRequest.getTypeValues()) {
       TypeValue typeValue = TypeValue.builder().val(typeValueVal).type(type).build();
 
       typeValues.add(typeValue);
@@ -55,27 +65,28 @@ public class CreateProductHelper {
   }
 
   public List<Variant> createVariants(
-      List<VariantDTO> variantDTOS, Product product, List<String> variantImageUrls) {
+      List<VariantRequest> variantRequests, Product product, List<String> variantImageUrls) {
 
     List<Variant> variants = new ArrayList<>();
-    for (int i = 0; i < variantDTOS.size(); i++) {
-      variants.add(createVariant(variantDTOS.get(i), product, variantImageUrls.get(i)));
+    for (int i = 0; i < variantRequests.size(); i++) {
+      variants.add(createVariant(variantRequests.get(i), product, variantImageUrls.get(i)));
     }
     return variants;
   }
 
-  private Variant createVariant(VariantDTO variantDTO, Product product, String variantImageUrl) {
+  private Variant createVariant(
+      VariantRequest variantRequest, Product product, String variantImageUrl) {
     Variant variant =
         Variant.builder()
             .product(product)
-            .price(variantDTO.getPrice())
-            .quantity(variantDTO.getQuantity())
+            .price(variantRequest.getPrice())
+            .quantity(variantRequest.getQuantity())
             .thumbnail(variantImageUrl)
             .build();
 
     List<VariantValue> variantValues = new ArrayList<>();
 
-    for (VariantValueDTO variantValueDTO : variantDTO.getVariantValues()) {
+    for (VariantValueDTO variantValueDTO : variantRequest.getVariantValues()) {
       Type type = findType(variantValueDTO.getTypeName(), product);
 
       VariantValue variantValue =

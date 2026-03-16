@@ -1,7 +1,7 @@
 package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.enums.OrderTrackingStatus;
+import com.e_cormerce.shoppe.enums.order.OrderTrackingStatus;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,14 +21,14 @@ public class OrderTracking {
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
 
-  @Column(precision = 15, scale = 2, nullable = false)
-  BigDecimal ship_cost;
+  @Column(name = "ship_cost", precision = 15, scale = 2, nullable = false)
+  BigDecimal shipCost;
 
-  @Column(nullable = false)
-  LocalDate required_date;
+  @Column(name = "required_date", nullable = false)
+  LocalDate requiredDate;
 
-  @Column(nullable = false)
-  LocalDateTime created_at;
+  @Column(name = "created_at", nullable = false)
+  LocalDateTime createdAt;
 
   @Enumerated(EnumType.STRING)
   @Column(columnDefinition = "ENUM('PENDING', 'FAILED', 'SUCCEED')", nullable = false)
@@ -40,5 +40,5 @@ public class OrderTracking {
 
   @ManyToOne
   @JoinColumn(name = "order_tracking_id", nullable = false)
-  OrderTracking order_tracking;
+  OrderTracking orderTracking;
 }

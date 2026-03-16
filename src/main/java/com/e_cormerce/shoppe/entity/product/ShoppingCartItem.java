@@ -24,14 +24,14 @@ public class ShoppingCartItem {
   @Column(nullable = false)
   int quantity;
 
-  @Column(precision = 15, scale = 2, nullable = false)
-  BigDecimal price_each;
+  @Column(name = "price_each", precision = 15, scale = 2, nullable = false)
+  BigDecimal priceEach;
 
   @Column(columnDefinition = "boolean default false")
-  boolean is_deleted;
+  boolean deleted;
 
-  @Column(columnDefinition = "boolean default false")
-  boolean is_Variant;
+  @Column(name = "is_variant", columnDefinition = "boolean default false")
+  boolean isVariant;
 
   @ManyToOne
   @JoinColumn(name = "variant_id")

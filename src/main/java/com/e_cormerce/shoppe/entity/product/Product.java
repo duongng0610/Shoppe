@@ -1,7 +1,7 @@
 package com.e_cormerce.shoppe.entity.product;
 
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.enums.ProductStatus;
+import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,22 +37,22 @@ public class Product {
   @Column(nullable = false, columnDefinition = "TEXT")
   String description;
 
-  @Column(precision = 15, scale = 2, nullable = false)
+  @Column(name = "origin_price", precision = 15, scale = 2, nullable = false)
   BigDecimal originPrice;
 
-  float discount_percentage;
+  @Column(name = "discount_percentage")
+  float discountPercentage;
 
-  @Column(nullable = false)
-  int total_quantity;
+  @Column(name = "total_quantity", nullable = false)
+  int totalQuantity;
 
   @Enumerated(EnumType.STRING)
   @Column(
       columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')") // , nullable = false)
   ProductStatus status = ProductStatus.PENDING;
 
-  LocalDateTime created_at;
-
-  boolean has_Variant = false;
+  @Column(name = "created_at")
+  LocalDateTime createdAt;
 
   // owner side
   @ManyToOne

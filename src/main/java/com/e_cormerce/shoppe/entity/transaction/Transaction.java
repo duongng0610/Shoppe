@@ -1,8 +1,8 @@
 package com.e_cormerce.shoppe.entity.transaction;
 
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.enums.TargetTypeTransaction;
-import com.e_cormerce.shoppe.enums.TransactionStatus;
+import com.e_cormerce.shoppe.enums.transaction.TargetTypeTransaction;
+import com.e_cormerce.shoppe.enums.transaction.TransactionStatus;
 import jakarta.persistence.*;
 import java.util.Date;
 import lombok.*;
@@ -35,11 +35,11 @@ public class Transaction {
 
   @Column(name = "created_at", nullable = false)
   @NotNull
-  Date created_at;
+  Date createdAt;
 
   @Column(name = "target_id", nullable = false)
   @NotNull
-  String target_id;
+  String targetId;
 
   @Column @NotNull TargetTypeTransaction target_type_transaction;
 }

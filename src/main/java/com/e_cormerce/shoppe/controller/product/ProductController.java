@@ -6,12 +6,9 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-@Service
+@RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -25,5 +22,13 @@ public class ProductController {
 
     return ResponseEntity.ok(
         ApiResponse.builder().data(result).message("get product successfully").build());
+  }
+
+  @GetMapping("/{id}/details")
+  public ResponseEntity<ApiResponse> getDetailOfProduct(@PathVariable String id) {
+    var result = productService.getProductDetail(id);
+
+    return ResponseEntity.ok(
+        ApiResponse.builder().data(result).message("get product detail successfully").build());
   }
 }

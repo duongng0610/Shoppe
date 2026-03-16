@@ -34,13 +34,20 @@ public class Account {
   @NotNull
   Date created_at;
 
-  Date updated_at;
+  @Column(name = "updated_at")
+  Date updatedAt;
 
-  @NotNull LocalDateTime last_login_at;
+  @Column(name = "last_login_at")
+  @NotNull
+  LocalDateTime lastLoginAt;
 
-  @NotNull LocalDateTime last_active_at;
+  @Column(name = "last_active_at")
+  @NotNull
+  LocalDateTime lastActiveAt;
 
-  @NotNull boolean is_active;
+  @Column(name = "is_active")
+  @NotNull
+  boolean isActive;
 
   @Column(columnDefinition = "boolean default false")
   boolean deleted;

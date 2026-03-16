@@ -32,7 +32,8 @@ public class Variant {
   @Column(nullable = false)
   double quantity;
 
-  double discount_percentage;
+  @Column(name = "discount_percentage")
+  double discountPercentage;
 
   @Column(columnDefinition = "boolean default false")
   boolean deleted;
@@ -42,7 +43,7 @@ public class Variant {
   @JsonIgnore
   Product product;
 
-  @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL)
+  @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   @Nullable
   List<VariantValue> variantValues;
 }

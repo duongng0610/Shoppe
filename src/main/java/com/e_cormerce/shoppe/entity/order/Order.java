@@ -3,7 +3,7 @@ package com.e_cormerce.shoppe.entity.order;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.enums.OrderStatus;
+import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
@@ -33,16 +33,17 @@ public class Order {
       nullable = false)
   OrderStatus status;
 
-  @Column(nullable = false)
-  double price_each;
+  @Column(name = "price_each", nullable = false)
+  double priceEach;
 
   @Column(nullable = false)
   int quantity;
 
-  LocalDateTime created_at;
+  @Column(name = "created_at")
+  LocalDateTime createdAt;
 
-  @Column(nullable = false)
-  LocalDateTime updated_at;
+  @Column(name = "updated_at", nullable = false)
+  LocalDateTime updatedAt;
 
   @ManyToOne
   @JoinColumn(name = "variant_id", nullable = false)

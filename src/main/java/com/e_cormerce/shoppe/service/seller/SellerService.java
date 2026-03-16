@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.service.seller;
 
-import com.e_cormerce.shoppe.dto.request.Seller.CreateProductRequest;
+import com.e_cormerce.shoppe.dto.request.seller.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.CreateProductResponse;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
@@ -27,20 +27,16 @@ public class SellerService {
   public CreateProductResponse createProduct(
       CreateProductRequest request,
       MultipartFile thumbnail,
-      boolean hasExtraImages,
       List<MultipartFile> extraImages,
-      boolean hasVariant,
       List<MultipartFile> variantImages) {
 
-    if (hasVariant
-        && variantImages != null
-        && variantImages.size() != request.getVariantDTOS().size()) {
+    if (variantImages != null && variantImages.size() != request.getVariantRequests().size()) {
       throw new AppException(ErrorCode.INVALID_CREATE_VARIANTS);
     }
 
     ProductImagesUrl urls =
         uploadProductImagesHelper.uploadImagesOfProduct(thumbnail, extraImages, variantImages);
 
-    return productService.persistProduct(request, urls, hasVariant);
+    return productService.persistProduct(request, urls);
   }
 }

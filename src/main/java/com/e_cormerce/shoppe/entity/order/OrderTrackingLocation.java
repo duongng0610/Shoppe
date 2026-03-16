@@ -21,8 +21,11 @@ public class OrderTrackingLocation {
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
 
+  @Column(name = "is_last_update")
   boolean isLastUpdate = true;
-  LocalDate created_at;
+
+  @Column(name = "created_at")
+  LocalDate createdAt;
 
   @ManyToOne
   @JoinColumn(name = "address_id", nullable = false)

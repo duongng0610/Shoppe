@@ -1,7 +1,7 @@
 package com.e_cormerce.shoppe.entity.user;
 
 import com.e_cormerce.shoppe.entity.transaction.Transaction;
-import com.e_cormerce.shoppe.enums.UserStatus;
+import com.e_cormerce.shoppe.enums.user.UserStatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -32,11 +32,13 @@ public class User {
 
   String avatar;
   LocalDate birth;
-  LocalDateTime created_at;
+
+  @Column(name = "created_at")
+  LocalDateTime createdAt;
 
   @Enumerated(EnumType.STRING)
-  // @Column(nullable = false)
-  UserStatus user_status;
+  @Column(name = "user_status") // , nullable = false)
+  UserStatus userStatus;
 
   // owner side
   @OneToOne(fetch = FetchType.LAZY)

@@ -22,7 +22,8 @@ public class PhoneNumber {
   @Column(name = "val", unique = true)
   String val;
 
-  Boolean is_default = false;
+  @Column(name = "is_default")
+  Boolean isDefault = false;
 
   @Column(columnDefinition = "boolean default false")
   boolean deleted;

@@ -24,12 +24,12 @@ public class VariantValue {
   boolean deleted;
 
   // owner side
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "variant_id", nullable = false)
   @JsonIgnore
   Variant variant;
 
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name = "attribute_id", nullable = false)
   TypeValue value;
 }

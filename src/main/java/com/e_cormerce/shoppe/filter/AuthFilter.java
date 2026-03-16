@@ -1,7 +1,7 @@
 package com.e_cormerce.shoppe.filter;
 
 import com.e_cormerce.shoppe.properties.JwtProperties;
-import com.e_cormerce.shoppe.repository.InvalidTokenRepository;
+import com.e_cormerce.shoppe.repository.token.InvalidTokenRepository;
 import com.e_cormerce.shoppe.service.auth.JwtService;
 import com.e_cormerce.shoppe.util.CookieUtil;
 import com.e_cormerce.shoppe.util.HashUtil;

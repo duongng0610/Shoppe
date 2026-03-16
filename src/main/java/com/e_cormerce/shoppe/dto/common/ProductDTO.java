@@ -15,6 +15,6 @@ public class ProductDTO {
   String name;
   String thumbnail;
   BigDecimal originPrice;
-  float discount_percentage;
-  int total_quantity;
+  float discountPercentage;
+  int totalQuantity;
 }
