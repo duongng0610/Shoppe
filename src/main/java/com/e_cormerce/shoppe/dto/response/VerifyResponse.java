@@ -9,5 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VerifyResponse {
-  String username;
+    String id;
+    String username;
+    String avatar;
 }
