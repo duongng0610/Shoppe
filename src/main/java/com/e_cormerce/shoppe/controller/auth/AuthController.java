@@ -1,12 +1,12 @@
 package com.e_cormerce.shoppe.controller.auth;
 
-import com.e_cormerce.shoppe.dto.request.auth.LogInRequest;
-import com.e_cormerce.shoppe.dto.request.auth.LogOutRequest;
-import com.e_cormerce.shoppe.dto.request.auth.RegisterRequest;
+import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
+import com.e_cormerce.shoppe.dto.request.auth.register.RegisterClientRequest;
+import com.e_cormerce.shoppe.dto.request.auth.register.RegisterSellerRequest;
+import com.e_cormerce.shoppe.dto.request.auth.register.RegisterShipperRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
-import com.e_cormerce.shoppe.dto.response.LogInResponse;
-import com.e_cormerce.shoppe.dto.response.RegisterResponse;
-import com.e_cormerce.shoppe.dto.response.VerifyResponse;
+import com.e_cormerce.shoppe.dto.response.auth.VerifyResponse;
+import com.e_cormerce.shoppe.enums.user.RoleEnum;
 import com.e_cormerce.shoppe.properties.CookieTokenProperties;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.util.CookieUtil;
@@ -16,9 +16,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,65 +26,86 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthController {
 
-  AuthService authService;
-  CookieTokenProperties cookieTokenProperties;
-  CookieUtil cookieUtil;
+    AuthService authService;
+    CookieTokenProperties cookieTokenProperties;
+    CookieUtil cookieUtil;
 
-  @PostMapping("/login")
-  public ResponseEntity<ApiResponse<LogInResponse>> logIn(
-      @Valid @RequestBody LogInRequest request, HttpServletResponse response) {
-    var result = authService.logIn(request);
-    ResponseCookie cookie =
-        cookieUtil.generateCookie(
-            "access_token", result.getAccessToken(), cookieTokenProperties.getExpirationTime());
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse> logIn(
+            @Valid @RequestBody LogInRequest request, HttpServletResponse response) {
+        var accessToken = authService.logIn(request);
 
-    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    return ResponseEntity.ok(
-        ApiResponse.<LogInResponse>builder()
-            .data(result)
-            .success(true)
-            .message("login successfully")
-            .build());
-  }
+        cookieUtil.saveToken(
+                "access_token", accessToken, cookieTokenProperties.getExpirationTime(), response);
 
-  @PostMapping("/register")
-  public ResponseEntity<ApiResponse<RegisterResponse>> register(
-      @Valid @RequestBody RegisterRequest request) {
-    var result = authService.register(request);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(
-            ApiResponse.<RegisterResponse>builder()
-                .data(result)
-                .message("register successfully")
-                .success(true)
-                .build());
-  }
 
-  @GetMapping("/logout")
-  public ResponseEntity<ApiResponse<Void>> logOut(
-      HttpServletRequest request, HttpServletResponse response) {
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("login successfully")
+                        .build());
+    }
 
-    authService.logOut(
-        LogOutRequest.builder().accessToken(cookieUtil.getAccessToken(request)).build());
+    @PostMapping("/register/client")
+    public ResponseEntity<ApiResponse> registerClient(
+            @Valid @RequestBody RegisterClientRequest request) {
+        authService.registerUser(request, RoleEnum.CLIENT);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.builder()
+                                .message("register successfully")
+                                .success(true)
+                                .build());
+    }
 
-    ResponseCookie cookie = cookieUtil.generateCookie("access_token", "0", 0);
+    @PostMapping("/register/seller")
+    public ResponseEntity<ApiResponse> registerSeller(
+            @Valid @RequestBody RegisterSellerRequest request) {
+        authService.registerUser(request, RoleEnum.SELLER);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.builder()
+                                .message("register successfully")
+                                .success(true)
+                                .build());
+    }
 
-    response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    @PostMapping("/register/shipper")
+    public ResponseEntity<ApiResponse> registerShipper(
+            @Valid @RequestBody RegisterShipperRequest request) {
+        authService.registerUser(request, RoleEnum.SHIPPER);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.builder()
+                                .message("register successfully")
+                                .success(true)
+                                .build());
+    }
 
-    return ResponseEntity.ok(
-        ApiResponse.<Void>builder().success(true).message("logout successfully").build());
-  }
+    @GetMapping("/logout")
+    public ResponseEntity<ApiResponse<Void>> logOut(
+            HttpServletRequest request, HttpServletResponse response) {
 
-  @GetMapping("/verify")
-  public ResponseEntity<ApiResponse<VerifyResponse>> verify() {
-    var result = authService.verify();
+        authService.logOut(
+                cookieUtil.getAccessToken(request));
 
-    return ResponseEntity.ok()
-        .body(
-            ApiResponse.<VerifyResponse>builder()
-                .message("verify user successfully")
-                .success(true)
-                .data(result)
-                .build());
-  }
+        cookieUtil.saveToken("access_token", "0", 0, response);
+
+
+        return ResponseEntity.ok(
+                ApiResponse.<Void>builder().success(true).message("logout successfully").build());
+    }
+
+    @GetMapping("/verify")
+    public ResponseEntity<ApiResponse<VerifyResponse>> verify() {
+        var result = authService.verify();
+
+        return ResponseEntity.ok()
+                .body(
+                        ApiResponse.<VerifyResponse>builder()
+                                .message("verify user successfully")
+                                .success(true)
+                                .data(result)
+                                .build());
+    }
 }

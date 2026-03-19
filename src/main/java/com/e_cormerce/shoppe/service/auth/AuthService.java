@@ -1,29 +1,29 @@
 package com.e_cormerce.shoppe.service.auth;
 
-import com.e_cormerce.shoppe.dto.request.auth.LogInRequest;
-import com.e_cormerce.shoppe.dto.request.auth.LogOutRequest;
-import com.e_cormerce.shoppe.dto.request.auth.RegisterRequest;
-import com.e_cormerce.shoppe.dto.response.LogInResponse;
-import com.e_cormerce.shoppe.dto.response.RegisterResponse;
-import com.e_cormerce.shoppe.dto.response.VerifyResponse;
+import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
+import com.e_cormerce.shoppe.dto.request.auth.register.AbstractRegisterRequest;
+import com.e_cormerce.shoppe.dto.request.auth.register.RegisterSellerRequest;
+import com.e_cormerce.shoppe.dto.request.auth.register.RegisterShipperRequest;
+import com.e_cormerce.shoppe.dto.response.auth.VerifyResponse;
 import com.e_cormerce.shoppe.entity.token.InvalidToken;
 import com.e_cormerce.shoppe.entity.token.RefreshToken;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.Role;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.enums.user.RoleEnum;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.mapper.address.AddressMapper;
+import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.properties.JwtProperties;
 import com.e_cormerce.shoppe.repository.token.InvalidTokenRepository;
 import com.e_cormerce.shoppe.repository.token.RefreshTokenRepository;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
+import com.e_cormerce.shoppe.repository.user.AddressRepository;
 import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.util.HashUtil;
 import io.jsonwebtoken.Claims;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -35,129 +35,134 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 @EnableConfigurationProperties({JwtProperties.class})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class AuthService {
-  UserRepository userRepository;
-  AccountRepository accountRepository;
-  RoleRepository roleRepository;
-  RefreshTokenRepository refreshTokenRepository;
-  InvalidTokenRepository invalidTokenRepository;
+    UserRepository userRepository;
+    AccountRepository accountRepository;
+    RoleRepository roleRepository;
+    RefreshTokenRepository refreshTokenRepository;
+    InvalidTokenRepository invalidTokenRepository;
+    AddressMapper addressMapper;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+    JwtService jwtService;
+    TokenService tokenService;
+    UserMapper userMapper;
+    JwtProperties jwtProperties;
+    AddressRepository addressRepository;
 
-  BCryptPasswordEncoder bCryptPasswordEncoder;
-  JwtService jwtService;
-  TokenService tokenService;
+    @Transactional(timeout = 5)
+    public String logIn(LogInRequest request) {
+        Account account =
+                accountRepository
+                        .findByEmail(request.getEmail())
+                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_ACCOUNT));
 
-  JwtProperties jwtProperties;
+        boolean authenticated =
+                bCryptPasswordEncoder.matches(request.getPassword(), account.getPassword());
 
-  public LogInResponse logIn(LogInRequest request) {
-    Account account =
-        accountRepository
-            .findByEmail(request.getEmail())
-            .orElseThrow(() -> new AppException(ErrorCode.INVALID_ACCOUNT));
+        if (!authenticated) {
+            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        }
 
-    boolean authenticated =
-        bCryptPasswordEncoder.matches(request.getPassword(), account.getPassword());
+        var user = account.getUser();
+        return tokenService.generateAccessToken(user);
 
-    if (!authenticated) {
-      throw new AppException(ErrorCode.INCORRECT_PASSWORD);
     }
 
-    var user = account.getUser();
-    var accessToken = tokenService.generateAccessToken(user);
 
-    return LogInResponse.builder()
-        .email(account.getEmail())
-        .hashedPassword(bCryptPasswordEncoder.encode(request.getPassword()))
-        .accessToken(accessToken)
-        .build();
-  }
+    @Transactional(timeout = 5)
+    public void registerUser(AbstractRegisterRequest request, RoleEnum roleEnum) {
+        if (accountRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.EXISTED_ACCOUNT);
+        }
 
-  public RegisterResponse register(RegisterRequest request) {
-    if (accountRepository.existsByEmail(request.getEmail())) {
-      throw new AppException(ErrorCode.EXISTED_ACCOUNT);
+        var account =
+                Account.builder()
+                        .email(request.getEmail())
+                        .created_at(new Date())
+                        .password(bCryptPasswordEncoder.encode(request.getPassword()))
+                        .build();
+
+        Role role =
+                roleRepository
+                        .findByVal(roleEnum.getValue())
+                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
+
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.INVALID_USERNAME);
+        }
+
+        var user =
+                User.builder()
+                        .account(account)
+                        .username(request.getUsername())
+                        .role(role)
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+        if (request.getClass() == RegisterSellerRequest.class || request.getClass() == RegisterShipperRequest.class) {
+
+            var addressDto = request.getClass() == RegisterShipperRequest.class ?
+                    ((RegisterShipperRequest) request).getAddress() :
+                    ((RegisterSellerRequest) request).getAddress();
+
+            var address = addressRepository.findByEntireAddress(addressDto.getProvince(), addressDto.getDistrict(), addressDto.getWard());
+            if (address == null) {
+                user.setAddress(addressMapper.toAddress(addressDto));
+            } else {
+                user.setAddress(address);
+            }
+        }
+        userRepository.save(user);
     }
 
-    var account =
-        Account.builder()
-            .email(request.getEmail())
-            .created_at(new Date())
-            .password(bCryptPasswordEncoder.encode(request.getPassword()))
-            .build();
 
-    Role role =
-        roleRepository
-            .findByVal(request.getRole())
-            .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
+    @Transactional(timeout = 5)
+    public void logOut(String accessToken) {
 
-    if (userRepository.existsByUsername(request.getUsername())) {
-      throw new AppException(ErrorCode.INVALID_USERNAME);
+        Claims accessTokenClaims =
+                jwtService.extractClaims(accessToken, jwtProperties.getAccessTokenSecret());
+
+        String refreshTokenId = (String) accessTokenClaims.get("refreshTokenId");
+
+        InvalidToken invalidToken =
+                InvalidToken.builder()
+                        .val(HashUtil.sha256(accessToken))
+                        .invalidDate(LocalDate.now())
+                        .build();
+
+        invalidTokenRepository.save(invalidToken);
+
+        RefreshToken refreshToken =
+                refreshTokenRepository
+                        .findById(refreshTokenId)
+                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+        refreshToken.setRevoked(true);
+        refreshTokenRepository.save(refreshToken);
     }
 
-    var user =
-        User.builder()
-            .account(account)
-            .username(request.getUsername())
-            .role(role)
-            .createdAt(LocalDateTime.now())
-            .build();
+    public VerifyResponse verify() {
+        var user = this.getUserThroughAuthentication();
+        var res = userMapper.toUserDTO(user);
+        res.setRole(user.getRole().getVal());
+        return VerifyResponse.builder().user(userMapper.toUserDTO(user)).build();
+    }
 
-    userRepository.save(user);
+    public User getUserThroughAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
 
-    return RegisterResponse.builder()
-        .email(request.getEmail())
-        .username(request.getUsername())
-        .role(user.getRole())
-        .hashedPassword(bCryptPasswordEncoder.encode(request.getPassword()))
-        .build();
-  }
-
-  @Transactional(timeout = 5)
-  public void logOut(LogOutRequest request) {
-
-    Claims accessTokenClaims =
-        jwtService.extractClaims(request.getAccessToken(), jwtProperties.getAccessTokenSecret());
-
-    String refreshTokenId = (String) accessTokenClaims.get("refreshTokenId");
-
-    InvalidToken invalidToken =
-        InvalidToken.builder()
-            .val(HashUtil.sha256(request.getAccessToken()))
-            .invalidDate(LocalDate.now())
-            .build();
-
-    invalidTokenRepository.save(invalidToken);
-
-    //        try {
-    //            Thread.sleep(6000);
-    //        } catch (InterruptedException e) {
-    //            throw new RuntimeException(e);
-    //        }
-
-    RefreshToken refreshToken =
-        refreshTokenRepository
-            .findById(refreshTokenId)
-            .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
-
-    refreshToken.setRevoked(true);
-    refreshTokenRepository.save(refreshToken);
-  }
-
-  public VerifyResponse verify() {
-    var user = this.getUserThroughAuthentication();
-
-    return VerifyResponse.builder().username(user.getUsername()).build();
-  }
-
-  public User getUserThroughAuthentication() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String userId = (String) authentication.getPrincipal();
-
-    return userRepository
-        .findById(userId)
-        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
-  }
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
+    }
 }
