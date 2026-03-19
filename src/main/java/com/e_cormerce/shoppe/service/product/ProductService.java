@@ -1,9 +1,11 @@
 package com.e_cormerce.shoppe.service.product;
 
-import com.e_cormerce.shoppe.dto.common.*;
-import com.e_cormerce.shoppe.dto.request.seller.CreateProductRequest;
-import com.e_cormerce.shoppe.dto.response.CreateProductResponse;
-import com.e_cormerce.shoppe.dto.response.GetProductDetailResponse;
+import com.e_cormerce.shoppe.dto.common.catgory.CategoryDto;
+import com.e_cormerce.shoppe.dto.common.user.UserDto;
+import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
+import com.e_cormerce.shoppe.dto.response.product.GetProductDetailResponse;
+import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
+import com.e_cormerce.shoppe.dto.response.product.VariantDetailResponse;
 import com.e_cormerce.shoppe.entity.product.*;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
@@ -11,7 +13,7 @@ import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.CategoryMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
-import com.e_cormerce.shoppe.mapper.product.SellerMapper;
+import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.repository.product.CategoryRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
@@ -40,18 +42,19 @@ public class ProductService {
     CategoryRepository categoryRepository;
     ProductMapper productMapper;
     ProductQueryDBHelper productQueryDBHelper;
-    SellerMapper sellerMapper;
+    UserMapper userMapper;
     CategoryMapper categoryMapper;
     GetProductDetailsHelper getProductDetailsHelper;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
-    public CreateProductResponse persistProduct(CreateProductRequest request, ProductImagesUrl urls) {
+    public void persistProduct(CreateProductRequest request, ProductImagesUrl urls) {
 
         Product product =
                 Product.builder()
                         .name(request.getName())
                         .description(request.getDescription())
                         .originPrice(request.getOriginPrice())
+
                         .status(ProductStatus.PENDING)
                         .createdAt(LocalDateTime.now())
                         .thumbnail(urls.getThumbnailUrl())
@@ -85,18 +88,9 @@ public class ProductService {
 
         productRepository.save(product);
 
-        return CreateProductResponse.builder()
-                .name(request.getName())
-                .description(request.getDescription())
-                .originPrice(request.getOriginPrice())
-                .created_at(LocalDateTime.now())
-                .total_quantity(request.getTotalQuantity())
-                .types(product.getTypes())
-                .variants(product.getVariants())
-                .build();
     }
 
-    public List<ProductDTO> getProductForHome(int limit, int offset) {
+    public List<ProductCardResponse> getProductForHome(int limit, int offset) {
         List<Product> products = productRepository.findProductForHome(limit, offset);
         return products.stream().map(productMapper::toProductDTO).toList();
     }
@@ -119,12 +113,12 @@ public class ProductService {
         User seller = shopFuture.join();
         Category category = categoryFuture.join();
 
-        SellerDTO sellerResponse = sellerMapper.toSellerDTO(seller);
-        CategoryDTO categoryResponse = categoryMapper.toCategoryDTO(category);
+        UserDto sellerResponse = userMapper.toUserDTO(seller);
+        CategoryDto categoryResponse = categoryMapper.toCategoryDTO(category);
 
         List<VariantDetailResponse> variantResponses =
                 getProductDetailsHelper.createVariantDetail(variants);
-        List<TypeResponse> typeResponses = getProductDetailsHelper.createTypesResponse(types);
+        var typeResponses = getProductDetailsHelper.createTypesResponse(types);
 
         return GetProductDetailResponse.builder()
                 .id(product.getId())
