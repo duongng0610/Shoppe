@@ -1,0 +1,16 @@
+package com.e_cormerce.shoppe.dto.request.auth.register;
+
+import com.e_cormerce.shoppe.dto.common.address.AddressDto;
+import jakarta.validation.Valid;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class RegisterShipperRequest extends AbstractRegisterRequest {
+    @Valid
+    AddressDto address;
+}

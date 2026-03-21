@@ -1,18 +1,17 @@
 package com.e_cormerce.shoppe.entity.user;
 
 import jakarta.persistence.*;
-import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
 @Table(
-    name = "addresses",
-    indexes = {
-      @Index(name = "idx_province", columnList = "province"),
-      @Index(name = "idx_province_district", columnList = "province, district"),
-      @Index(name = "idx_province_district_ward", columnList = "province, district, ward")
-    })
+        name = "addresses",
+        indexes = {
+                @Index(name = "idx_province", columnList = "province"),
+                @Index(name = "idx_province_district", columnList = "province, district"),
+                @Index(name = "idx_province_district_ward", columnList = "province, district, ward")
+        })
 @Getter
 @Setter
 @Builder
@@ -20,23 +19,17 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Address {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
-  @Column(nullable = false)
-  String province;
+    @Column(nullable = false)
+    String province;
 
-  @Column(nullable = false)
-  String district;
+    @Column(nullable = false)
+    String district;
 
-  @Column(nullable = false)
-  String ward;
+    @Column(nullable = false)
+    String ward;
 
-  @Column(name = "is_default")
-  boolean isDefault = false;
-
-  // inverse side
-  @ManyToMany(mappedBy = "addresses")
-  Set<User> users;
 }

@@ -1,9 +1,8 @@
 package com.e_cormerce.shoppe.service.product.helper;
 
-import com.e_cormerce.shoppe.dto.common.TypeResponse;
-import com.e_cormerce.shoppe.dto.common.TypeValueResponse;
-import com.e_cormerce.shoppe.dto.common.VariantDetailResponse;
-import com.e_cormerce.shoppe.dto.common.VariantValueDTO;
+import com.e_cormerce.shoppe.dto.common.product.TypeDto;
+import com.e_cormerce.shoppe.dto.common.product.VariantAttributeDto;
+import com.e_cormerce.shoppe.dto.response.product.VariantDetailResponse;
 import com.e_cormerce.shoppe.entity.product.Type;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.mapper.product.VariantMapper;
@@ -25,44 +24,34 @@ public class GetProductDetailsHelper {
     VariantValueRepository variantValueRepository;
     VariantMapper variantMapper;
 
-    public List<TypeResponse> createTypesResponse(List<Type> types) {
-        List<TypeResponse> typeResponses = new ArrayList<>();
-        for (Type type : types) {
+    public List<TypeDto> createTypesResponse(List<Type> types) {
 
-            List<TypeValueResponse> typeValueResponses =
-                    typeValueRepository.findValueOfType(type.getId()).stream()
-                            .map(
-                                    typeValue -> {
-                                        TypeValueResponse typeValueResponse =
-                                                TypeValueResponse.builder().name(typeValue.getVal()).build();
-                                        return typeValueResponse;
-                                    })
-                            .toList();
-
-            TypeResponse response =
-                    TypeResponse.builder().name(type.getVal()).typeValues(typeValueResponses).build();
-
-            typeResponses.add(response);
-        }
-
-        return typeResponses;
+        return types.stream().map(type ->
+                TypeDto.builder().name(type.getVal()).values(
+                        typeValueRepository.findValueOfType(type.getId()).stream()
+                                .map(
+                                        typeValue -> typeValue.getVal()
+                                )
+                                .toList()
+                ).build()
+        ).toList();
     }
 
     public List<VariantDetailResponse> createVariantDetail(List<Variant> variants) {
         List<VariantDetailResponse> responses = new ArrayList<>();
 
         for (Variant variant : variants) {
-            List<VariantValueDTO> variantValues =
+            List<VariantAttributeDto> variantValues =
                     variantValueRepository.findValueOfVariant(variant.getId()).stream()
                             .map(
                                     variantValue -> {
-                                        VariantValueDTO variantValueDTO =
-                                                VariantValueDTO.builder()
-                                                        .typeValue(variantValue.getValue().getVal())
-                                                        .typeName(variantValue.getValue().getType().getVal())
+                                        VariantAttributeDto variantAttributeDTO =
+                                                VariantAttributeDto.builder()
+                                                        .value(variantValue.getValue().getVal())
+                                                        .name(variantValue.getValue().getType().getVal())
                                                         .build();
 
-                                        return variantValueDTO;
+                                        return variantAttributeDTO;
                                     })
                             .toList();
 
