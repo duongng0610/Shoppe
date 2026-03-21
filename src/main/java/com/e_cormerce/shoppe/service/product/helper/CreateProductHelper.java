@@ -82,11 +82,11 @@ public class CreateProductHelper {
         List<VariantValue> variantValues = new ArrayList<>();
 
         for (VariantAttributeDto variantAttributeDTO : variantRequest.getVariantValues()) {
-            Type type = findType(variantAttributeDTO.getTypeName(), product);
+            Type type = findType(variantAttributeDTO.getName(), product);
 
             VariantValue variantValue =
                     VariantValue.builder()
-                            .value(findTypeValue(variantAttributeDTO.getTypeValue(), type))
+                            .value(findTypeValue(variantAttributeDTO.getValue(), type))
                             .variant(variant)
                             .build();
             variantValues.add(variantValue);

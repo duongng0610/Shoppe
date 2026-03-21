@@ -47,8 +47,8 @@ public class GetProductDetailsHelper {
                                     variantValue -> {
                                         VariantAttributeDto variantAttributeDTO =
                                                 VariantAttributeDto.builder()
-                                                        .typeValue(variantValue.getValue().getVal())
-                                                        .typeName(variantValue.getValue().getType().getVal())
+                                                        .value(variantValue.getValue().getVal())
+                                                        .name(variantValue.getValue().getType().getVal())
                                                         .build();
 
                                         return variantAttributeDTO;

@@ -17,9 +17,10 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Valid
 public class TypeDto {
-    @NotBlank
+    @NotBlank(message = "type name is required")
     String name;
-    @NotNull
-    @Size(min = 1)
+
+    @NotNull(message = "type values is required")
+    @Size(min = 1, message = "type values must not be empty")
     List<String> values;
 }

@@ -27,7 +27,6 @@ public class AppConfig {
                     appConfigProperties.getEmail(),
                     appConfigProperties.getPassword(),
                     appConfigProperties.getUsername());
-            appConfigHelper.createSeller("seller", "seller", "seller"); // test
             appConfigHelper.createDefaultCategories();
         };
     }

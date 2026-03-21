@@ -10,10 +10,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AddressDto {
-    @NotBlank
+    @NotBlank(message = "province is required")
     String province;
-    @NotBlank
+    @NotBlank(message = "district is required")
     String district;
-    @NotBlank
+    @NotBlank(message = "ward is required")
     String ward;
 }

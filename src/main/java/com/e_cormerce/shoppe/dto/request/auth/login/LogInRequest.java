@@ -14,11 +14,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Valid
 public class LogInRequest {
-    @NotBlank(message = "Email must not be blank")//cần đătj lên trên
-    @Email
+    @NotBlank(message = "LoginRequest must not be blank")
+    @Email(message = "Invalid Email")
     String email;
 
-    @NotBlank(message = "Password must not be blank")
+    @NotBlank(message = "LoginRequest must not be blank")
     @StrongPassword
     String password;
 }

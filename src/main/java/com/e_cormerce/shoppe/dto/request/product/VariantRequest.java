@@ -3,9 +3,9 @@ package com.e_cormerce.shoppe.dto.request.product;
 import com.e_cormerce.shoppe.dto.common.product.VariantAttributeDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -17,17 +17,16 @@ import java.util.List;
 @Builder
 @Valid
 public class VariantRequest {
-    @NotEmpty
-    MultipartFile thumbnail;
-
-    @NotEmpty
+    @Valid
+    @NotEmpty(message = "variantValues is required")
     List<VariantAttributeDto> variantValues;
 
-    @NotEmpty
-    @Positive
+    @NotNull(message = "price of variant is required")
+    @Positive(message = "price of variant must be greater than 0")
     BigDecimal price;
 
-    @NotEmpty
-    @Positive
-    int quantity;
+
+    @NotNull(message = "quantity of variant is required")
+    @Positive(message = "quantity of variant must be greater than 0")
+    Long quantity;
 }

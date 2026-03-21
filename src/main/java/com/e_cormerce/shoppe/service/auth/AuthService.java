@@ -154,7 +154,7 @@ public class AuthService {
         var user = this.getUserThroughAuthentication();
         var res = userMapper.toUserDTO(user);
         res.setRole(user.getRole().getVal());
-        return VerifyResponse.builder().user(userMapper.toUserDTO(user)).build();
+        return VerifyResponse.builder().user(res).build();
     }
 
     public User getUserThroughAuthentication() {

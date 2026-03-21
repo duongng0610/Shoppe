@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.service.seller;
 
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
+import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
 import com.e_cormerce.shoppe.service.seller.helper.UploadProductImagesHelper;
@@ -20,16 +21,15 @@ public class SellerService {
     ProductService productService;
 
 
-    public void createProduct(
-            CreateProductRequest request) {
-        List<MultipartFile> variantImages = null;
-        if (request.getHasVariant()) {
-            variantImages = request.getVariantRequests().stream().map(variant->variant.getThumbnail()).toList();
-        }
+    public Product createProduct(
+            CreateProductRequest request, MultipartFile thumbnail,
+            List<MultipartFile> extraImages,
+            List<MultipartFile> variantImages) {
+
 
         ProductImagesUrl urls =
-                uploadProductImagesHelper.uploadImagesOfProduct(request.getThumbnail(), request.getExtraImages(), variantImages);
+                uploadProductImagesHelper.uploadImagesOfProduct(thumbnail, extraImages, variantImages);
 
-        productService.persistProduct(request, urls);
+        return productService.persistProduct(request, urls);
     }
 }
