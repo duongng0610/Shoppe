@@ -1,15 +1,12 @@
 package com.e_cormerce.shoppe.dto.request.product;
 
 import com.e_cormerce.shoppe.dto.common.product.TypeDto;
-import com.e_cormerce.shoppe.validation.product.name.ValidProductName;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,38 +16,37 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Valid
 public class CreateProductRequest {
 
-    @ValidProductName
+    @NotBlank(message = "name is required")
     String name;
 
-    @NotBlank
-    @Size(min = 5)
+    @NotBlank(message = "description is required")
     String description;
 
-    @NotEmpty
-    @Positive()
+    @NotNull(message = "originPrice is required")
+    @Positive(message = "originPrice must be greater than 0")
     BigDecimal originPrice;
 
-    @NotEmpty
+    @NotNull(message = "hasVariant is required")
     Boolean hasVariant;
 
-    @NotEmpty
-    @Positive()
-    long totalQuantity;
+    @NotNull(message = "totalQuantity is required")
+    @Positive(message = "totalQuantity must be greater than 0")
+    Long totalQuantity;
 
-    @NotBlank(message = "Thumnail must not be blank")
+    @NotBlank(message = "categoryId is required")
     String categoryId;
 
-    @NotEmpty(message = "Thumnail must be sent")
-    MultipartFile thumbnail;
-
-    
-    List<MultipartFile> extraImages;
-
-
+    /**
+     * @Valid bật nested validation: nếu có trường types sẽ vào types lấy field và so khớp với validation
+     */
+    @Valid
     List<TypeDto> types;
 
+    /**
+     * @Valid bật nested validation: nếu có trường types sẽ vào types lấy field và so khớp với validation
+     */
+    @Valid
     List<VariantRequest> variantRequests;
 }

@@ -21,12 +21,14 @@ import com.e_cormerce.shoppe.service.product.helper.CreateProductHelper;
 import com.e_cormerce.shoppe.service.product.helper.GetProductDetailsHelper;
 import com.e_cormerce.shoppe.service.product.helper.ProductQueryDBHelper;
 import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,6 +37,7 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Validated
 public class ProductService {
     AuthService authService;
     CreateProductHelper createProductHelper;
@@ -47,14 +50,13 @@ public class ProductService {
     GetProductDetailsHelper getProductDetailsHelper;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
-    public void persistProduct(CreateProductRequest request, ProductImagesUrl urls) {
+    public Product persistProduct(@Valid CreateProductRequest request, ProductImagesUrl urls) {
 
         Product product =
                 Product.builder()
                         .name(request.getName())
                         .description(request.getDescription())
                         .originPrice(request.getOriginPrice())
-
                         .status(ProductStatus.PENDING)
                         .createdAt(LocalDateTime.now())
                         .thumbnail(urls.getThumbnailUrl())
@@ -72,11 +74,12 @@ public class ProductService {
         if (request.getTypes() != null && !request.getTypes().isEmpty()) {
             product.setTypes(createProductHelper.createType(request.getTypes(), product));
         }
-
-        if (urls.getVariantImageUrls() != null && !urls.getVariantImageUrls().isEmpty()) {
-            product.setVariants(
-                    createProductHelper.createVariants(
-                            request.getVariantRequests(), product, urls.getVariantImageUrls()));
+        if (request.getHasVariant()) {
+            if (urls.getVariantImageUrls() != null && !urls.getVariantImageUrls().isEmpty()) {
+                product.setVariants(
+                        createProductHelper.createVariants(
+                                request.getVariantRequests(), product, urls.getVariantImageUrls()));
+            }
         } else {
             product.setVariants(createProductHelper.createDefaultVariant(product));
         }
@@ -87,6 +90,7 @@ public class ProductService {
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_CATEGORY)));
 
         productRepository.save(product);
+        return product;
 
     }
 

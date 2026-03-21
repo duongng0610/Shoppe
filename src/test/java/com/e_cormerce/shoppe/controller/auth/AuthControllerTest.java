@@ -1,20 +1,22 @@
-package com.e_cormerce.shoppe.controller;
+package com.e_cormerce.shoppe.controller.auth;
 
 import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
 import com.e_cormerce.shoppe.properties.CookieTokenProperties;
 import com.e_cormerce.shoppe.service.auth.AuthService;
+import com.e_cormerce.shoppe.util.ConvertObject;
 import com.e_cormerce.shoppe.util.CookieUtil;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /**
@@ -25,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * run mock server: fake http and can catch controller endpoint.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@AutoConfigureMockMvc
 //bắt buộc thêm nếu dùng SpringBootTest + MockMvc để testController
 /**
  * Cách 2:nhẹ hơn, tập trung vào class controller duy nhất
@@ -48,15 +51,42 @@ public class AuthControllerTest {
     CookieUtil cookieUtil;
 
     @Test
-    public void testLoginRequestInvalid() throws Exception {
-        var request = LogInRequest.builder().email("aaaa").password("aaaa").build();
+    public void testLoginRequestEmptyField() throws Exception {
+        var request = LogInRequest.builder().email("123").password("123").build();
 
         mockMvc.perform(post("/auth/login")
-                        .content(toJson(request))
+                        .content(ConvertObject.toJson(request))
 
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                 )
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("LoginRequest must not be blank"));
+    }
+
+    @Test
+    public void testLoginRequestInvalidPassword() throws Exception {
+        var request = LogInRequest.builder().email("123").password("123").build();
+
+        mockMvc.perform(post("/auth/login")
+                        .content(ConvertObject.toJson(request))
+
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid Password"));
+    }
+
+    @Test
+    public void testLoginRequestInvalidEmail() throws Exception {
+        var request = LogInRequest.builder().email("123").password("Seller@123").build();
+
+        mockMvc.perform(post("/auth/login")
+                        .content(ConvertObject.toJson(request))
+
+                        .contentType(MediaType.APPLICATION_JSON_VALUE)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Invalid Email"));
     }
 
     @Test
@@ -64,14 +94,11 @@ public class AuthControllerTest {
         var request = LogInRequest.builder().email("van@gmail.com").password("Vant1@abc").build();
 
         mockMvc.perform(post("/auth/login")
-                        .content(toJson(request))
+                        .content(ConvertObject.toJson(request))
                         .contentType(MediaType.APPLICATION_JSON_VALUE)
                 )
                 .andExpect(status().isOk());
     }
 
 
-    private String toJson(Object obj) throws Exception {
-        return new ObjectMapper().writeValueAsString(obj);
-    }
 }

@@ -48,7 +48,7 @@ public class User {
     Account account;
 
     // owner side
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "address_id")
     Address address;
 
