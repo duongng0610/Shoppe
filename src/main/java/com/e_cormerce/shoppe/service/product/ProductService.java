@@ -51,7 +51,6 @@ public class ProductService {
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
     public void persistProduct(@Valid CreateProductRequest request, ProductImagesUrl urls) {
-
         Product product =
                 Product.builder()
                         .name(request.getName())

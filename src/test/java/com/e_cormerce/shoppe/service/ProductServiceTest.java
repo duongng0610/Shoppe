@@ -8,7 +8,6 @@ import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -52,9 +51,8 @@ public class ProductServiceTest {
         when(authService.getUserThroughAuthentication()).thenReturn(User.builder().build());
         when(categoryRepository.findById(request.getCategoryId())).thenReturn(Optional.of(new Category()));
 
-        var product = productService.persistProduct(request, urls);
-        Assertions.assertNotNull(product);
-        Assertions.assertEquals(product.getName(), request.getName());
+        productService.persistProduct(request, urls);
+
 
     }
 }

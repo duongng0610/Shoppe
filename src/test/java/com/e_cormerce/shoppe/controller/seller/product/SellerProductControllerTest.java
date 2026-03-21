@@ -42,7 +42,7 @@ public class SellerProductControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     public void missingThumbnailCreateProductRequest() throws Exception {
         var request = DataTestCreateProductRequestHelper.validNoVariantRequest();
         mockMvc.perform(multipart("/seller/product")
@@ -59,7 +59,7 @@ public class SellerProductControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void nameIsBlank() throws Exception {
         var request = DataTestCreateProductRequestHelper.validNoVariantRequest();
         request.setName("");
@@ -78,7 +78,7 @@ public class SellerProductControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void originPriceInvalid() throws Exception {
         var request = DataTestCreateProductRequestHelper.validNoVariantRequest();
         request.setOriginPrice(BigDecimal.valueOf(-1));
@@ -96,7 +96,7 @@ public class SellerProductControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void totalQuantityIsNull() throws Exception {
         var request = DataTestCreateProductRequestHelper.validNoVariantRequest();
         request.setTotalQuantity(null);
@@ -113,7 +113,7 @@ public class SellerProductControllerTest {
      * CategoryId sai.
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void categoryIdIsBlank() throws Exception {
         var request = DataTestCreateProductRequestHelper.validNoVariantRequest();
         request.setCategoryId(null);
@@ -132,7 +132,7 @@ public class SellerProductControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void typeNameInvalid() throws Exception {
         var type = new TypeDto();
         type.setName(""); // ❌
@@ -164,7 +164,7 @@ public class SellerProductControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void hasVariant_true_missingVariantImages() throws Exception {
 
         var request = CreateProductRequest.builder()
@@ -197,7 +197,7 @@ public class SellerProductControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void missingVariantImages() throws Exception {
 
         var request = DataTestCreateProductRequestHelper.validVariantRequest(); // ✔ có type + variant
@@ -218,7 +218,7 @@ public class SellerProductControllerTest {
      * 3. size variantImages != variantRequests
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void variantImageSizeNotMatch() throws Exception {
 
         var request = DataTestCreateProductRequestHelper.variantRequestWithSize(2); // 2 variants
@@ -238,7 +238,7 @@ public class SellerProductControllerTest {
      * 4.Có variant nhưng KHÔNG có type
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void hasVariantButMissingTypes() throws Exception {
 
         var request = DataTestCreateProductRequestHelper.validVariantRequest();
@@ -259,7 +259,7 @@ public class SellerProductControllerTest {
      * 5. hasVariant = false nhưng vẫn gửi variantRequests
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void hasVariantFalseButHasVariantRequests() throws Exception {
 
         var request = DataTestCreateProductRequestHelper.validVariantRequest();
@@ -279,7 +279,7 @@ public class SellerProductControllerTest {
      * 6. hasVariant = false nhưng vẫn gửi variantImages
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")
     void hasVariantFalseButHasVariantImages() throws Exception {
 
         var request = DataTestCreateProductRequestHelper.validNoVariantRequest(); // ✔ không variant
@@ -302,7 +302,7 @@ public class SellerProductControllerTest {
      * @throws Exception
      */
     @Test
-    @WithMockUser(authorities = "CREATE_PRODUCT")//tương ứng với hasAuthority ở PreAuthority
+    @WithMockUser(authorities = "PERMISSION_CREATE_PRODUCT")//tương ứng với hasAuthority ở PreAuthority
     public void ValidCreateProductWithoutVariantRequest() throws Exception {
         var request = DataTestCreateProductRequestHelper.validNoVariantRequest();
         mockMvc.perform(multipart("/seller/product")
