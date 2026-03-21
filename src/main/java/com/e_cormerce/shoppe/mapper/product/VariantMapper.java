@@ -7,6 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface VariantMapper {
-  @Mapping(target = "variantValues", ignore = true)
-  VariantDetailResponse toVariantDetailResponse(Variant variant);
+    @Mapping(target = "attributes", ignore = true)
+    VariantDetailResponse toVariantDetailResponse(Variant variant);
 }

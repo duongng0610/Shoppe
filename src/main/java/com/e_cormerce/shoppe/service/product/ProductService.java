@@ -127,6 +127,7 @@ public class ProductService {
         List<TypeResponse> typeResponses = getProductDetailsHelper.createTypesResponse(types);
 
         return GetProductDetailResponse.builder()
+                .name(product.getName())
                 .id(product.getId())
                 .category(categoryResponse)
                 .seller(sellerResponse)

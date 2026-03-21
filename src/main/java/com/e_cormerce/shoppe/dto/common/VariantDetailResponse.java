@@ -15,6 +15,5 @@ public class VariantDetailResponse {
     String thumbnail;
     double quantity;
     double discountPercentage;
-
-    List<VariantValueDTO> variantValues;
+    List<VariantValueDTO> attributes;
 }

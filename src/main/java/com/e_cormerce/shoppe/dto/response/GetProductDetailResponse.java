@@ -16,6 +16,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GetProductDetailResponse {
     String id;
+    String name;
     String description;
     CategoryDTO category;
     SellerDTO seller;
