@@ -197,14 +197,7 @@ public class AppConfigHelper {
 
             userRepository.save(admin);
 
-            log.warn(
-                    "Admin has been created with email: -"
-                            + email
-                            + "- password: -"
-                            + password
-                            + "- username: -"
-                            + username
-                            + "-");
+       
         }
     }
 

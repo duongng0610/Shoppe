@@ -39,7 +39,7 @@ public enum ErrorCode {
     MISSING_REQUIRED_PARAMS("Required parameters are missing", 1022, HttpStatus.BAD_REQUEST),
 
     TIME_OUT_REQUEST("Request timed out", 1023, HttpStatus.REQUEST_TIMEOUT),
-
+    INVALID_APPROVE_PRODUCT_REQUEST("List products id is null or empty", 1024, HttpStatus.BAD_REQUEST),
     ;
     String message;
     int code;

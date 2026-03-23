@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.dto.request.admin;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,9 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateCategoryRequest {
+    @NotEmpty(message = "Image category is required")
     MultipartFile image;
-    @NotBlank(message = "Name must not be blank")
+    @NotBlank(message = "Name category is required")
     String name;
-    @NotBlank(message = "Name must not be blank")
+
     String parentId;
 }
