@@ -39,6 +39,7 @@ public enum ErrorCode {
     MISSING_REQUIRED_PARAMS("Required parameters are missing", 1022, HttpStatus.BAD_REQUEST),
 
     TIME_OUT_REQUEST("Request timed out", 1023, HttpStatus.REQUEST_TIMEOUT),
+
     ;
     String message;
     int code;

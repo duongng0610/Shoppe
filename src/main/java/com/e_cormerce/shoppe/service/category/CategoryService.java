@@ -30,7 +30,7 @@ public class CategoryService {
         }
         Category category =
                 Category.builder()
-                        .val(request.getName())
+                        .val(request.getName().toLowerCase())
                         .thumbnail(imageService.uploadSingleImage(thumbnail))
                         .build();
         /** nếu khác null thì mơi theem parent , còn ko thì vẫn tạo với mức mặc định. */

@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Table(
     name = "order_notifications",
-    indexes = {@Index(name = "idx_to", columnList = "to_id")})
+    indexes = {@Index(name = "idx_order_notifications_to", columnList = "to_id")})
 @Getter
 @Setter
 @Builder

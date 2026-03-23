@@ -16,8 +16,8 @@ import lombok.experimental.FieldDefaults;
 @Table(
     name = "categories",
     indexes = {
-      @Index(name = "idx_parent", columnList = "parent_id"),
-      @Index(name = "idx_val", columnList = "val")
+      @Index(name = "idx_categories_parent", columnList = "parent_id"),
+      @Index(name = "idx_categories_val", columnList = "val")
     })
 public class Category {
   @Id

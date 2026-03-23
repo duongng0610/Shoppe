@@ -14,8 +14,8 @@ import java.util.Set;
 @Table(
         name = "users",
         indexes = {
-                @Index(name = "idx_username", columnList = "username"),
-                @Index(name = "idx_role", columnList = "role_id")
+                @Index(name = "idx_users_username", columnList = "username"),
+                @Index(name = "idx_users_role", columnList = "role_id")
         })
 @Getter
 @Setter

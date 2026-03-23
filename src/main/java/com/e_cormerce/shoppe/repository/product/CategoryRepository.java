@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.repository.product;
 
+import com.e_cormerce.shoppe.dto.common.search.CategoryProjection;
 import com.e_cormerce.shoppe.entity.product.Category;
 import java.util.List;
 import java.util.Optional;
@@ -19,4 +20,7 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
   @Query(value = "SELECT * FROM categories WHERE parent_id = :id ", nativeQuery = true)
   List<Category> findChildren(@Param("id") String id);
+
+  @Query(value = "SELECT id, val FROM categories", nativeQuery = true)
+  List<CategoryProjection> findAllCategoryNames();
 }

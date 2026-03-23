@@ -29,4 +29,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
           "SELECT u.* FROM users u JOIN products p ON p.seller_id = u.id WHERE p.id = :product_id",
       nativeQuery = true)
   CompletableFuture<User> findSellerOfProduct(@Param("product_id") String productId);
+
+  @Query(value = "SELECT * FROM products WHERE category_id = :category_id", nativeQuery = true)
+  List<Product> findProductsInCategory(@Param("category_id") String category_id);
 }

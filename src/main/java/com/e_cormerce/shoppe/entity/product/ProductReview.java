@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 @Table(
     name = "product_reviews",
     indexes = {
-      @Index(name = "idx_product", columnList = "product_id"),
-      @Index(name = "idx_client", columnList = "client_id")
+      @Index(name = "idx_product_reviews_product", columnList = "product_id"),
+      @Index(name = "idx_product_reviews_client", columnList = "client_id")
     })
 @Getter
 @Setter

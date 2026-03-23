@@ -50,7 +50,7 @@ public class ProductService {
     GetProductDetailsHelper getProductDetailsHelper;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
-    public void persistProduct(@Valid CreateProductRequest request, ProductImagesUrl urls) {
+    public Product persistProduct(@Valid CreateProductRequest request, ProductImagesUrl urls) {
 
         Product product =
                 Product.builder()
@@ -92,6 +92,7 @@ public class ProductService {
 
         productRepository.save(product);
 
+        return product;
 
     }
 

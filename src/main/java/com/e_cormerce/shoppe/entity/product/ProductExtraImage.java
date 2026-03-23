@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Table(
     name = "product_extra_images",
-    indexes = {@Index(name = "idx_product", columnList = "product_id")})
+    indexes = {@Index(name = "idx_product_extra_images_product", columnList = "product_id")})
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

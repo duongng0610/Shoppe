@@ -101,7 +101,8 @@ public final class DataTestCreateProductRequestHelper {
 
     // ===== CASE 6: hasVariant=false + không variant nhưng sẽ gửi image =====
     public static CreateProductRequest caseHasVariantFalseButImages() {
-        return validNoVariantRequest();
+        var request = validNoVariantRequest();
+        return request;
     }
 
     public static CreateProductRequest variantRequestWithSize(int size) {

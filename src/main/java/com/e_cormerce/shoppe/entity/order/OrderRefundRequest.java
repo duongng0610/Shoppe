@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @Entity
 @Table(
     name = "order_refund_requests",
-    indexes = {@Index(name = "idx_seller", columnList = "seller_id")})
+    indexes = {@Index(name = "idx_order_refund_requests_seller", columnList = "seller_id")})
 @Getter
 @Setter
 @Builder
