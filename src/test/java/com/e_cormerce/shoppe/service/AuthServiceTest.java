@@ -45,25 +45,14 @@ public class AuthServiceTest {
 
   @Mock AccountRepository accountRepository;
 
-  @Mock RoleRepository roleRepository;
-
-  @Mock RefreshTokenRepository refreshTokenRepository;
-
-  @Mock InvalidTokenRepository invalidTokenRepository;
-
-  @Mock AddressMapper addressMapper;
 
   @Mock BCryptPasswordEncoder bCryptPasswordEncoder;
 
-  @Mock JwtService jwtService;
+
 
   @Mock TokenService tokenService;
 
-  @Mock UserMapper userMapper;
 
-  @Mock JwtProperties jwtProperties;
-
-  @Mock AddressRepository addressRepository;
 
   @Test
   public void successLogin() {

@@ -20,23 +20,23 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminController {
-  CategoryService categoryService;
-  AdminService adminService;
+    CategoryService categoryService;
+    AdminService adminService;
 
-  @PreAuthorize("hasRole('ADMIN')")
-  @PostMapping(path = "/categories", consumes = "multipart/form-data")
-  public ResponseEntity<ApiResponse> create(
-      @Valid @RequestPart CreateCategoryRequest request, @RequestPart MultipartFile thumbnail) {
-    categoryService.create(request, thumbnail);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(ApiResponse.builder().success(true).message("create category successfully").build());
-  }
+    @PreAuthorize("hasAuthority('PERMISSION_ADD_CATEGORY')")
+    @PostMapping(path = "/categories", consumes = "multipart/form-data")
+    public ResponseEntity<ApiResponse> create(
+            @Valid @RequestPart CreateCategoryRequest request, @RequestPart MultipartFile thumbnail) {
+        categoryService.create(request, thumbnail);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.builder().success(true).message("create category successfully").build());
+    }
 
-  @PreAuthorize("hasAuthority('PERMISSION_APPROVE_PRODUCTS')")
-  @PatchMapping(path = "/products/approve", consumes = "application/json")
-  public ResponseEntity<ApiResponse> approveProducts(@RequestBody ApproveProductsRequest request) {
-    adminService.approveProducts(request.getProductIds());
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(ApiResponse.builder().success(true).message("approve products successfully").build());
-  }
+    @PreAuthorize("hasAuthority('PERMISSION_APPROVE_PRODUCTS')")
+    @PatchMapping(path = "/products/approve", consumes = "application/json")
+    public ResponseEntity<ApiResponse> approveProducts(@RequestBody ApproveProductsRequest request) {
+        adminService.approveProducts(request.getProductIds());
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.builder().success(true).message("approve products successfully").build());
+    }
 }
