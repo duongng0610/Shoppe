@@ -8,6 +8,12 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface AddressRepository extends JpaRepository<Address, String> {
-    @Query(value = "Select * from addresses where province =:province and district =:district and ward =:ward", nativeQuery = true)
-    Address findByEntireAddress(@Param("province") String province, @Param("district") String district, @Param("ward") String ward);
+  @Query(
+      value =
+          "Select * from addresses where province =:province and district =:district and ward =:ward",
+      nativeQuery = true)
+  Address findByEntireAddress(
+      @Param("province") String province,
+      @Param("district") String district,
+      @Param("ward") String ward);
 }

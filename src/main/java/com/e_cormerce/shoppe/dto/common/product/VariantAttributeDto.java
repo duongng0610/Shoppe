@@ -13,9 +13,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Valid
 public class VariantAttributeDto {
-    @NotBlank(message = "name of variant attribute is required")
-    String name;
+  @NotBlank(message = "name of variant attribute is required")
+  String name;
 
-    @NotBlank(message = "value of variant attribute is required")
-    String value;
+  @NotBlank(message = "value of variant attribute is required")
+  String value;
 }

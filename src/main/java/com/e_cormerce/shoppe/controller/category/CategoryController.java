@@ -16,27 +16,27 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryController {
-    CategoryService categoryService;
+  CategoryService categoryService;
 
-    @GetMapping("{id}/children")
-    public ResponseEntity<ApiResponse> getChildren(@PathVariable String id) {
-        var result = categoryService.getChildren(id);
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .data(result)
-                        .success(true)
-                        .message("get children categories successfully")
-                        .build());
-    }
+  @GetMapping("{id}/children")
+  public ResponseEntity<ApiResponse> getChildren(@PathVariable String id) {
+    var result = categoryService.getChildren(id);
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .data(result)
+            .success(true)
+            .message("get children categories successfully")
+            .build());
+  }
 
-    @GetMapping("/default")
-    public ResponseEntity<ApiResponse> getDefault() {
-        var result = categoryService.getDefault();
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .data(result)
-                        .success(true)
-                        .message("get default categories successfully")
-                        .build());
-    }
+  @GetMapping("/default")
+  public ResponseEntity<ApiResponse> getDefault() {
+    var result = categoryService.getDefault();
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .data(result)
+            .success(true)
+            .message("get default categories successfully")
+            .build());
+  }
 }

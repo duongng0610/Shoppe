@@ -10,9 +10,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class CategorySuggestionDTO {
-    String categoryId;
-    String categoryName;
-    MatchType matchType;
+  String categoryId;
+  String categoryName;
+  MatchType matchType;
 }

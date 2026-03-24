@@ -10,7 +10,4 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Log4j2
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AddressService {
-
-
-}
+public class AddressService {}

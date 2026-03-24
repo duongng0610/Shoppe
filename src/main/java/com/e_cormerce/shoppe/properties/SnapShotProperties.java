@@ -12,8 +12,7 @@ import org.springframework.stereotype.Component;
 @Setter
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Component
-
 public class SnapShotProperties {
-    long delay;
-    String filePath;
+  long delay;
+  String filePath;
 }

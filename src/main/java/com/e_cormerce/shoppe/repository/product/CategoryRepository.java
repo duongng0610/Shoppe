@@ -23,4 +23,14 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
   @Query(value = "SELECT id, val FROM categories", nativeQuery = true)
   List<CategoryProjection> findAllCategoryNames();
+
+  @Query(
+      value =
+          "SELECT c.val, c.id "
+              + "FROM categories c "
+              + "WHERE c.val LIKE CONCAT('%', :keyword, '%') "
+              + "LIMIT :num",
+      nativeQuery = true)
+  List<CategoryProjection> findPrefixCategory(
+      @Param("keyword") String keyword, @Param("num") int num);
 }

@@ -8,6 +8,4 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ProductControllerTest {
-
-}
+public class ProductControllerTest {}

@@ -1,5 +1,8 @@
 package com.e_cormerce.shoppe.controller.admin;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.e_cormerce.shoppe.service.admin.AdminService;
 import com.e_cormerce.shoppe.util.ConvertObject;
 import lombok.AccessLevel;
@@ -13,26 +16,22 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AdminControllerTest {
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockitoBean
-    AdminService adminService;
+  @MockitoBean AdminService adminService;
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
-    public void testApproveProductsSuccess() throws Exception {
-        mockMvc.perform(
-                        patch("/admin/products/approve").contentType(MediaType.APPLICATION_JSON)
-                                .content(ConvertObject.toJson(DataTestAdminControllerHelper
-                                        .createListString(1))))
-                .andExpect(status().isOk());
-    }
+  @Test
+  @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
+  public void testApproveProductsSuccess() throws Exception {
+    mockMvc
+        .perform(
+            patch("/admin/products/approve")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(ConvertObject.toJson(DataTestAdminControllerHelper.createListString(1))))
+        .andExpect(status().isOk());
+  }
 }

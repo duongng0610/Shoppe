@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
-    String id;
-    String avatar;
-    String username;
-    String role;
+  String id;
+  String avatar;
+  String username;
+  String role;
 }

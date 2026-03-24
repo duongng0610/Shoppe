@@ -9,8 +9,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class CategoryProjection {
-    String name;
-    String categoryId;
+  String categoryId;
+  String name;
 }

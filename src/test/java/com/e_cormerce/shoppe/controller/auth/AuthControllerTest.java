@@ -1,5 +1,9 @@
 package com.e_cormerce.shoppe.controller.auth;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
 import com.e_cormerce.shoppe.properties.CookieTokenProperties;
 import com.e_cormerce.shoppe.service.auth.AuthService;
@@ -15,90 +19,78 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 /**
- * ===Cách 1: load full context.
- *
- * @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
- * @AutoConfigureMockMvc//bắt buộc thêm nếu dùng SpringBootTest + MockMvc để testController
- * run mock server: fake http and can catch controller endpoint.
+ * ===Cách 1: load full context. @SpringBootTest(webEnvironment =
+ * SpringBootTest.WebEnvironment.MOCK) @AutoConfigureMockMvc//bắt buộc thêm nếu dùng SpringBootTest
+ * + MockMvc để testController run mock server: fake http and can catch controller endpoint.
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-//bắt buộc thêm nếu dùng SpringBootTest + MockMvc để testController
+// bắt buộc thêm nếu dùng SpringBootTest + MockMvc để testController
 /**
- * Cách 2:nhẹ hơn, tập trung vào class controller duy nhất
- * nếu dùng WebMvcTest cần thêm thuộc tính addFilters = false để bỏ qua tầng filter.
- * @WebMvcTest(controllers = AuthController.class)
- * @AutoConfigureMockMvc(addFilters = false)
+ * Cách 2:nhẹ hơn, tập trung vào class controller duy nhất nếu dùng WebMvcTest cần thêm thuộc tính
+ * addFilters = false để bỏ qua tầng filter. @WebMvcTest(controllers =
+ * AuthController.class) @AutoConfigureMockMvc(addFilters = false)
  */
-//=====common=====
+// =====common=====
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthControllerTest {
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockitoBean
-    AuthService authService;
+  @MockitoBean AuthService authService;
 
-    @MockitoBean
-    CookieTokenProperties cookieTokenProperties;
+  @MockitoBean CookieTokenProperties cookieTokenProperties;
 
-    @MockitoBean
-    CookieUtil cookieUtil;
+  @MockitoBean CookieUtil cookieUtil;
 
-    @Test
-    public void testLoginRequestEmptyField() throws Exception {
-        var request = LogInRequest.builder().email("123").password("123").build();
+  @Test
+  public void testLoginRequestEmptyField() throws Exception {
+    var request = LogInRequest.builder().email("123").password("123").build();
 
-        mockMvc.perform(post("/auth/login")
-                        .content(ConvertObject.toJson(request))
+    mockMvc
+        .perform(
+            post("/auth/login")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value("LoginRequest must not be blank"));
+  }
 
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("LoginRequest must not be blank"));
-    }
+  @Test
+  public void testLoginRequestInvalidPassword() throws Exception {
+    var request = LogInRequest.builder().email("123").password("123").build();
 
-    @Test
-    public void testLoginRequestInvalidPassword() throws Exception {
-        var request = LogInRequest.builder().email("123").password("123").build();
+    mockMvc
+        .perform(
+            post("/auth/login")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value("Invalid Password"));
+  }
 
-        mockMvc.perform(post("/auth/login")
-                        .content(ConvertObject.toJson(request))
+  @Test
+  public void testLoginRequestInvalidEmail() throws Exception {
+    var request = LogInRequest.builder().email("123").password("Seller@123").build();
 
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Invalid Password"));
-    }
+    mockMvc
+        .perform(
+            post("/auth/login")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value("Invalid Email"));
+  }
 
-    @Test
-    public void testLoginRequestInvalidEmail() throws Exception {
-        var request = LogInRequest.builder().email("123").password("Seller@123").build();
+  @Test
+  public void testLoginRequestValid() throws Exception {
+    var request = LogInRequest.builder().email("van@gmail.com").password("Vant1@abc").build();
 
-        mockMvc.perform(post("/auth/login")
-                        .content(ConvertObject.toJson(request))
-
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                )
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Invalid Email"));
-    }
-
-    @Test
-    public void testLoginRequestValid() throws Exception {
-        var request = LogInRequest.builder().email("van@gmail.com").password("Vant1@abc").build();
-
-        mockMvc.perform(post("/auth/login")
-                        .content(ConvertObject.toJson(request))
-                        .contentType(MediaType.APPLICATION_JSON_VALUE)
-                )
-                .andExpect(status().isOk());
-    }
-
-
+    mockMvc
+        .perform(
+            post("/auth/login")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk());
+  }
 }

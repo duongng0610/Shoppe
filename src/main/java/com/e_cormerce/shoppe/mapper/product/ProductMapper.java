@@ -6,10 +6,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(
-        componentModel = "spring",
-        unmappedSourcePolicy =
-                ReportingPolicy.IGNORE // avoid waring causes by not match source to target
-)
+    componentModel = "spring",
+    unmappedSourcePolicy =
+        ReportingPolicy.IGNORE // avoid waring causes by not match source to target
+    )
 public interface ProductMapper {
-    ProductCardResponse toProductDTO(Product product);
+  ProductCardResponse toProductDTO(Product product);
 }

@@ -7,6 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
-    @Mapping(target = "role", ignore = true)
-    UserDto toUserDTO(User user);
+  @Mapping(target = "role", ignore = true)
+  UserDto toUserDTO(User user);
 }

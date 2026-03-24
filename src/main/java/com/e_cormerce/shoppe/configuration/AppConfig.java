@@ -16,19 +16,18 @@ import org.springframework.context.annotation.Configuration;
 @Slf4j
 public class AppConfig {
 
-    AppConfigHelper appConfigHelper;
-    AdminProperties appConfigProperties;
+  AppConfigHelper appConfigHelper;
+  AdminProperties appConfigProperties;
 
-    @Bean
-    CommandLineRunner initData() {
-        return args -> {
-            appConfigHelper.createRoles();
-            appConfigHelper.createAdmin(
-                    appConfigProperties.getEmail(),
-                    appConfigProperties.getPassword(),
-                    appConfigProperties.getUsername());
-            appConfigHelper.createDefaultCategories();
-        };
-    }
-
+  @Bean
+  CommandLineRunner initData() {
+    return args -> {
+      appConfigHelper.createRoles();
+      appConfigHelper.createAdmin(
+          appConfigProperties.getEmail(),
+          appConfigProperties.getPassword(),
+          appConfigProperties.getUsername());
+      appConfigHelper.createDefaultCategories();
+    };
+  }
 }

@@ -9,11 +9,10 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public enum ProductStatus {
-    BANNED("BANNED"),
-    PENDING("PENDING"),
-    APPROVED("APPROVED"),
-    HIDDEN("HIDDEN");
+  BANNED("BANNED"),
+  PENDING("PENDING"),
+  APPROVED("APPROVED"),
+  HIDDEN("HIDDEN");
 
-    String value;
-
+  String value;
 }

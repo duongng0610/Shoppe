@@ -1,5 +1,7 @@
 package com.e_cormerce.shoppe.configuration;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import com.e_cormerce.shoppe.exception.filter.AccessDeninedException;
 import com.e_cormerce.shoppe.exception.filter.JwtAuthEntryPoint;
 import com.e_cormerce.shoppe.filter.AuthFilter;
@@ -17,8 +19,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.security.config.Customizer.withDefaults;
-
 @Configuration
 @EnableConfigurationProperties({EndpointProperties.class})
 @RequiredArgsConstructor
@@ -26,35 +26,35 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableMethodSecurity // bật tính năng check quyền @PreAuthority ... trước controller.
 public class SecurityConfig {
 
-    AuthFilter authFilter;
+  AuthFilter authFilter;
 
-    EndpointProperties endpointProperties;
+  EndpointProperties endpointProperties;
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(10);
-    }
+  @Bean
+  public BCryptPasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(10);
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(
-            HttpSecurity http,
-            AccessDeninedException accessDeninedException,
-            JwtAuthEntryPoint jwtAuthEntryPoint)
-            throws Exception {
-        http.authorizeHttpRequests(
-                        authorizeRequests ->
-                                authorizeRequests
-                                        .requestMatchers(endpointProperties.getPublicUrls().toArray(new String[0]))
-                                        .permitAll()
-                                        .anyRequest()
-                                        .authenticated())
-                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(withDefaults()) // nếu trong ioc có bean CorsConfiguration sẽ dùng bean đó
-                .exceptionHandling(
-                        e ->
-                                e.authenticationEntryPoint(jwtAuthEntryPoint)
-                                        .accessDeniedHandler(accessDeninedException));
-        return http.build();
-    }
+  @Bean
+  public SecurityFilterChain securityFilterChain(
+      HttpSecurity http,
+      AccessDeninedException accessDeninedException,
+      JwtAuthEntryPoint jwtAuthEntryPoint)
+      throws Exception {
+    http.authorizeHttpRequests(
+            authorizeRequests ->
+                authorizeRequests
+                    .requestMatchers(endpointProperties.getPublicUrls().toArray(new String[0]))
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
+        .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(withDefaults()) // nếu trong ioc có bean CorsConfiguration sẽ dùng bean đó
+        .exceptionHandling(
+            e ->
+                e.authenticationEntryPoint(jwtAuthEntryPoint)
+                    .accessDeniedHandler(accessDeninedException));
+    return http.build();
+  }
 }

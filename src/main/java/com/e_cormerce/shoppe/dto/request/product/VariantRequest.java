@@ -5,10 +5,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.*;
-
 import java.math.BigDecimal;
 import java.util.List;
+import lombok.*;
 
 @Data
 @Getter
@@ -17,16 +16,15 @@ import java.util.List;
 @Builder
 @Valid
 public class VariantRequest {
-    @Valid
-    @NotEmpty(message = "variantValues is required")
-    List<VariantAttributeDto> variantValues;
+  @Valid
+  @NotEmpty(message = "variantValues is required")
+  List<VariantAttributeDto> variantValues;
 
-    @NotNull(message = "price of variant is required")
-    @Positive(message = "price of variant must be greater than 0")
-    BigDecimal price;
+  @NotNull(message = "price of variant is required")
+  @Positive(message = "price of variant must be greater than 0")
+  BigDecimal price;
 
-
-    @NotNull(message = "quantity of variant is required")
-    @Positive(message = "quantity of variant must be greater than 0")
-    Long quantity;
+  @NotNull(message = "quantity of variant is required")
+  @Positive(message = "quantity of variant must be greater than 0")
+  Long quantity;
 }

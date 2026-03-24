@@ -1,10 +1,9 @@
 package com.e_cormerce.shoppe.dto.request.admin;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @AllArgsConstructor
@@ -12,10 +11,11 @@ import org.springframework.web.multipart.MultipartFile;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateCategoryRequest {
-    @NotEmpty(message = "Image category is required")
-    MultipartFile image;
-    @NotBlank(message = "Name category is required")
-    String name;
 
-    String parentId;
+  @NotBlank(message = "Name category is required")
+  String name;
+
+  String parentId;
+
+  List<String> synonyms;
 }

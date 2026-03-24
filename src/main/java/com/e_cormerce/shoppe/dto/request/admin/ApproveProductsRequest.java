@@ -1,9 +1,8 @@
 package com.e_cormerce.shoppe.dto.request.admin;
 
+import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -11,5 +10,5 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ApproveProductsRequest {
-    List<String> productIds;
+  List<String> productIds;
 }

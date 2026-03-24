@@ -18,15 +18,15 @@ import lombok.experimental.FieldDefaults;
 @Valid
 public abstract class AbstractRegisterRequest {
 
-    @NotBlank(message = "email of register is required")
-    @Email(message = "email of register is required")
-    String email;
+  @NotBlank(message = "email of register is required")
+  @Email(message = "email of register is required")
+  String email;
 
-    @NotBlank(message = "password of register is required")
-    @StrongPassword
-    String password;
+  @NotBlank(message = "password of register is required")
+  @StrongPassword
+  String password;
 
-    @NotBlank(message = "username of register is required")
-    @Size(min = 6)
-    String username;
+  @NotBlank(message = "username of register is required")
+  @Size(min = 6)
+  String username;
 }
