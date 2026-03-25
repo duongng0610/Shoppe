@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity.product;
+package com.e_cormerce.shoppe.entity.category;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;

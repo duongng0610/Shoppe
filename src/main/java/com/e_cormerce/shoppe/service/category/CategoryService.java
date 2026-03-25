@@ -3,20 +3,22 @@ package com.e_cormerce.shoppe.service.category;
 import com.e_cormerce.shoppe.dto.request.admin.CreateCategoryRequest;
 import com.e_cormerce.shoppe.dto.response.category.CategoryDetailResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
-import com.e_cormerce.shoppe.entity.product.Category;
-import com.e_cormerce.shoppe.entity.search.KeyWordCategory;
+import com.e_cormerce.shoppe.entity.category.Category;
+import com.e_cormerce.shoppe.entity.category.CategorySynonyms;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
-import com.e_cormerce.shoppe.repository.product.CategoryRepository;
+import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
+import com.e_cormerce.shoppe.repository.catgory.SynonymsRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
-import com.e_cormerce.shoppe.repository.search.KeyWordCategoryRepository;
 import com.e_cormerce.shoppe.service.category.helper.CategoryHelper;
 import com.e_cormerce.shoppe.service.media.ImageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -29,10 +31,11 @@ public class CategoryService {
     CategoryHelper categoryHelper;
     ImageService imageService;
     CategoryRepository categoryRepository;
-    KeyWordCategoryRepository keyWordCategoryRepository;
+    SynonymsRepository synonymsRepository;
     ProductRepository productRepository;
     ProductMapper productMapper;
 
+    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     public void create(CreateCategoryRequest request, MultipartFile thumbnail) {
         if (categoryRepository.existsByVal(request.getName())) {
             throw new AppException(ErrorCode.EXISTED_CATEGORY);
@@ -47,21 +50,26 @@ public class CategoryService {
             category.setParent(categoryHelper.findById(request.getParentId()));
         }
 
+        categoryRepository.save(category);
+        synonymsRepository.save(
+                CategorySynonyms.builder()
+                        .category(category)
+                        .val(request.getName())
+                        .build());
+
         if (request.getSynonyms() != null) {
             request
                     .getSynonyms()
                     .forEach(
                             relevant -> {
-                                keyWordCategoryRepository.save(
-                                        KeyWordCategory.builder()
-                                                .category_id(category.getId())
-                                                .keyword(relevant)
+                                synonymsRepository.save(
+                                        CategorySynonyms.builder()
+                                                .category(category)
+                                                .val(relevant)
                                                 .build());
                             });
         }
-        keyWordCategoryRepository.save(
-                KeyWordCategory.builder().category_id(category.getId()).keyword(request.getName()).build());
-        categoryRepository.save(category);
+
     }
 
 

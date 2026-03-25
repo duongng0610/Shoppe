@@ -1,9 +1,9 @@
 package com.e_cormerce.shoppe.service.category.helper;
 
-import com.e_cormerce.shoppe.entity.product.Category;
+import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.repository.product.CategoryRepository;
+import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
