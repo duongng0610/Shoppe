@@ -1,9 +1,10 @@
 package com.e_cormerce.shoppe.dto.response.search;
 
-import com.e_cormerce.shoppe.dto.common.search.CategoryProjection;
-import java.util.List;
+import com.e_cormerce.shoppe.dto.common.search.CategoryDto;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -11,5 +12,5 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SearchResponse {
-  List<CategoryProjection> suggestions;
+    List<CategoryDto> suggestions;
 }

@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryProjection {
-  String categoryId;
-  String name;
+public class CategoryDto {
+    String id;
+    String val;
 }
