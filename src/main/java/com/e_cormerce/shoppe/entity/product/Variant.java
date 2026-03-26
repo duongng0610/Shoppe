@@ -30,13 +30,19 @@ public class Variant {
   String thumbnail;
 
   @Column(nullable = false)
-  double quantity;
+  int quantity;
+
+  @Column(name = "quantity_sold")
+  int quantitySold;
 
   @Column(name = "discount_percentage")
   double discountPercentage;
 
   @Column(columnDefinition = "boolean default false")
   boolean deleted;
+
+  @Column(name = "is_default", columnDefinition = "boolean default true")
+  boolean isDefault;
 
   @ManyToOne
   @JoinColumn(name = "product_id", nullable = false)

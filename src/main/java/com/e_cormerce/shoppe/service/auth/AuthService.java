@@ -5,6 +5,7 @@ import com.e_cormerce.shoppe.dto.request.auth.register.AbstractRegisterRequest;
 import com.e_cormerce.shoppe.dto.request.auth.register.RegisterSellerRequest;
 import com.e_cormerce.shoppe.dto.request.auth.register.RegisterShipperRequest;
 import com.e_cormerce.shoppe.dto.response.auth.VerifyResponse;
+import com.e_cormerce.shoppe.entity.product.ShoppingCart;
 import com.e_cormerce.shoppe.entity.token.InvalidToken;
 import com.e_cormerce.shoppe.entity.token.RefreshToken;
 import com.e_cormerce.shoppe.entity.user.Account;
@@ -16,6 +17,7 @@ import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.address.AddressMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.properties.JwtProperties;
+import com.e_cormerce.shoppe.repository.product.ShoppingCartRepository;
 import com.e_cormerce.shoppe.repository.token.InvalidTokenRepository;
 import com.e_cormerce.shoppe.repository.token.RefreshTokenRepository;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
@@ -24,6 +26,7 @@ import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.util.HashUtil;
 import io.jsonwebtoken.Claims;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -44,6 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class AuthService {
+  private final ShoppingCartRepository shoppingCartRepository;
   UserRepository userRepository;
   AccountRepository accountRepository;
   RoleRepository roleRepository;
@@ -122,6 +126,14 @@ public class AuthService {
         user.setAddress(address);
       }
     }
+
+    if (role.getVal() == RoleEnum.CLIENT.getValue()) {
+      ShoppingCart shoppingCart =
+          ShoppingCart.builder().client(user).totalPrice(BigDecimal.ZERO).totalQuantity(0).build();
+
+      shoppingCartRepository.save(shoppingCart);
+    }
+
     userRepository.save(user);
   }
 

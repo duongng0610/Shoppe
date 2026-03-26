@@ -4,14 +4,19 @@ import jakarta.persistence.*;
 import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
+@Table(name = "role")
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE role SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class Role {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.service.product.helper;
 
-import com.e_cormerce.shoppe.entity.product.Category;
+import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.product.Type;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;

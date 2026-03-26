@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.cache;
 
-import com.e_cormerce.shoppe.dto.common.search.CategoryProjection;
+import com.e_cormerce.shoppe.dto.common.search.CategoryDto;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -25,14 +25,13 @@ public class TernaryTrie implements Serializable {
     return cur;
   }
 
-  public Iterable<CategoryProjection> searchWithPrefix(String prefix) {
-    Queue<CategoryProjection> q = new LinkedList<>();
+  public Iterable<CategoryDto> searchWithPrefix(String prefix) {
+    Queue<CategoryDto> q = new LinkedList<>();
     TSTNode x = get(root, prefix, 0);
     if (x == null) return q;
 
     if (x.val != null) {
-      CategoryProjection projection =
-          CategoryProjection.builder().name(prefix).categoryId(x.val).build();
+      CategoryDto projection = CategoryDto.builder().val(prefix).id(x.val).build();
       q.add(projection);
     }
 
@@ -40,13 +39,13 @@ public class TernaryTrie implements Serializable {
     return q;
   }
 
-  private void collect(TSTNode cur, String prefix, Queue<CategoryProjection> q) {
+  private void collect(TSTNode cur, String prefix, Queue<CategoryDto> q) {
     if (cur == null) return;
 
     collect(cur.left, prefix, q);
 
     if (cur.val != null) {
-      q.add(CategoryProjection.builder().name(prefix + cur.c).categoryId(cur.val).build());
+      q.add(CategoryDto.builder().val(prefix + cur.c).id(cur.val).build());
     }
 
     collect(cur.mid, prefix + cur.c, q);

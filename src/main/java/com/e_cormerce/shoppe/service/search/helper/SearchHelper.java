@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.service.search;
+package com.e_cormerce.shoppe.service.search.helper;
 
 import org.springframework.stereotype.Component;
 

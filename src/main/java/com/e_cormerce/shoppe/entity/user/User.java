@@ -8,6 +8,9 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -22,10 +25,15 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE users SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
+
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
   @Column(nullable = false, unique = true)
   String username;
@@ -33,7 +41,8 @@ public class User {
   String avatar;
   LocalDate birth;
 
-  @Column(name = "created_at")
+  @CreationTimestamp
+  @Column(name = "created_at", updatable = false)
   LocalDateTime createdAt;
 
   @Enumerated(EnumType.STRING)

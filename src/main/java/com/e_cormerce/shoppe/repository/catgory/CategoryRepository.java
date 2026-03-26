@@ -1,7 +1,7 @@
-package com.e_cormerce.shoppe.repository.product;
+package com.e_cormerce.shoppe.repository.catgory;
 
-import com.e_cormerce.shoppe.dto.common.search.CategoryProjection;
-import com.e_cormerce.shoppe.entity.product.Category;
+import com.e_cormerce.shoppe.dto.response.category.CategoryDetailResponse;
+import com.e_cormerce.shoppe.entity.category.Category;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,16 +21,12 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
   @Query(value = "SELECT * FROM categories WHERE parent_id = :id ", nativeQuery = true)
   List<Category> findChildren(@Param("id") String id);
 
-  @Query(value = "SELECT id, val FROM categories", nativeQuery = true)
-  List<CategoryProjection> findAllCategoryNames();
-
   @Query(
       value =
-          "SELECT c.val, c.id "
-              + "FROM categories c "
-              + "WHERE c.val LIKE CONCAT('%', :keyword, '%') "
-              + "LIMIT :num",
+          "SELECT c1.id, c1.val,c1.thumbnail, c1.deleted, c1.created_at, c2.val "
+              + "FROM categories c1 "
+              + "JOIN categories c2 on c1.parent_id = c2.id "
+              + "WHERE c1.id = :id ",
       nativeQuery = true)
-  List<CategoryProjection> findPrefixCategory(
-      @Param("keyword") String keyword, @Param("num") int num);
+  Optional<CategoryDetailResponse> findCategoryDetailsById(@Param("id") String id);
 }

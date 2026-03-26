@@ -41,7 +41,8 @@ public enum ErrorCode {
   TIME_OUT_REQUEST("Request timed out", 1023, HttpStatus.REQUEST_TIMEOUT),
   INVALID_APPROVE_PRODUCT_REQUEST(
       "List products id is null or empty", 1024, HttpStatus.BAD_REQUEST),
-  ;
+  NOT_EXISTED_VARIANT("This variant is not existed", 1025, HttpStatus.BAD_REQUEST);
+
   String message;
   int code;
   HttpStatus httpStatus;

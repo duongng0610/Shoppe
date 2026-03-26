@@ -26,5 +26,5 @@ public class VariantRequest {
 
   @NotNull(message = "quantity of variant is required")
   @Positive(message = "quantity of variant must be greater than 0")
-  Long quantity;
+  int quantity;
 }

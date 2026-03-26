@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.product;
 
+import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import jakarta.persistence.*;
@@ -8,6 +9,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -23,6 +27,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE products SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class Product {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -46,15 +52,22 @@ public class Product {
   @Column(name = "total_quantity", nullable = false)
   int totalQuantity;
 
+  @Column(name = "total_quantity_sold")
+  int totalQuantitySold;
+
   @Column(name = "has_variant", nullable = false)
   boolean hasVariant;
+
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
   @Enumerated(EnumType.STRING)
   @Column(
       columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')") // , nullable = false)
   ProductStatus status = ProductStatus.PENDING;
 
-  @Column(name = "created_at")
+  @CreationTimestamp
+  @Column(name = "created_at", updatable = false)
   LocalDateTime createdAt;
 
   // owner side

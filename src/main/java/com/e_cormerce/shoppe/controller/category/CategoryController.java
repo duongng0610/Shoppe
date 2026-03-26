@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.controller.category;
 
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
+import com.e_cormerce.shoppe.dto.response.category.CategoryDetailResponse;
 import com.e_cormerce.shoppe.service.category.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +39,23 @@ public class CategoryController {
             .success(true)
             .message("get default categories successfully")
             .build());
+  }
+
+  @GetMapping("/{id}/details")
+  public ResponseEntity<ApiResponse<CategoryDetailResponse>> getDetails(@PathVariable String id) {
+    var res = categoryService.getCategoryDetailResponse(id);
+    return ResponseEntity.ok(
+        ApiResponse.<CategoryDetailResponse>builder().success(true).data(res).build());
+  }
+
+  @GetMapping("{id}/products")
+  public ResponseEntity<ApiResponse> searchProductsInCategories(@PathVariable String id) {
+    var result = categoryService.getProductsByCategoryId(id);
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder()
+                .data(result)
+                .message("get suggest category successfully")
+                .build());
   }
 }

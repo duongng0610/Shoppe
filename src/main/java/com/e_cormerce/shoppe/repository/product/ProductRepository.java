@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.repository.product;
 
-import com.e_cormerce.shoppe.entity.product.Category;
+import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.entity.user.User;
 import java.util.List;

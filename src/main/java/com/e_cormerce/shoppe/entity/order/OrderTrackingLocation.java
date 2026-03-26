@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -16,15 +19,21 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE order_tracking_locations SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class OrderTrackingLocation {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
 
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
+
   @Column(name = "is_last_update")
   boolean isLastUpdate = true;
 
   @Column(name = "created_at")
+  @CreationTimestamp
   LocalDate createdAt;
 
   @ManyToOne

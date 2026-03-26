@@ -3,9 +3,9 @@ package com.e_cormerce.shoppe.service;
 import static org.mockito.Mockito.when;
 
 import com.e_cormerce.shoppe.controller.seller.product.DataTestCreateProductRequestHelper;
-import com.e_cormerce.shoppe.entity.product.Category;
+import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.repository.product.CategoryRepository;
+import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;

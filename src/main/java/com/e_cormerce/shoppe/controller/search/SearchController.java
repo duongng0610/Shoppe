@@ -18,22 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class SearchController {
   SearchService searchService;
 
-  @GetMapping("/suggest-categories")
+  @GetMapping
   public ResponseEntity<ApiResponse> search(
       @RequestParam("keyword") String keyword, @RequestParam("num") int num) {
     var result = searchService.search(keyword, num);
-    return ResponseEntity.ok()
-        .body(
-            ApiResponse.builder()
-                .data(result)
-                .message("get suggest category successfully")
-                .build());
-  }
-
-  @GetMapping("/suggest-products")
-  public ResponseEntity<ApiResponse> searchProductsInCategories(
-      @RequestParam("category_id") String category_id) {
-    var result = searchService.searchProductInCategory(category_id);
     return ResponseEntity.ok()
         .body(
             ApiResponse.builder()

@@ -22,11 +22,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ApiResponse> UncategorizedException(Exception e) {
     return ResponseEntity.status(ErrorCode.UNCATEGORIZED.getHttpStatus())
-        .body(
-            ApiResponse.builder()
-                .success(false)
-                .message(ErrorCode.UNCATEGORIZED.getMessage())
-                .build());
+        .body(ApiResponse.builder().success(false).message(e.getMessage()).build());
   }
 
   /**

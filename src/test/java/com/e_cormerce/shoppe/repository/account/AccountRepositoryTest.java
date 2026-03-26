@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.repository;
+package com.e_cormerce.shoppe.repository.account;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,7 +25,7 @@ public class AccountRepositoryTest {
   public void findByEmail() {
     // Arrange
     Account account =
-        Account.builder().email("test@gmail.co").password("aaaa").created_at(new Date()).build();
+        Account.builder().email("test@gmail.com").password("aaaa").created_at(new Date()).build();
 
     accountRepository.save(account);
 

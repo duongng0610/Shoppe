@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.configuration.helper;
 
-import com.e_cormerce.shoppe.entity.product.Category;
+import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.Permission;
 import com.e_cormerce.shoppe.entity.user.Role;
@@ -9,7 +9,7 @@ import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.user.PermissionEnum;
 import com.e_cormerce.shoppe.enums.user.RoleEnum;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.repository.product.CategoryRepository;
+import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
 import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;

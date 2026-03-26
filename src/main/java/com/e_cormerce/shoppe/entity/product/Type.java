@@ -5,14 +5,21 @@ import jakarta.persistence.*;
 import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
+@Table(
+    name = "type",
+    indexes = {@Index(name = "idx_type_product", columnList = "product_id")})
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE type SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class Type {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

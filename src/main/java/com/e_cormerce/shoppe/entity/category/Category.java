@@ -1,10 +1,14 @@
-package com.e_cormerce.shoppe.entity.product;
+package com.e_cormerce.shoppe.entity.category;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
@@ -19,6 +23,8 @@ import lombok.experimental.FieldDefaults;
       @Index(name = "idx_categories_parent", columnList = "parent_id"),
       @Index(name = "idx_categories_val", columnList = "val")
     })
+@SQLDelete(sql = "UPDATE categories SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class Category {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -31,6 +37,10 @@ public class Category {
   boolean deleted;
 
   String thumbnail;
+
+  @CreationTimestamp
+  @Column(name = "created_at", updatable = false)
+  private LocalDateTime createdAt;
 
   // owner side
   @ManyToOne

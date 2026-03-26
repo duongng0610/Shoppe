@@ -8,6 +8,9 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -19,10 +22,15 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE orders SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class Order {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
+
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
   @Enumerated(EnumType.STRING)
   @Column(
@@ -40,9 +48,11 @@ public class Order {
   int quantity;
 
   @Column(name = "created_at")
+  @CreationTimestamp
   LocalDateTime createdAt;
 
   @Column(name = "updated_at", nullable = false)
+  @CreationTimestamp
   LocalDateTime updatedAt;
 
   @ManyToOne
