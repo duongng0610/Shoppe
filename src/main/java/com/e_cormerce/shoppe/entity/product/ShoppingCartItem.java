@@ -42,6 +42,6 @@ public class ShoppingCartItem {
   Product product;
 
   @ManyToOne
-  @JoinColumn(name = "client_id", nullable = false)
-  private User client;
+  @JoinColumn(name = "shopping_cart_id", nullable = false)
+  ShoppingCart shoppingCart;
 }
