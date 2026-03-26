@@ -46,7 +46,10 @@ public class Product {
     float discountPercentage;
 
     @Column(name = "total_quantity", nullable = false)
-    int totalQuantity;
+    long totalQuantity;
+
+    @Column(name = "total_sold_quantity", nullable = false)
+    long totalSoldQuantity;
 
     @Column(name = "has_variant", nullable = false)
     boolean hasVariant;
