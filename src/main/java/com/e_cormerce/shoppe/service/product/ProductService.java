@@ -78,14 +78,42 @@ public class ProductService {
     if (request.getTypes() != null && !request.getTypes().isEmpty()) {
       product.setTypes(createProductHelper.createType(request.getTypes(), product));
     }
-    if (request.getHasVariant()) {
-      if (urls.getVariantImageUrls() != null && !urls.getVariantImageUrls().isEmpty()) {
-        product.setVariants(
-            createProductHelper.createVariants(
-                request.getVariantRequests(), product, urls.getVariantImageUrls()));
-      }
-    } else {
-      product.setVariants(createProductHelper.createDefaultVariant(product));
+
+    public GetProductDetailResponse getProductDetail(String id) {
+        Product product =
+                productRepository
+                        .findById(id)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
+
+        CompletableFuture<List<Type>> typesFuture = productQueryDBHelper.getTypes(id);
+        CompletableFuture<List<Variant>> variantsFuture = productQueryDBHelper.getVariants(id);
+        CompletableFuture<User> shopFuture = productQueryDBHelper.getSeller(id);
+        CompletableFuture<Category> categoryFuture = productQueryDBHelper.getCategory(id);
+
+        CompletableFuture.allOf(typesFuture, variantsFuture, shopFuture, categoryFuture).join();
+
+        List<Type> types = typesFuture.join();
+        List<Variant> variants = variantsFuture.join();
+        User seller = shopFuture.join();
+        Category category = categoryFuture.join();
+
+        UserDto sellerResponse = userMapper.toUserDTO(seller);
+        CategoryDto categoryResponse = categoryMapper.toCategoryDTO(category);
+
+        List<VariantDetailResponse> variantResponses =
+                getProductDetailsHelper.createVariantDetail(variants);
+        var typeResponses = getProductDetailsHelper.createTypesResponse(types);
+
+        return GetProductDetailResponse.builder()
+                .name(product.getName())
+                .id(product.getId())
+                .category(categoryResponse)
+                .seller(sellerResponse)
+                .variants(variantResponses)
+                .types(typeResponses)
+                .thumbnail(product.getThumbnail())
+                .extraImages(product.getProductExtraImages().stream().map(item -> item.getUrl()).toList())
+                .build();
     }
 
     product.setCategory(

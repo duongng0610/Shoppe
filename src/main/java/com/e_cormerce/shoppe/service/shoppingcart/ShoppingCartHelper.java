@@ -7,48 +7,49 @@ import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.product.ShoppingCartItemRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
-import java.math.BigDecimal;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ShoppingCartHelper {
-  VariantRepository variantRepository;
-  ShoppingCartItemRepository shoppingCartItemRepository;
+    VariantRepository variantRepository;
+    ShoppingCartItemRepository shoppingCartItemRepository;
 
-  public ShoppingCartItem createShoppingCartItem(AddItemToShoppingCartRequest request) {
-    Variant variant =
-        variantRepository
-            .findById(request.getVariantId())
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_VARIANT));
+    public ShoppingCartItem createShoppingCartItem(AddItemToShoppingCartRequest request) {
+        Variant variant =
+                variantRepository
+                        .findById(request.getVariantId())
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_VARIANT));
 
-    ShoppingCartItem item =
-        ShoppingCartItem.builder()
-            .isVariant(!variant.isDefault())
-            .quantity(request.getQuantity())
-            .variant(variant)
-            .priceEach(variant.getPrice())
-            .build();
+        ShoppingCartItem item =
+                ShoppingCartItem.builder()
+                        .isVariant(!variant.isDefault())
+                        .quantity(request.getQuantity())
+                        .variant(variant)
+                        .priceEach(variant.getPrice())
+                        .build();
 
-    shoppingCartItemRepository.save(item);
+        shoppingCartItemRepository.save(item);
 
-    return item;
-  }
+        return item;
+    }
 
-  public BigDecimal deleteShoppingCartItems(List<String> itemIds) {
-    List<ShoppingCartItem> items = shoppingCartItemRepository.findByIdIn(itemIds);
-    BigDecimal itemsTotal =
-        items.stream()
-            .map(item -> item.getPriceEach().multiply(BigDecimal.valueOf(item.getQuantity())))
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    public BigDecimal deleteShoppingCartItems(List<String> itemIds) {
+        List<ShoppingCartItem> items = shoppingCartItemRepository.findByIdIn(itemIds);
+        BigDecimal itemsTotal =
+                items.stream()
+                        .map(item -> item.getPriceEach().multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    shoppingCartItemRepository.deleteAll(items);
+        shoppingCartItemRepository.deleteAll(items);
 
-    return itemsTotal;
-  }
+        return itemsTotal;
+    }
 }
