@@ -10,6 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryDto {
-    String id;
-    String val;
+  String id;
+  String val;
 }

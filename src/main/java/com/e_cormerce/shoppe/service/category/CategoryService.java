@@ -13,6 +13,7 @@ import com.e_cormerce.shoppe.repository.catgory.SynonymsRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.service.category.helper.CategoryHelper;
 import com.e_cormerce.shoppe.service.media.ImageService;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,80 +22,72 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryService {
 
-    CategoryHelper categoryHelper;
-    ImageService imageService;
-    CategoryRepository categoryRepository;
-    SynonymsRepository synonymsRepository;
-    ProductRepository productRepository;
-    ProductMapper productMapper;
+  CategoryHelper categoryHelper;
+  ImageService imageService;
+  CategoryRepository categoryRepository;
+  SynonymsRepository synonymsRepository;
+  ProductRepository productRepository;
+  ProductMapper productMapper;
 
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
-    public void create(CreateCategoryRequest request, MultipartFile thumbnail) {
-        if (categoryRepository.existsByVal(request.getName())) {
-            throw new AppException(ErrorCode.EXISTED_CATEGORY);
-        }
-        Category category =
-                Category.builder()
-                        .val(request.getName().toLowerCase())
-                        .thumbnail(imageService.uploadSingleImage(thumbnail))
-                        .build();
-        /** nếu khác null thì mơi theem parent , còn ko thì vẫn tạo với mức mặc định. */
-        if (request.getParentId() != null) {
-            category.setParent(categoryHelper.findById(request.getParentId()));
-        }
-
-        categoryRepository.save(category);
-        synonymsRepository.save(
-                CategorySynonyms.builder()
-                        .category(category)
-                        .val(request.getName())
-                        .build());
-
-        if (request.getSynonyms() != null) {
-            request
-                    .getSynonyms()
-                    .forEach(
-                            relevant -> {
-                                synonymsRepository.save(
-                                        CategorySynonyms.builder()
-                                                .category(category)
-                                                .val(relevant)
-                                                .build());
-                            });
-        }
-
+  @Transactional(isolation = Isolation.READ_UNCOMMITTED)
+  public void create(CreateCategoryRequest request, MultipartFile thumbnail) {
+    if (categoryRepository.existsByVal(request.getName())) {
+      throw new AppException(ErrorCode.EXISTED_CATEGORY);
+    }
+    Category category =
+        Category.builder()
+            .val(request.getName().toLowerCase())
+            .thumbnail(imageService.uploadSingleImage(thumbnail))
+            .build();
+    /** nếu khác null thì mơi theem parent , còn ko thì vẫn tạo với mức mặc định. */
+    if (request.getParentId() != null) {
+      category.setParent(categoryHelper.findById(request.getParentId()));
     }
 
+    categoryRepository.save(category);
+    synonymsRepository.save(
+        CategorySynonyms.builder().category(category).val(request.getName()).build());
 
-    public List<ProductCardResponse> getProductsByCategoryId(String category_id) {
-
-        return productRepository.findProductsInCategory(category_id).stream()
-                .map(
-                        product -> {
-                            ProductCardResponse response = productMapper.toProductDTO(product);
-                            return response;
-                        })
-                .toList();
+    if (request.getSynonyms() != null) {
+      request
+          .getSynonyms()
+          .forEach(
+              relevant -> {
+                synonymsRepository.save(
+                    CategorySynonyms.builder().category(category).val(relevant).build());
+              });
     }
+  }
 
-    public CategoryDetailResponse getCategoryDetailResponse(String id) {
-        return categoryRepository.findCategoryDetailsById(id).orElseThrow(() -> new AppException(ErrorCode.EXISTED_CATEGORY));
-    }
+  public List<ProductCardResponse> getProductsByCategoryId(String category_id) {
 
-    public List<Category> getChildren(String id) {
-        List<Category> children = categoryHelper.findChildren(id);
-        return children;
-    }
+    return productRepository.findProductsInCategory(category_id).stream()
+        .map(
+            product -> {
+              ProductCardResponse response = productMapper.toProductDTO(product);
+              return response;
+            })
+        .toList();
+  }
 
-    public List<Category> getDefault() {
-        List<Category> defaults = categoryHelper.findDefault();
-        return defaults;
-    }
+  public CategoryDetailResponse getCategoryDetailResponse(String id) {
+    return categoryRepository
+        .findCategoryDetailsById(id)
+        .orElseThrow(() -> new AppException(ErrorCode.EXISTED_CATEGORY));
+  }
+
+  public List<Category> getChildren(String id) {
+    List<Category> children = categoryHelper.findChildren(id);
+    return children;
+  }
+
+  public List<Category> getDefault() {
+    List<Category> defaults = categoryHelper.findDefault();
+    return defaults;
+  }
 }

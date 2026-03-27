@@ -4,82 +4,90 @@ import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import jakarta.persistence.*;
-import lombok.*;
-import lombok.experimental.FieldDefaults;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
-        name = "products",
-        indexes = {
-                @Index(name = "idx_products_category", columnList = "category_id"),
-                @Index(name = "idx_products_seller", columnList = "seller_id"),
-                @Index(name = "idx_products_seller_status", columnList = "seller_id, status")
-        })
+    name = "products",
+    indexes = {
+      @Index(name = "idx_products_category", columnList = "category_id"),
+      @Index(name = "idx_products_seller", columnList = "seller_id"),
+      @Index(name = "idx_products_seller_status", columnList = "seller_id, status")
+    })
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE products SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(nullable = false)
-    String name;
+  @Column(nullable = false)
+  String name;
 
-    @Column(nullable = false)
-    String thumbnail;
+  @Column(nullable = false)
+  String thumbnail;
 
-    @Column(nullable = false, columnDefinition = "TEXT")
-    String description;
+  @Column(nullable = false, columnDefinition = "TEXT")
+  String description;
 
-    @Column(name = "origin_price", precision = 15, scale = 2, nullable = false)
-    BigDecimal originPrice;
+  @Column(name = "origin_price", precision = 15, scale = 2, nullable = false)
+  BigDecimal originPrice;
 
-    @Column(name = "discount_percentage")
-    float discountPercentage;
+  @Column(name = "discount_percentage")
+  float discountPercentage;
 
-    @Column(name = "total_quantity", nullable = false)
-    long totalQuantity;
+  @Column(name = "total_quantity", nullable = false)
+  int totalQuantity;
 
-    @Column(name = "total_sold_quantity", nullable = false)
-    long totalSoldQuantity;
+  @Column(name = "total_quantity_sold")
+  int totalQuantitySold;
 
-    @Column(name = "has_variant", nullable = false)
-    boolean hasVariant;
+  @Column(name = "has_variant", nullable = false)
+  boolean hasVariant;
 
-    @Enumerated(EnumType.STRING)
-    @Column(
-            columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')") // , nullable = false)
-    ProductStatus status = ProductStatus.PENDING;
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
-    @Column(name = "created_at")
-    LocalDateTime createdAt;
+  @Enumerated(EnumType.STRING)
+  @Column(
+      columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')") // , nullable = false)
+  ProductStatus status = ProductStatus.PENDING;
 
-    // owner side
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    Category category;
+  @CreationTimestamp
+  @Column(name = "created_at", updatable = false)
+  LocalDateTime createdAt;
 
-    // inverse side
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Type> types;
+  // owner side
+  @ManyToOne
+  @JoinColumn(name = "category_id")
+  Category category;
 
-    // inverse side
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<Variant> variants;
+  // inverse side
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  List<Type> types;
 
-    // inverse side
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ProductExtraImage> productExtraImages;
+  // inverse side
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  List<Variant> variants;
 
-    @ManyToOne
-    @JoinColumn(name = "seller_id", nullable = false)
-    User seller;
+  // inverse side
+  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  List<ProductExtraImage> productExtraImages;
+
+  @ManyToOne
+  @JoinColumn(name = "seller_id", nullable = false)
+  User seller;
 }

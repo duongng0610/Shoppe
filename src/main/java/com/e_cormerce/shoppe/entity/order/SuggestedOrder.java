@@ -7,6 +7,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -21,10 +24,15 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE suggested_orders SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class SuggestedOrder {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
+
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
   @Column(name = "shipping_cost", precision = 15, scale = 2, nullable = false)
   BigDecimal shippingCost;
@@ -33,6 +41,7 @@ public class SuggestedOrder {
   LocalDate requiredDate;
 
   @Column(name = "created_at", nullable = false)
+  @CreationTimestamp
   LocalDateTime createdAt;
 
   @ManyToOne

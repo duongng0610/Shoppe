@@ -8,6 +8,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(
@@ -19,10 +22,15 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE order_refund_requests SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class OrderRefundRequest {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
+
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
   @Column(nullable = false, columnDefinition = "TEXT")
   String reason;
@@ -31,6 +39,7 @@ public class OrderRefundRequest {
   BigDecimal refundAmount;
 
   @Column(name = "created_at", nullable = false)
+  @CreationTimestamp
   LocalDateTime createdAt;
 
   @Column(name = "resolved_at")

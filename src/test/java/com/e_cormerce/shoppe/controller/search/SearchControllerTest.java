@@ -1,12 +1,16 @@
 package com.e_cormerce.shoppe.controller.search;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.e_cormerce.shoppe.dto.common.search.CategoryDto;
 import com.e_cormerce.shoppe.filter.AuthFilter;
 import com.e_cormerce.shoppe.service.search.SearchService;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
@@ -34,13 +38,21 @@ public class SearchControllerTest {
 
   @Test
   public void testValidSearch() throws Exception {
+    Mockito.when(searchService.search("laptop", 10))
+        .thenReturn(List.of(CategoryDto.builder().id("c1").val("Laptop").build()));
+
     mockMvc
         .perform(
-            get("/search/suggest")
+            get("/search")
                 .param("keyword", "laptop")
                 .param("num", "10")
                 .contentType(MediaType.APPLICATION_JSON_VALUE))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.message").value("get suggest category successfully"));
+        .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.message").value("get suggest category successfully"))
+        .andExpect(jsonPath("$.data[0].id").value("c1"))
+        .andExpect(jsonPath("$.data[0].val").value("Laptop"));
+
+    Mockito.verify(searchService).search("laptop", 10);
   }
 }

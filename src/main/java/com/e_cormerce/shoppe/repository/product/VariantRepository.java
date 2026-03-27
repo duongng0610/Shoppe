@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.repository.product;
 
 import com.e_cormerce.shoppe.entity.product.Variant;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,4 +19,6 @@ LEFT JOIN FETCH v.variantValues
 WHERE v.product.id = :product_id
 """)
   CompletableFuture<List<Variant>> findVariantsOfProduct(@Param("product_id") String product_id);
+
+  Optional<Variant> findById(String variant_id);
 }

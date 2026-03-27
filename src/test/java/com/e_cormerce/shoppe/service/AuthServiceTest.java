@@ -9,17 +9,9 @@ import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.mapper.address.AddressMapper;
-import com.e_cormerce.shoppe.mapper.user.UserMapper;
-import com.e_cormerce.shoppe.properties.JwtProperties;
-import com.e_cormerce.shoppe.repository.token.InvalidTokenRepository;
-import com.e_cormerce.shoppe.repository.token.RefreshTokenRepository;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
-import com.e_cormerce.shoppe.repository.user.AddressRepository;
-import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
-import com.e_cormerce.shoppe.service.auth.JwtService;
 import com.e_cormerce.shoppe.service.auth.TokenService;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -45,14 +37,9 @@ public class AuthServiceTest {
 
   @Mock AccountRepository accountRepository;
 
-
   @Mock BCryptPasswordEncoder bCryptPasswordEncoder;
 
-
-
   @Mock TokenService tokenService;
-
-
 
   @Test
   public void successLogin() {

@@ -19,7 +19,7 @@ import lombok.experimental.FieldDefaults;
 public abstract class AbstractRegisterRequest {
 
   @NotBlank(message = "email of register is required")
-  @Email(message = "email of register is required")
+  @Email(message = "email of register has wrong type")
   String email;
 
   @NotBlank(message = "password of register is required")
@@ -27,6 +27,6 @@ public abstract class AbstractRegisterRequest {
   String password;
 
   @NotBlank(message = "username of register is required")
-  @Size(min = 6)
+  @Size(min = 6, message = "your username at least 6 character")
   String username;
 }

@@ -4,14 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
+@Table(
+    name = "type_value",
+    indexes = {@Index(name = "idx_type_value_type", columnList = "type_id")})
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE type_value SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class TypeValue {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)

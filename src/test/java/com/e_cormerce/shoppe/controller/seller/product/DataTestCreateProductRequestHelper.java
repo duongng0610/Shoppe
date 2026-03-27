@@ -25,7 +25,7 @@ public final class DataTestCreateProductRequestHelper {
     VariantRequest variant = new VariantRequest();
     variant.setVariantValues(List.of(attr));
     variant.setPrice(BigDecimal.valueOf(100));
-    variant.setQuantity(Long.valueOf(100));
+    variant.setQuantity(Integer.valueOf(100));
 
     return CreateProductRequest.builder()
         .name("Product")
@@ -64,7 +64,7 @@ public final class DataTestCreateProductRequestHelper {
     VariantRequest variant = new VariantRequest();
     variant.setVariantValues(List.of(attr));
     variant.setPrice(BigDecimal.valueOf(100));
-    variant.setQuantity(Long.valueOf(100));
+    variant.setQuantity(Integer.valueOf(100));
 
     return CreateProductRequest.builder()
         .name("Product")
@@ -119,7 +119,7 @@ public final class DataTestCreateProductRequestHelper {
       VariantRequest variant = new VariantRequest();
       variant.setVariantValues(List.of(attr));
       variant.setPrice(BigDecimal.valueOf(100 + i));
-      variant.setQuantity(Long.valueOf(100 + i));
+      variant.setQuantity(Integer.valueOf(100 + i));
 
       variants.add(variant);
     }

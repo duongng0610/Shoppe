@@ -16,19 +16,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SearchController {
-    SearchService searchService;
+  SearchService searchService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponse> search(
-            @RequestParam("keyword") String keyword, @RequestParam("num") int num) {
-        var result = searchService.search(keyword, num);
-        return ResponseEntity.ok()
-                .body(
-                        ApiResponse.builder()
-                                .data(result)
-                                .message("get suggest category successfully")
-                                .build());
-    }
-
-
+  @GetMapping
+  public ResponseEntity<ApiResponse> search(
+      @RequestParam("keyword") String keyword, @RequestParam("num") int num) {
+    var result = searchService.search(keyword, num);
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder()
+                .data(result)
+                .message("get suggest category successfully")
+                .build());
+  }
 }

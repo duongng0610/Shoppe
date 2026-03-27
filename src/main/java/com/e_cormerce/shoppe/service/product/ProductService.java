@@ -108,7 +108,7 @@ public class ProductService {
         Product product =
                 productRepository
                         .findById(id)
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_PRODUCT));
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
         CompletableFuture<List<Type>> typesFuture = productQueryDBHelper.getTypes(id);
         CompletableFuture<List<Variant>> variantsFuture = productQueryDBHelper.getVariants(id);
@@ -132,10 +132,6 @@ public class ProductService {
         return GetProductDetailResponse.builder()
                 .name(product.getName())
                 .id(product.getId())
-                .description(product.getDescription())
-                .originPrice(product.getOriginPrice())
-                .totalQuantity(product.getTotalQuantity())
-                .totalSoldQuantity(product.getTotalSoldQuantity())
                 .category(categoryResponse)
                 .seller(sellerResponse)
                 .variants(variantResponses)
