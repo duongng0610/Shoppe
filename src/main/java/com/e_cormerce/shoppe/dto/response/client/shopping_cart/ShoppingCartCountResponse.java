@@ -1,6 +1,5 @@
 package com.e_cormerce.shoppe.dto.response.client.shopping_cart;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,6 +9,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShoppingCartCountResponse {
-    String id;
-    long count;
+  String id;
+  long count;
 }

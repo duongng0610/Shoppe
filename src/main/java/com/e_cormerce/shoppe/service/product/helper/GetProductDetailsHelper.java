@@ -56,7 +56,7 @@ public class GetProductDetailsHelper {
                   })
               .toList();
 
-      VariantDetailResponse response = variantMapper.toVariantDetailResponse(variant);
+      VariantDetailResponse response = variantMapper.toDto(variant);
       response.setAttributes(variantValues);
       responses.add(response);
     }

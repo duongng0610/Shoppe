@@ -6,5 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface VariantMapper {
-  VariantDetailResponse toVariantDetailResponse(Variant variant);
+  VariantDetailResponse toDto(Variant variant);
 }

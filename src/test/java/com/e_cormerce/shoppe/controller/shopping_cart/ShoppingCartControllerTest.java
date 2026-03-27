@@ -1,6 +1,10 @@
 package com.e_cormerce.shoppe.controller.shopping_cart;
 
-import com.e_cormerce.shoppe.client.shoppingcart.ShoppingCartController;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.e_cormerce.shoppe.controller.seller.shoppingcart.ShoppingCartController;
 import com.e_cormerce.shoppe.filter.AuthFilter;
 import com.e_cormerce.shoppe.service.shoppingcart.ShoppingCartService;
 import com.e_cormerce.shoppe.util.ConvertObject;
@@ -18,90 +22,84 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest(
-        controllers = {ShoppingCartController.class},
-        excludeAutoConfiguration = {
-                SecurityAutoConfiguration.class,
-                SecurityFilterAutoConfiguration.class
-        },
-        excludeFilters =
+    controllers = {ShoppingCartController.class},
+    excludeAutoConfiguration = {
+      SecurityAutoConfiguration.class,
+      SecurityFilterAutoConfiguration.class
+    },
+    excludeFilters =
         @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = AuthFilter.class))
 @AutoConfigureMockMvc(addFilters = false)
 public class ShoppingCartControllerTest {
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockitoBean
-    ShoppingCartService shoppingCartService;
+  @MockitoBean ShoppingCartService shoppingCartService;
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_ADD_CART_SHOPPING")
-    public void testValidAdd() throws Exception {
-        var request = DataTestAddItemRequestHelper.validRequest();
+  @Test
+  @WithMockUser(authorities = "PERMISSION_ADD_CART_SHOPPING")
+  public void testValidAdd() throws Exception {
+    var request = DataTestAddItemRequestHelper.validRequest();
 
-        mockMvc
-                .perform(
-                        post("/shopping_cart/add")
-                                .content(ConvertObject.toJson(request))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isCreated());
+    mockMvc
+        .perform(
+            post("/shopping_cart/add")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isCreated());
 
-        Mockito.verify(shoppingCartService).addItem(Mockito.any());
-    }
+    Mockito.verify(shoppingCartService).addItem(Mockito.any());
+  }
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_ADD_CART_SHOPPING")
-    public void testInvalidAddWithNoQuantity() throws Exception {
-        var request = DataTestAddItemRequestHelper.requestWithNoQuantity();
+  @Test
+  @WithMockUser(authorities = "PERMISSION_ADD_CART_SHOPPING")
+  public void testInvalidAddWithNoQuantity() throws Exception {
+    var request = DataTestAddItemRequestHelper.requestWithNoQuantity();
 
-        mockMvc
-                .perform(
-                        post("/shopping_cart/add")
-                                .content(ConvertObject.toJson(request))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(
+            post("/shopping_cart/add")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isBadRequest());
+  }
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_ADD_CART_SHOPPING")
-    public void testInvalidAddWithNoVariantId() throws Exception {
-        var request = DataTestAddItemRequestHelper.requestWithNoVariantId();
+  @Test
+  @WithMockUser(authorities = "PERMISSION_ADD_CART_SHOPPING")
+  public void testInvalidAddWithNoVariantId() throws Exception {
+    var request = DataTestAddItemRequestHelper.requestWithNoVariantId();
 
-        mockMvc
-                .perform(
-                        post("/shopping_cart/add")
-                                .content(ConvertObject.toJson(request))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(
+            post("/shopping_cart/add")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isBadRequest());
+  }
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
-    public void testValiDelete() throws Exception {
-        var request = DataTestDeleteRequestHelper.validRequest();
+  @Test
+  @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
+  public void testValiDelete() throws Exception {
+    var request = DataTestDeleteRequestHelper.validRequest();
 
-        mockMvc
-                .perform(
-                        delete("/shopping_cart/delete")
-                                .content(ConvertObject.toJson(request))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isOk());
-    }
+    mockMvc
+        .perform(
+            delete("/shopping_cart/delete")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isOk());
+  }
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
-    public void testInvalidRequestWithNoListIds() throws Exception {
-        var request = DataTestDeleteRequestHelper.requestWithNoListIds();
+  @Test
+  @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
+  public void testInvalidRequestWithNoListIds() throws Exception {
+    var request = DataTestDeleteRequestHelper.requestWithNoListIds();
 
-        mockMvc
-                .perform(
-                        delete("/shopping_cart/delete")
-                                .content(ConvertObject.toJson(request))
-                                .contentType(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isBadRequest());
-    }
+    mockMvc
+        .perform(
+            delete("/shopping_cart/delete")
+                .content(ConvertObject.toJson(request))
+                .contentType(MediaType.APPLICATION_JSON_VALUE))
+        .andExpect(status().isBadRequest());
+  }
 }
