@@ -4,7 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.e_cormerce.shoppe.controller.seller.shoppingcart.ShoppingCartController;
+import com.e_cormerce.shoppe.controller.client.shoppingcart.ShoppingCartController;
 import com.e_cormerce.shoppe.filter.AuthFilter;
 import com.e_cormerce.shoppe.service.shoppingcart.ShoppingCartService;
 import com.e_cormerce.shoppe.util.ConvertObject;

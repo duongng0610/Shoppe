@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.controller.seller.shoppingcart;
+package com.e_cormerce.shoppe.controller.client.shoppingcart;
 
 import com.e_cormerce.shoppe.dto.request.shoppingcart.AddItemToShoppingCartRequest;
 import com.e_cormerce.shoppe.dto.request.shoppingcart.DeleteItemsInShoppingCartRequest;

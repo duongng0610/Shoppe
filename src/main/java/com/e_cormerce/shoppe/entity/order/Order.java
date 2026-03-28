@@ -1,10 +1,10 @@
 package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.product.Variant;
-import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -41,8 +41,8 @@ public class Order {
       nullable = false)
   OrderStatus status;
 
-  @Column(name = "price_each", nullable = false)
-  double priceEach;
+  @Column(name = "total_price", precision = 15, scale = 2, nullable = false)
+  BigDecimal totalPrice;
 
   @Column(nullable = false)
   int quantity;
@@ -64,6 +64,18 @@ public class Order {
   User client;
 
   @ManyToOne
-  @JoinColumn(name = "shipping_address_id", nullable = false)
-  Address shipping_address;
+  @JoinColumn(name = "seller_id", nullable = false)
+  User seller;
+
+  @Column(name = "shipping_address", nullable = false)
+  String shippingAddress;
+
+  @Column(name = "shipping_phone_number", nullable = false)
+  String shippingPhoneNumber;
+
+  @Column(name = "product_name", nullable = false)
+  String productName;
+
+  @Column(name = "variant_name", nullable = false)
+  String variantName;
 }

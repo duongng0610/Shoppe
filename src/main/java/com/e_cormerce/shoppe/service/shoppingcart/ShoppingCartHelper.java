@@ -11,6 +11,7 @@ import com.e_cormerce.shoppe.repository.product.ShoppingCartItemRepository;
 import com.e_cormerce.shoppe.repository.product.ShoppingCartRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
+import jakarta.validation.Valid;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.AccessLevel;
@@ -28,7 +29,7 @@ public class ShoppingCartHelper {
   ShoppingCartRepository shoppingCartRepository;
 
   public ShoppingCartItem createShoppingCartItem(
-      AddItemToShoppingCartRequest request, ShoppingCart shoppingCart) {
+      @Valid AddItemToShoppingCartRequest request, ShoppingCart shoppingCart) {
     Variant variant =
         variantRepository
             .findById(request.getVariantId())
