@@ -1,9 +1,5 @@
 package com.e_cormerce.shoppe.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
 import com.e_cormerce.shoppe.dto.request.shoppingcart.AddItemToShoppingCartRequest;
 import com.e_cormerce.shoppe.dto.request.shoppingcart.DeleteItemsInShoppingCartRequest;
 import com.e_cormerce.shoppe.entity.product.ShoppingCart;
@@ -11,13 +7,10 @@ import com.e_cormerce.shoppe.entity.product.ShoppingCartItem;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.repository.product.ShoppingCartRepository;
+import com.e_cormerce.shoppe.repository.shopping_cart.ShoppingCartRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.shoppingcart.ShoppingCartHelper;
 import com.e_cormerce.shoppe.service.shoppingcart.ShoppingCartService;
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
@@ -30,104 +23,116 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShoppingCartServiceTest {
 
-  @Mock ShoppingCartRepository shoppingCartRepository;
+    @Mock
+    ShoppingCartRepository shoppingCartRepository;
 
-  @Mock ShoppingCartHelper shoppingCartHelper;
+    @Mock
+    ShoppingCartHelper shoppingCartHelper;
 
-  @Mock UserRepository userRepository;
+    @Mock
+    UserRepository userRepository;
 
-  @InjectMocks ShoppingCartService shoppingCartService;
+    @InjectMocks
+    ShoppingCartService shoppingCartService;
 
-  private void mockAuthentication(String username) {
-    Authentication authentication = Mockito.mock(Authentication.class);
-    when(authentication.getName()).thenReturn(username);
+    private void mockAuthentication(String username) {
+        Authentication authentication = Mockito.mock(Authentication.class);
+        when(authentication.getName()).thenReturn(username);
 
-    SecurityContext securityContext = Mockito.mock(SecurityContext.class);
-    when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContext securityContext = Mockito.mock(SecurityContext.class);
+        when(securityContext.getAuthentication()).thenReturn(authentication);
 
-    SecurityContextHolder.setContext(securityContext);
-  }
+        SecurityContextHolder.setContext(securityContext);
+    }
 
-  @Test
-  void testAddItem_success() {
-    String username = "user1";
-    mockAuthentication(username);
+    @Test
+    void testAddItem_success() {
+        String username = "user1";
+        mockAuthentication(username);
 
-    User user = new User();
-    user.setId("u1");
+        User user = new User();
+        user.setId("u1");
 
-    ShoppingCart cart = new ShoppingCart();
-    cart.setId("c1");
-    cart.setTotalPrice(BigDecimal.valueOf(100));
-    cart.setTotalQuantity(1);
+        ShoppingCart cart = new ShoppingCart();
+        cart.setId("c1");
+        cart.setTotalPrice(BigDecimal.valueOf(100));
+        cart.setTotalQuantity(1);
 
-    ShoppingCartItem item = new ShoppingCartItem();
-    item.setPriceEach(BigDecimal.valueOf(50));
-    item.setQuantity(2);
+        ShoppingCartItem item = new ShoppingCartItem();
+        item.setPriceEach(BigDecimal.valueOf(50));
+        item.setQuantity(2);
 
-    AddItemToShoppingCartRequest request = new AddItemToShoppingCartRequest("v1", 2);
+        AddItemToShoppingCartRequest request = new AddItemToShoppingCartRequest("v1", 2);
 
-    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-    when(shoppingCartRepository
-            .findByUserId("u1")
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SHOPPING_CART)))
-        .thenReturn(cart);
+        when(shoppingCartRepository
+                .findByUserId("u1")
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SHOPPING_CART)))
+                .thenReturn(cart);
 
-    when(shoppingCartHelper.createShoppingCartItem(request)).thenReturn(item);
+        when(shoppingCartHelper.createShoppingCartItem(request)).thenReturn(item);
 
-    shoppingCartService.addItem(request);
+        shoppingCartService.addItem(request);
 
-    assertEquals(BigDecimal.valueOf(200), cart.getTotalPrice());
-    assertEquals(2, cart.getTotalQuantity());
+        assertEquals(BigDecimal.valueOf(200), cart.getTotalPrice());
+        assertEquals(2, cart.getTotalQuantity());
 
-    Mockito.verify(shoppingCartRepository).save(cart);
-  }
+        Mockito.verify(shoppingCartRepository).save(cart);
+    }
 
-  @Test
-  void testAddItem_userNotFound() {
-    String username = "user1";
-    mockAuthentication(username);
+    @Test
+    void testAddItem_userNotFound() {
+        String username = "user1";
+        mockAuthentication(username);
 
-    AddItemToShoppingCartRequest request = new AddItemToShoppingCartRequest("v1", 2);
+        AddItemToShoppingCartRequest request = new AddItemToShoppingCartRequest("v1", 2);
 
-    when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
+        when(userRepository.findByUsername(username)).thenReturn(Optional.empty());
 
-    assertThrows(AppException.class, () -> shoppingCartService.addItem(request));
-  }
+        assertThrows(AppException.class, () -> shoppingCartService.addItem(request));
+    }
 
-  @Test
-  void testDeleteItem_success() {
-    String username = "user1";
-    mockAuthentication(username);
+    @Test
+    void testDeleteItem_success() {
+        String username = "user1";
+        mockAuthentication(username);
 
-    User user = new User();
-    user.setId("u1");
+        User user = new User();
+        user.setId("u1");
 
-    ShoppingCart cart = new ShoppingCart();
-    cart.setTotalPrice(BigDecimal.valueOf(200));
-    cart.setTotalQuantity(2);
+        ShoppingCart cart = new ShoppingCart();
+        cart.setTotalPrice(BigDecimal.valueOf(200));
+        cart.setTotalQuantity(2);
 
-    DeleteItemsInShoppingCartRequest request =
-        new DeleteItemsInShoppingCartRequest(List.of("i1", "i2"));
+        DeleteItemsInShoppingCartRequest request =
+                new DeleteItemsInShoppingCartRequest(List.of("i1", "i2"));
 
-    when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
+        when(userRepository.findByUsername(username)).thenReturn(Optional.of(user));
 
-    when(shoppingCartRepository
-            .findByUserId("u1")
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SHOPPING_CART)))
-        .thenReturn(cart);
+        when(shoppingCartRepository
+                .findByUserId("u1")
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SHOPPING_CART)))
+                .thenReturn(cart);
 
-    when(shoppingCartHelper.deleteShoppingCartItems(request.getItemIds()))
-        .thenReturn(BigDecimal.valueOf(100));
+        when(shoppingCartHelper.deleteShoppingCartItems(request.getItemIds()))
+                .thenReturn(BigDecimal.valueOf(100));
 
-    shoppingCartService.deleteItem(request);
+        shoppingCartService.deleteItems(request);
 
-    assertEquals(BigDecimal.valueOf(100), cart.getTotalPrice());
-    assertEquals(1, cart.getTotalQuantity());
-  }
+        assertEquals(BigDecimal.valueOf(100), cart.getTotalPrice());
+        assertEquals(1, cart.getTotalQuantity());
+    }
 }

@@ -6,8 +6,8 @@ import com.e_cormerce.shoppe.mapper.product.VariantMapper;
 import org.mapstruct.Mapper;
 
 @Mapper(
-    componentModel = "spring",
-    uses = {VariantMapper.class})
+        componentModel = "spring",
+        uses = {VariantMapper.class})
 public interface ShoppingCartItemMapper {
-  ShoppingCartItemDto toDto(ShoppingCartItem item);
+    ShoppingCartItemDto toDto(ShoppingCartItem item);
 }
