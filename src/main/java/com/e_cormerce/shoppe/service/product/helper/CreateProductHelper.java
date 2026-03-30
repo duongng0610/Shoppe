@@ -21,6 +21,7 @@ public class CreateProductHelper {
     variants.add(
         Variant.builder()
             .product(product)
+                .isDefault(true)
             .thumbnail(product.getThumbnail())
             .quantity(product.getTotalQuantity())
             .price(product.getOriginPrice())

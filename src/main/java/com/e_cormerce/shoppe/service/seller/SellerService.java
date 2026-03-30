@@ -1,6 +1,8 @@
 package com.e_cormerce.shoppe.service.seller;
 
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
+import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
 import com.e_cormerce.shoppe.service.seller.helper.UploadProductImagesHelper;
@@ -23,6 +25,21 @@ public class SellerService {
       MultipartFile thumbnail,
       List<MultipartFile> extraImages,
       List<MultipartFile> variantImages) {
+
+      if (request.getHasVariant()) {
+          if (variantImages == null
+                  || request.getVariantRequests() == null
+                  || (variantImages.size() != request.getVariantRequests().size()) // sai kích thước
+                  || (request.getVariantRequests() != null
+                  && request.getTypes() == null)) // có variant mà ko có type
+          {
+              throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
+          }
+      } else {
+          if (variantImages != null || request.getVariantRequests() != null) {
+              throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
+          }
+      }
 
     ProductImagesUrl urls =
         uploadProductImagesHelper.uploadImagesOfProduct(thumbnail, extraImages, variantImages);

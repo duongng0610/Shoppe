@@ -41,4 +41,5 @@ public interface VariantRepository extends JpaRepository<Variant, String> {
               + "WHERE v.id = :variant_id",
       nativeQuery = true)
   List<String> getVariantValues(@Param("variant_id") String variant_id);
+
 }

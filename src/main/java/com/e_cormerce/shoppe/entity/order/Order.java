@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.product.Variant;
+import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import jakarta.persistence.*;
@@ -67,8 +68,9 @@ public class Order {
   @JoinColumn(name = "seller_id", nullable = false)
   User seller;
 
-  @Column(name = "shipping_address", nullable = false)
-  String shippingAddress;
+  @OneToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "shipping_address_id", nullable = false)
+    Address shippingAddress;
 
   @Column(name = "shipping_phone_number", nullable = false)
   String shippingPhoneNumber;

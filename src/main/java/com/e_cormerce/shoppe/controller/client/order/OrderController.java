@@ -14,13 +14,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("client/order")
+@RequestMapping("client/orders")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderController {
   OrderService orderService;
 
-  @PostMapping("/create")
+  @PostMapping()
   @PreAuthorize("hasAuthority('PERMISSION_CREATE_ORDER')")
   public ResponseEntity<ApiResponse<CreateOrderResponse>> create(
       @RequestBody @Valid CreateOrderRequest request) {

@@ -3,6 +3,7 @@ package com.e_cormerce.shoppe.service.order;
 import com.e_cormerce.shoppe.dto.common.address.AddressDto;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.Variant;
+import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
@@ -44,11 +45,11 @@ public class CreateOrderHelper {
     return authService.getUserThroughAuthentication();
   }
 
-  public String getShippingAddress(AddressDto addressDto) {
+  public Address getShippingAddress(AddressDto addressDto) {
     String fullAddress =
         addressDto.getWard() + ", " + addressDto.getDistrict() + ", " + addressDto.getProvince();
 
-    return fullAddress;
+    return Address.builder().province(addressDto.getProvince()).district(addressDto.getDistrict()).ward(addressDto.getWard()).build();
   }
 
   private String getProductName(Variant variant) {
