@@ -34,11 +34,10 @@ public class CloudinaryService {
         new Transformation()
             .width(cloudinaryProperties.getImageWidth())
             .height(cloudinaryProperties.getImageHeight())
-            /**
-             * crop: chế độ resize: -fill : cắt ảnh gốc -fit: thu nhỏ ảnh vừa với khung -scale: co
-             * ảnh
-             */
-            .crop(cloudinaryProperties.getCrop()));
+                .crop(cloudinaryProperties.getCrop())
+                .quality("auto")
+                .fetchFormat("auto")
+    );
   }
 
   /**
