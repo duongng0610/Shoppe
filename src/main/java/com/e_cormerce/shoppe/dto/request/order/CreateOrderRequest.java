@@ -17,9 +17,6 @@ public class CreateOrderRequest {
   @NotBlank(message = "variant id is required")
   String variantId;
 
-  @NotBlank(message = "seller id is required")
-  String sellerId;
-
   @NotNull(message = "shipping address is required")
   @Valid
   AddressDto shippingAddress;
@@ -27,6 +24,9 @@ public class CreateOrderRequest {
   @NotBlank(message = "phone number is required")
   String shippingPhoneNumber;
 
+  @NotNull(message = "order quantity is required")
   @Min(value = 1, message = "quantity must be >= 1")
   int quantity;
+
+
 }

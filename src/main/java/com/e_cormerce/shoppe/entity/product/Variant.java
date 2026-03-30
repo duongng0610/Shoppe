@@ -35,13 +35,13 @@ public class Variant {
   @Column(name = "quantity_sold")
   int quantitySold;
 
-  @Column(name = "discount_percentage")
+  @Column(name = "discount_percentage", columnDefinition = "float default 0")
   double discountPercentage;
 
   @Column(columnDefinition = "boolean default false")
   boolean deleted;
 
-  @Column(name = "is_default", columnDefinition = "boolean default true")
+  @Column(name = "is_default", columnDefinition = "boolean default false")
   boolean isDefault;
 
   @ManyToOne

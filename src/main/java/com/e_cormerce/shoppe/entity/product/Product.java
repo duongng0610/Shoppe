@@ -46,14 +46,14 @@ public class Product {
   @Column(name = "origin_price", precision = 15, scale = 2, nullable = false)
   BigDecimal originPrice;
 
-  @Column(name = "discount_percentage")
-  float discountPercentage;
+  @Column(name = "discount_percentage", columnDefinition = "float default 0")
+  Float discountPercentage;
 
   @Column(name = "total_quantity", nullable = false)
-  int totalQuantity;
+  Integer totalQuantity;
 
-  @Column(name = "total_quantity_sold")
-  int totalQuantitySold;
+  @Column(name = "total_quantity_sold", columnDefinition = "float default 0")
+  Integer totalQuantitySold;
 
   @Column(name = "has_variant", nullable = false)
   boolean hasVariant;
