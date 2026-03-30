@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.user;
 
+import com.e_cormerce.shoppe.entity.notification.Notification;
 import com.e_cormerce.shoppe.entity.transaction.Transaction;
 import com.e_cormerce.shoppe.enums.user.UserStatus;
 import jakarta.persistence.*;
@@ -82,4 +83,14 @@ public class User {
       orphanRemoval = true,
       fetch = FetchType.LAZY)
   Set<Transaction> transactions;
+
+
+    // inverse side
+    @OneToMany(
+            mappedBy = "user",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true,
+            fetch = FetchType.LAZY)
+    Set<Notification> notifications;
+
 }

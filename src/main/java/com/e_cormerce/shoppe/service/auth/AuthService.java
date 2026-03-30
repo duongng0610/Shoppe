@@ -178,4 +178,9 @@ public class AuthService {
                 .findById(userId)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
     }
+
+    public String getUserId(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+       return (String) authentication.getPrincipal();
+    }
 }

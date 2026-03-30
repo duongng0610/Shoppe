@@ -43,6 +43,7 @@ public enum ErrorCode {
       "List products id is null or empty", 1024, HttpStatus.BAD_REQUEST),
   NOT_EXIST_VARIANT("This variant is not exist", 1025, HttpStatus.BAD_REQUEST),
   NOT_EXIST_SHOPPING_CART("Shopping cart is not exist", 1026, HttpStatus.CONFLICT),
+  INSUFFICIENT_STOCK("Insufficient stock", 1027, HttpStatus.BAD_REQUEST),
   ;
 
   String message;

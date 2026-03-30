@@ -39,20 +39,7 @@ public class SellerController {
       @RequestPart("thumbnail") MultipartFile thumbnail,
       @RequestPart(value = "extraImages", required = false) List<MultipartFile> extraImages,
       @RequestPart(value = "variantImages", required = false) List<MultipartFile> variantImages) {
-    if (request.getHasVariant()) {
-      if (variantImages == null
-          || request.getVariantRequests() == null
-          || (variantImages.size() != request.getVariantRequests().size()) // sai kích thước
-          || (request.getVariantRequests() != null
-              && request.getTypes() == null)) // có variant mà ko có type
-      {
-        throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
-      }
-    } else {
-      if (variantImages != null || request.getVariantRequests() != null) {
-        throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
-      }
-    }
+
 
     sellerService.createProduct(request, thumbnail, extraImages, variantImages);
     return ResponseEntity.status(HttpStatus.CREATED)
