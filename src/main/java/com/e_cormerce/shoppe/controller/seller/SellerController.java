@@ -2,8 +2,6 @@ package com.e_cormerce.shoppe.controller.seller;
 
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
-import com.e_cormerce.shoppe.enums.ErrorCode;
-import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.service.seller.SellerService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -39,7 +37,6 @@ public class SellerController {
       @RequestPart("thumbnail") MultipartFile thumbnail,
       @RequestPart(value = "extraImages", required = false) List<MultipartFile> extraImages,
       @RequestPart(value = "variantImages", required = false) List<MultipartFile> variantImages) {
-
 
     sellerService.createProduct(request, thumbnail, extraImages, variantImages);
     return ResponseEntity.status(HttpStatus.CREATED)

@@ -70,7 +70,7 @@ public class Order {
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "shipping_address_id", nullable = false)
-    Address shippingAddress;
+  Address shippingAddress;
 
   @Column(name = "shipping_phone_number", nullable = false)
   String shippingPhoneNumber;

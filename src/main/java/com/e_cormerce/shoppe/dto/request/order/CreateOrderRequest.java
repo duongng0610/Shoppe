@@ -27,6 +27,4 @@ public class CreateOrderRequest {
   @NotNull(message = "order quantity is required")
   @Min(value = 1, message = "quantity must be >= 1")
   int quantity;
-
-
 }

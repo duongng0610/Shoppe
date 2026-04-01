@@ -1,15 +1,10 @@
 package com.e_cormerce.shoppe.service.media;
 
 import com.cloudinary.Cloudinary;
-import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.properties.CloudinaryProperties;
-
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -27,21 +22,19 @@ import org.springframework.web.multipart.MultipartFile;
 public class CloudinaryService {
   Cloudinary cloudinary;
 
-  private byte[] getOptizedImage (MultipartFile file) {
-      try {
+  private byte[] getOptizedImage(MultipartFile file) {
+    try {
       ByteArrayOutputStream os = new ByteArrayOutputStream();
-          Thumbnails.of(file.getInputStream())
-                  .size(800, 800)          // resize trước
-                  .outputQuality(0.7)      // nén trước
-                  .toOutputStream(os);
+      Thumbnails.of(file.getInputStream())
+          .size(800, 800) // resize trước
+          .outputQuality(0.7) // nén trước
+          .toOutputStream(os);
 
-         return os.toByteArray();
-      }catch (Exception e) {
-          throw new AppException(ErrorCode.INVALID_FILE_FORMAT);
-      }
+      return os.toByteArray();
+    } catch (Exception e) {
+      throw new AppException(ErrorCode.INVALID_FILE_FORMAT);
+    }
   }
-
-
 
   /**
    * upload file đơn. trả về CompleteableFuture mà ko trả về thằng url vì để làm cơ chế song song ,

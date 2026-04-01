@@ -1,7 +1,6 @@
 package com.e_cormerce.shoppe.entity.user;
 
 import com.e_cormerce.shoppe.entity.notification.Notification;
-import com.e_cormerce.shoppe.entity.transaction.Transaction;
 import com.e_cormerce.shoppe.enums.user.UserStatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
@@ -40,7 +39,8 @@ public class User {
   String username;
 
   String avatar;
-  LocalDate birth;
+  LocalDate dob;
+  String phoneNumber;
 
   @CreationTimestamp
   @Column(name = "created_at", updatable = false)
@@ -74,23 +74,5 @@ public class User {
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.LAZY)
-  Set<PhoneNumber> phoneNumbers;
-
-  // inverse side
-  @OneToMany(
-      mappedBy = "user",
-      cascade = CascadeType.ALL,
-      orphanRemoval = true,
-      fetch = FetchType.LAZY)
-  Set<Transaction> transactions;
-
-
-    // inverse side
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY)
-    Set<Notification> notifications;
-
+  Set<Notification> notifications;
 }

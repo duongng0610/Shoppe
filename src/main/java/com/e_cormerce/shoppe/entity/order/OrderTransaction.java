@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.entity.transaction;
+package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.transaction.TargetTypeTransaction;
@@ -18,14 +18,10 @@ import org.hibernate.annotations.Where;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Table(
-    name = "transactions",
-    indexes = {
-      @Index(name = "idx_user", columnList = "user_id"),
-    })
+@Table(name = "transactions")
 @SQLDelete(sql = "UPDATE transactions SET deleted=true where id=?")
 @Where(clause = "deleted = false")
-public class Transaction {
+public class OrderTransaction {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   String id;
@@ -34,21 +30,26 @@ public class Transaction {
   boolean deleted;
 
   @ManyToOne
-  @JoinColumn(name = "user_id", nullable = false)
-  User user;
+  @JoinColumn(name = "from_id", nullable = false)
+  User from;
+
+  @ManyToOne
+  @JoinColumn(name = "to_id", nullable = false)
+  User to;
+
+  @ManyToOne
+  @JoinColumn(name = "order_id", nullable = false)
+  Order order;
 
   @NotNull String message;
 
+  @Column(name = "status", nullable = false)
   TransactionStatus status;
 
   @CreationTimestamp
   @Column(name = "created_at", nullable = false)
   @NotNull
   Date createdAt;
-
-  @Column(name = "target_id", nullable = false)
-  @NotNull
-  String targetId;
 
   @Column @NotNull TargetTypeTransaction target_type_transaction;
 }

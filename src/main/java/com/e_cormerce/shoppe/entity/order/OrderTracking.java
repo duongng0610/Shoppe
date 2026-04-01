@@ -1,6 +1,5 @@
 package com.e_cormerce.shoppe.entity.order;
 
-import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.order.OrderTrackingStatus;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -21,10 +20,7 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(
     name = "order_trackings",
-    indexes = {
-      @Index(name = "idx_order_trackings_shipper", columnList = "shipper_id"),
-      @Index(name = "idx_order_trackings_order_tracking", columnList = "order_tracking_id")
-    })
+    indexes = {@Index(name = "idx_order_trackings_order", columnList = "order_id")})
 @SQLDelete(sql = "UPDATE order_trackings SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class OrderTracking {
@@ -50,10 +46,6 @@ public class OrderTracking {
   OrderTrackingStatus status;
 
   @ManyToOne
-  @JoinColumn(name = "shipper_id", nullable = false)
-  User shipper;
-
-  @ManyToOne
-  @JoinColumn(name = "order_tracking_id", nullable = false)
-  OrderTracking orderTracking;
+  @JoinColumn(name = "order_id", nullable = false)
+  Order order;
 }

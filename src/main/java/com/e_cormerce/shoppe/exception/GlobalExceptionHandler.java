@@ -44,15 +44,12 @@ public class GlobalExceptionHandler {
    * @return
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiResponse> ValidateException(MethodArgumentNotValidException e) {
-    // message
+  public ResponseEntity<ApiResponse> validateException(MethodArgumentNotValidException e) {
+
+    String message = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+
     return ResponseEntity.badRequest()
-        .body(
-            ApiResponse.builder()
-                .success(false)
-                .message(e.getBindingResult().getFieldError().getDefaultMessage())
-                .code(400)
-                .build());
+        .body(ApiResponse.builder().success(false).message(message).build());
   }
 
   /** Use empty field of request object. */

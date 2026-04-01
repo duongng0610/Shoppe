@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.service.order;
+package com.e_cormerce.shoppe.service.order.helper;
 
 import com.e_cormerce.shoppe.dto.common.address.AddressDto;
 import com.e_cormerce.shoppe.entity.order.Order;
@@ -49,7 +49,11 @@ public class CreateOrderHelper {
     String fullAddress =
         addressDto.getWard() + ", " + addressDto.getDistrict() + ", " + addressDto.getProvince();
 
-    return Address.builder().province(addressDto.getProvince()).district(addressDto.getDistrict()).ward(addressDto.getWard()).build();
+    return Address.builder()
+        .province(addressDto.getProvince())
+        .district(addressDto.getDistrict())
+        .ward(addressDto.getWard())
+        .build();
   }
 
   private String getProductName(Variant variant) {

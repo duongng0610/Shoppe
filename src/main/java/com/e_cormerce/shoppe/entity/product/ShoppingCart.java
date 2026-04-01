@@ -32,7 +32,7 @@ public class ShoppingCart {
   @Column(name = "total_quantity", nullable = false)
   int totalQuantity;
 
-  @Column(name = "price_each", precision = 15, scale = 2, nullable = false)
+  @Column(name = "total_price", precision = 15, scale = 2, nullable = false)
   BigDecimal totalPrice;
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "shoppingCart")

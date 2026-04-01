@@ -19,57 +19,57 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ShoppingCartController {
-    ShoppingCartService shoppingCartService;
+  ShoppingCartService shoppingCartService;
 
-    @GetMapping()
-    // @PreAuthorize
-    public ResponseEntity<ApiResponse> getAllShoppingCartItems() {
-        return ResponseEntity.ok()
-                .body(
-                        ApiResponse.builder()
-                                .data(shoppingCartService.getShoppingCartItems())
-                                .message("get shopping cart count successfully")
-                                .success(true)
-                                .build());
-    }
+  @GetMapping()
+  // @PreAuthorize
+  public ResponseEntity<ApiResponse> getAllShoppingCartItems() {
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder()
+                .data(shoppingCartService.getShoppingCartItems())
+                .message("get shopping cart count successfully")
+                .success(true)
+                .build());
+  }
 
-    @GetMapping("/count")
-    // @PreAuthorize
-    public ResponseEntity<ApiResponse<ShoppingCartCountResponse>> getShoppingCartCount() {
-        return ResponseEntity.ok()
-                .body(
-                        ApiResponse.<ShoppingCartCountResponse>builder()
-                                .data(shoppingCartService.getBasicShoppingCart())
-                                .message("get shopping cart count successfully")
-                                .success(true)
-                                .build());
-    }
+  @GetMapping("/count")
+  // @PreAuthorize
+  public ResponseEntity<ApiResponse<ShoppingCartCountResponse>> getShoppingCartCount() {
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.<ShoppingCartCountResponse>builder()
+                .data(shoppingCartService.getBasicShoppingCart())
+                .message("get shopping cart count successfully")
+                .success(true)
+                .build());
+  }
 
-    @PostMapping()
-    @PreAuthorize("hasAuthority('PERMISSION_ADD_CART_SHOPPING')")
-    public ResponseEntity<ApiResponse> addItem(
-            @RequestBody @Valid AddItemToShoppingCartRequest request) {
-        shoppingCartService.addItem(request);
+  @PostMapping()
+  @PreAuthorize("hasAuthority('PERMISSION_ADD_CART_SHOPPING')")
+  public ResponseEntity<ApiResponse> addItem(
+      @RequestBody @Valid AddItemToShoppingCartRequest request) {
+    shoppingCartService.addItem(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(
-                        ApiResponse.builder()
-                                .message("add item to shopping cart successfully")
-                                .success(true)
-                                .build());
-    }
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(
+            ApiResponse.builder()
+                .message("add item to shopping cart successfully")
+                .success(true)
+                .build());
+  }
 
-    @DeleteMapping()
-    @PreAuthorize("hasAuthority('PERMISSION_DELETE_CART_SHOPPING')")
-    public ResponseEntity<ApiResponse> deleteItem(
-            @RequestBody @Valid DeleteItemsInShoppingCartRequest request) {
-        shoppingCartService.deleteItems(request);
+  @DeleteMapping()
+  @PreAuthorize("hasAuthority('PERMISSION_DELETE_CART_SHOPPING')")
+  public ResponseEntity<ApiResponse> deleteItem(
+      @RequestBody @Valid DeleteItemsInShoppingCartRequest request) {
+    shoppingCartService.deleteItems(request);
 
-        return ResponseEntity.ok()
-                .body(
-                        ApiResponse.builder()
-                                .message("delete list of item to shopping cart successfully")
-                                .success(true)
-                                .build());
-    }
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder()
+                .message("delete list of item to shopping cart successfully")
+                .success(true)
+                .build());
+  }
 }

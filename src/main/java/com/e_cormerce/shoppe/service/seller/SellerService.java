@@ -26,20 +26,20 @@ public class SellerService {
       List<MultipartFile> extraImages,
       List<MultipartFile> variantImages) {
 
-      if (request.getHasVariant()) {
-          if (variantImages == null
-                  || request.getVariantRequests() == null
-                  || (variantImages.size() != request.getVariantRequests().size()) // sai kích thước
-                  || (request.getVariantRequests() != null
-                  && request.getTypes() == null)) // có variant mà ko có type
-          {
-              throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
-          }
-      } else {
-          if (variantImages != null || request.getVariantRequests() != null) {
-              throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
-          }
+    if (request.getHasVariant()) {
+      if (variantImages == null
+          || request.getVariantRequests() == null
+          || (variantImages.size() != request.getVariantRequests().size()) // sai kích thước
+          || (request.getVariantRequests() != null
+              && request.getTypes() == null)) // có variant mà ko có type
+      {
+        throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
       }
+    } else {
+      if (variantImages != null || request.getVariantRequests() != null) {
+        throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
+      }
+    }
 
     ProductImagesUrl urls =
         uploadProductImagesHelper.uploadImagesOfProduct(thumbnail, extraImages, variantImages);

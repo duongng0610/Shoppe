@@ -11,9 +11,9 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShoppingCartItemDto {
-    String id;
-    int quantity;
-    boolean isVariant;
-    BaseProductResponse product;
-    VariantDetailResponse variant;
+  String id;
+  int quantity;
+  boolean isVariant;
+  BaseProductResponse product;
+  VariantDetailResponse variant;
 }

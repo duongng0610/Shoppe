@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.repository.user;
 
 import com.e_cormerce.shoppe.entity.user.Address;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,7 @@ public interface AddressRepository extends JpaRepository<Address, String> {
       value =
           "Select * from addresses where province =:province and district =:district and ward =:ward",
       nativeQuery = true)
-  Address findByEntireAddress(
+  Optional<Address> findByEntireAddress(
       @Param("province") String province,
       @Param("district") String district,
       @Param("ward") String ward);
