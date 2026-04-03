@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.entity.notification;
 
 import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.enums.notification.NotificationType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -51,8 +52,9 @@ public class Notification {
   @Column(name = "is_read", columnDefinition = "boolean default false")
   Boolean isRead;
 
-  @Column(name = "type", nullable = false)
-  String type;
+  @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "ENUM('ORDER', 'TRANSACTION', 'PRODUCT', 'ACCOUNT','SYSTEM')")
+  NotificationType type;
 
   @Column(name = "target_id")
   String targetId;

@@ -2,7 +2,6 @@ package com.e_cormerce.shoppe.entity.product;
 
 import com.e_cormerce.shoppe.entity.user.User;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -31,9 +30,6 @@ public class ShoppingCart {
 
   @Column(name = "total_quantity", nullable = false)
   int totalQuantity;
-
-  @Column(name = "total_price", precision = 15, scale = 2, nullable = false)
-  BigDecimal totalPrice;
 
   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "shoppingCart")
   List<ShoppingCartItem> shoppingCartItems;
