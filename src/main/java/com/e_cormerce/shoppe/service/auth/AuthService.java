@@ -27,7 +27,6 @@ import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.util.HashUtil;
 import io.jsonwebtoken.Claims;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -138,8 +137,7 @@ public class AuthService {
 
     userRepository.save(user);
     if (role.getVal().equals(RoleEnum.CLIENT.getValue())) {
-      ShoppingCart shoppingCart =
-          ShoppingCart.builder().client(user).totalPrice(BigDecimal.ZERO).totalQuantity(0).build();
+      ShoppingCart shoppingCart = ShoppingCart.builder().client(user).totalQuantity(0).build();
 
       shoppingCartRepository.save(shoppingCart);
     }

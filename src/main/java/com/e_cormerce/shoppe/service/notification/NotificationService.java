@@ -34,7 +34,7 @@ public class NotificationService {
     Notification notification =
         Notification.builder()
             .user(user)
-            .type(notificationType.getValue())
+            .type(notificationType)
             .title(title)
             .content(content)
             .targetId(targetId)

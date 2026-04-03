@@ -33,9 +33,6 @@ public class ShoppingCartItem {
   @Column(columnDefinition = "boolean default false")
   boolean deleted;
 
-  @Column(name = "is_variant", columnDefinition = "boolean default false")
-  boolean isVariant;
-
   @ManyToOne
   @JoinColumn(name = "variant_id", nullable = false)
   Variant variant;

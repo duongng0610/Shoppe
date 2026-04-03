@@ -35,9 +35,7 @@ public class ShoppingCartService {
     ShoppingCartItem item = shoppingCartHelper.createShoppingCartItem(request, shoppingCart);
 
     BigDecimal itemTotal = item.getPriceEach().multiply(BigDecimal.valueOf(item.getQuantity()));
-    BigDecimal totalPrice = shoppingCart.getTotalPrice().add(itemTotal);
 
-    shoppingCart.setTotalPrice(totalPrice);
     shoppingCart.setTotalQuantity(shoppingCart.getTotalQuantity() + 1);
 
     shoppingCartRepository.save(shoppingCart);
@@ -48,9 +46,7 @@ public class ShoppingCartService {
 
     ShoppingCart shoppingCart = shoppingCartHelper.getCardOfUser();
     BigDecimal itemTotal = shoppingCartHelper.deleteShoppingCartItems(request.getItemIds());
-    BigDecimal totalPrice = shoppingCart.getTotalPrice().subtract(itemTotal);
 
-    shoppingCart.setTotalPrice(totalPrice);
     shoppingCart.setTotalQuantity(shoppingCart.getTotalQuantity() - request.getItemIds().size());
   }
 

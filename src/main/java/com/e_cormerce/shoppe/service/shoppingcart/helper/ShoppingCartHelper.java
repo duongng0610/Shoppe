@@ -36,7 +36,6 @@ public class ShoppingCartHelper {
 
     ShoppingCartItem item =
         ShoppingCartItem.builder()
-            .isVariant(!variant.isDefault())
             .quantity(request.getQuantity())
             .variant(variant)
             .priceEach(variant.getPrice())
