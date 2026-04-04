@@ -65,6 +65,8 @@ public class ProductService {
             .hasVariant(request.getHasVariant())
             .thumbnail(urls.getThumbnailUrl())
             .seller(authService.getUserThroughAuthentication())
+            .totalQuantity(0)
+            .totalQuantitySold(0)
             .originPrice(request.getOriginPrice())
             .build();
 
@@ -85,7 +87,7 @@ public class ProductService {
                 request.getVariantRequests(), product, urls.getVariantImageUrls()));
       }
     } else {
-      product.setVariants(createProductHelper.createDefaultVariant(product));
+      createProductHelper.createDefaultVariant(product);
     }
 
     product.setCategory(
@@ -110,14 +112,14 @@ public class ProductService {
             .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
     CompletableFuture<List<Type>> typesFuture = productQueryDBHelper.getTypes(id);
-    CompletableFuture<List<Variant>> variantsFuture = productQueryDBHelper.getVariants(id);
+//    CompletableFuture<List<Variant>> variantsFuture = productQueryDBHelper.getVariants(id);
     CompletableFuture<User> shopFuture = productQueryDBHelper.getSeller(id);
     CompletableFuture<Category> categoryFuture = productQueryDBHelper.getCategory(id);
 
-    CompletableFuture.allOf(typesFuture, variantsFuture, shopFuture, categoryFuture).join();
+    CompletableFuture.allOf(typesFuture,  shopFuture, categoryFuture).join();
 
     List<Type> types = typesFuture.join();
-    List<Variant> variants = variantsFuture.join();
+    List<Variant> variants = product.getVariants();
     User seller = shopFuture.join();
     Category category = categoryFuture.join();
 
@@ -136,7 +138,15 @@ public class ProductService {
         .variants(variantResponses)
         .types(typeResponses)
         .thumbnail(product.getThumbnail())
+            .originPrice(product.getOriginPrice())
+            .totalSoldQuantity(product.getTotalQuantity())
+            .totalQuantity(product.getTotalQuantity())
         .extraImages(product.getProductExtraImages().stream().map(item -> item.getUrl()).toList())
         .build();
+  }
+
+  public List<ProductCardResponse> getProductOfSeller(String id, int limit, int offset) {
+    List<Product> products = productRepository.findProductsOfSeller(id, limit, offset);
+    return products.stream().map(productMapper::toProductDTO).toList();
   }
 }

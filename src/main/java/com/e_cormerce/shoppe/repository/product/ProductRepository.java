@@ -42,4 +42,10 @@ public interface ProductRepository extends JpaRepository<Product, String> {
 
   @Query(value = "SELECT * FROM products WHERE category_id = :category_id", nativeQuery = true)
   List<Product> findProductsInCategory(@Param("category_id") String category_id);
+
+  @Query(
+      value =
+          "SELECT * FROM products p  WHERE seller_id=:sellerId and p.status = 'APPROVED'  LIMIT :limit OFFSET :offset",
+      nativeQuery = true)
+  List<Product> findProductsOfSeller(String sellerId, int limit, int offset);
 }

@@ -17,4 +17,9 @@ public interface AddressRepository extends JpaRepository<Address, String> {
       @Param("province") String province,
       @Param("district") String district,
       @Param("ward") String ward);
+
+  @Query(
+      value = "Select a.* from users u join address a on a.id = u.address_id where u.id =:userId",
+      nativeQuery = true)
+  Address findAddressByUser(String userId);
 }

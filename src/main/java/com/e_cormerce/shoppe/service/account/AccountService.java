@@ -6,6 +6,7 @@ import com.e_cormerce.shoppe.dto.request.account.ChangeShipInfo;
 import com.e_cormerce.shoppe.dto.request.account.ChangeUserProfileRequest;
 import com.e_cormerce.shoppe.dto.response.account.ChangeShipInfoResponse;
 import com.e_cormerce.shoppe.dto.response.account.ChangeUserProfileResponse;
+import com.e_cormerce.shoppe.dto.response.account.UserProfileResponse;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
@@ -18,6 +19,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -78,5 +81,12 @@ public class AccountService {
         .phoneNumber(user.getPhoneNumber())
         .address(addressMapper.toDto(user.getAddress()))
         .build();
+  }
+
+  public UserProfileResponse getUserProfile() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return userRepository
+        .getUserProfileById(authentication.getPrincipal().toString())
+        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
   }
 }
