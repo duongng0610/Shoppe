@@ -23,7 +23,7 @@ public class GetProductDetailResponse {
   List<String> extraImages;
   List<VariantDetailResponse> variants;
   List<TypeDto> types;
-  Long totalQuantity;
-  Long totalSoldQuantity;
+  Integer totalQuantity;
+  Integer totalSoldQuantity;
   BigDecimal originPrice;
 }

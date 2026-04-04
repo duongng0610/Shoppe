@@ -6,6 +6,7 @@ import com.e_cormerce.shoppe.dto.request.auth.register.AbstractRegisterRequest;
 import com.e_cormerce.shoppe.dto.request.auth.register.RegisterSellerRequest;
 import com.e_cormerce.shoppe.dto.request.auth.register.RegisterShipperRequest;
 import com.e_cormerce.shoppe.entity.product.ShoppingCart;
+import com.e_cormerce.shoppe.entity.seller.SellerInfo;
 import com.e_cormerce.shoppe.entity.token.InvalidToken;
 import com.e_cormerce.shoppe.entity.token.RefreshToken;
 import com.e_cormerce.shoppe.entity.user.Account;
@@ -18,6 +19,7 @@ import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.address.AddressMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.properties.JwtProperties;
+import com.e_cormerce.shoppe.repository.seller.SellerInfoRepository;
 import com.e_cormerce.shoppe.repository.shopping_cart.ShoppingCartRepository;
 import com.e_cormerce.shoppe.repository.token.InvalidTokenRepository;
 import com.e_cormerce.shoppe.repository.token.RefreshTokenRepository;
@@ -48,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AuthService {
   private final ShoppingCartRepository shoppingCartRepository;
+  SellerInfoRepository sellerInfoRepository;
   UserRepository userRepository;
   AccountRepository accountRepository;
   RoleRepository roleRepository;
@@ -138,8 +141,11 @@ public class AuthService {
     userRepository.save(user);
     if (role.getVal().equals(RoleEnum.CLIENT.getValue())) {
       ShoppingCart shoppingCart = ShoppingCart.builder().client(user).totalQuantity(0).build();
-
       shoppingCartRepository.save(shoppingCart);
+    } else if (role.getVal().equals(RoleEnum.SELLER.getValue())) {
+      SellerInfo sellerInfo =
+          SellerInfo.builder().seller(user).follower(0).rating(0).productCount(0).build();
+      sellerInfoRepository.save(sellerInfo);
     }
   }
 
@@ -181,7 +187,7 @@ public class AuthService {
 
     return userRepository
         .findById(userId)
-        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
+        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
   }
 
   public String getUserId() {

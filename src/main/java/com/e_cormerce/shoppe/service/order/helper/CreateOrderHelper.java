@@ -38,7 +38,7 @@ public class CreateOrderHelper {
   public User getSeller(@NotBlank String sellerId) {
     return userRepository
         .findById(sellerId)
-        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_USER));
+        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
   }
 
   public User getClient() {

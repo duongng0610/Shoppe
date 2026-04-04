@@ -53,4 +53,14 @@ public class AccountController {
                 .success(true)
                 .build());
   }
+
+  @GetMapping("/profile")
+  public ResponseEntity<ApiResponse> getProfile() {
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder()
+                .data(accountService.getUserProfile())
+                .message("profile successfully")
+                .build());
+  }
 }

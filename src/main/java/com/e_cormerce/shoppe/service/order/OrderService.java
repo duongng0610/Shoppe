@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class OrderService {
   OrderRepository orderRepository;
   ApplicationEventPublisher eventPublisher;
 
+  @Transactional
   public CreateOrderResponse create(@Valid CreateOrderRequest request) {
     Variant variant = createOrderHelper.getVariant(request.getVariantId());
     User seller = variant.getProduct().getSeller();

@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.controller.seller;
 
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
+import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
 import com.e_cormerce.shoppe.service.seller.SellerService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -11,10 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
@@ -30,7 +28,7 @@ public class SellerController {
    *
    * @return
    */
-  @PostMapping(path = "/product", consumes = "multipart/form-data")
+  @PostMapping(path = "/products", consumes = "multipart/form-data")
   @PreAuthorize("hasAuthority('PERMISSION_CREATE_PRODUCT')")
   public ResponseEntity<ApiResponse> create(
       @Valid @RequestPart CreateProductRequest request,
@@ -41,5 +39,18 @@ public class SellerController {
     sellerService.createProduct(request, thumbnail, extraImages, variantImages);
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(ApiResponse.builder().success(true).message("create product successfully").build());
+  }
+
+  @GetMapping("/{id}/info")
+  public ResponseEntity<ApiResponse<SellerInfoResponse>> getSeller(@PathVariable String id) {
+    var res = sellerService.getSeller(id);
+    return ResponseEntity.ok(ApiResponse.<SellerInfoResponse>builder().data(res).build());
+  }
+
+  @GetMapping("/{id}/products")
+  public ResponseEntity<ApiResponse> getProductsOfSeller(
+      @PathVariable String id, @RequestParam Integer limit, @RequestParam Integer offset) {
+    var res = sellerService.getProductCardsBySeller(id, limit, offset);
+    return ResponseEntity.ok(ApiResponse.builder().data(res).build());
   }
 }

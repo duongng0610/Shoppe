@@ -21,7 +21,8 @@ public enum ErrorCode {
   INVALID_ROLE("Your role is invalid", 1006, HttpStatus.BAD_REQUEST),
   INVALID_USERNAME("Your username is invalid", 1007, HttpStatus.BAD_REQUEST),
   INVALID_REFRESH_TOKEN("Your refresh token is invalid", 1008, HttpStatus.BAD_REQUEST),
-  NOT_EXISTED_USER("User is not existed", 1009, HttpStatus.BAD_REQUEST),
+  NOT_EXIST_USER("User is not existed", 1009, HttpStatus.BAD_REQUEST),
+  NOT_EXIST_SELLER("User is not existed", 1009, HttpStatus.CONFLICT),
   INVALID_EMAIL("Your email is invalid", 1010, HttpStatus.BAD_REQUEST),
   INVALID_CREATE_PASSWORD("Your password created is invalid", 1011, HttpStatus.BAD_REQUEST),
   // Create_Product

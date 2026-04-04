@@ -49,7 +49,7 @@ public class Product {
   @Column(name = "discount_percentage", columnDefinition = "float default 0")
   Float discountPercentage;
 
-  @Column(name = "total_quantity", nullable = false)
+  @Column(name = "total_quantity", nullable = false, columnDefinition = "int default 0")
   Integer totalQuantity;
 
   @Column(name = "total_quantity_sold", columnDefinition = "float default 0")
