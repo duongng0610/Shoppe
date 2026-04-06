@@ -45,7 +45,11 @@ public enum ErrorCode {
   NOT_EXIST_VARIANT("This variant is not exist", 1025, HttpStatus.BAD_REQUEST),
   NOT_EXIST_SHOPPING_CART("Shopping cart is not exist", 1026, HttpStatus.CONFLICT),
   INSUFFICIENT_STOCK("Insufficient stock", 1027, HttpStatus.BAD_REQUEST),
-  EXISTED_USERNAME("Username is existed", 1028, HttpStatus.BAD_REQUEST);
+  EXISTED_USERNAME("Username is existed", 1028, HttpStatus.BAD_REQUEST),
+  INVALID_CREATE_CONVERSATION("Not chat yourself", 1029, HttpStatus.BAD_REQUEST),
+  NOT_EXIST_CONVERSATION("Not exist conversation", 1030, HttpStatus.BAD_REQUEST),
+  INVALID_CREATE_MESSAGE("Message must have content", 1031, HttpStatus.BAD_REQUEST),
+  ;
 
   String message;
   int code;

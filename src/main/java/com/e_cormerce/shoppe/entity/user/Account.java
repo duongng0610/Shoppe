@@ -35,7 +35,7 @@ public class Account {
   @Column(name = "updated_at")
   Date updatedAt;
 
-  @Column(name = "last_login_at")
+  @Column(name = "last_login_   at")
   @NotNull
   LocalDateTime lastLoginAt;
 

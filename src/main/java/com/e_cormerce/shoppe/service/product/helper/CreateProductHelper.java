@@ -10,33 +10,32 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CreateProductHelper {
 
-
-    public void addVariant(Variant variant, Product product) {
-        var variants = product.getVariants();
-        if (variants == null) {
-            variants = new ArrayList<>();
-        }
-        variants.add(variant);
-        variant.setProduct(product);
+  public void addVariant(Variant variant, Product product) {
+    var variants = product.getVariants();
+    if (variants == null) {
+      variants = new ArrayList<>();
     }
-    public void createDefaultVariant(Product product) {
-        Variant v = Variant.builder()
-                .isDefault(true)
-                .thumbnail(product.getThumbnail())
-                .quantity(product.getTotalQuantity())
-                .price(product.getOriginPrice())
-                .build();
+    variants.add(variant);
+    variant.setProduct(product);
+  }
 
-        addVariant(v,product); // 💥 QUAN TRỌNG
-    }
+  public void createDefaultVariant(Product product) {
+    Variant v =
+        Variant.builder()
+            .isDefault(true)
+            .thumbnail(product.getThumbnail())
+            .quantity(product.getTotalQuantity())
+            .price(product.getOriginPrice())
+            .build();
+
+    addVariant(v, product); // 💥 QUAN TRỌNG
+  }
 
   public List<Type> createType(List<TypeDto> typeDtos, Product product) {
 

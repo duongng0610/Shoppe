@@ -44,7 +44,8 @@ public class SellerService {
         throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
       }
     } else {
-      if (variantImages != null || request.getVariantRequests().size() > 0) {
+      if (variantImages != null
+          || (request.getVariantRequests() != null && request.getVariantRequests().size() > 0)) {
         throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
       }
     }

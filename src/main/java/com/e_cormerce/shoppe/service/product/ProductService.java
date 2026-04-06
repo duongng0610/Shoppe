@@ -112,11 +112,11 @@ public class ProductService {
             .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
     CompletableFuture<List<Type>> typesFuture = productQueryDBHelper.getTypes(id);
-//    CompletableFuture<List<Variant>> variantsFuture = productQueryDBHelper.getVariants(id);
+    //    CompletableFuture<List<Variant>> variantsFuture = productQueryDBHelper.getVariants(id);
     CompletableFuture<User> shopFuture = productQueryDBHelper.getSeller(id);
     CompletableFuture<Category> categoryFuture = productQueryDBHelper.getCategory(id);
 
-    CompletableFuture.allOf(typesFuture,  shopFuture, categoryFuture).join();
+    CompletableFuture.allOf(typesFuture, shopFuture, categoryFuture).join();
 
     List<Type> types = typesFuture.join();
     List<Variant> variants = product.getVariants();
@@ -138,9 +138,9 @@ public class ProductService {
         .variants(variantResponses)
         .types(typeResponses)
         .thumbnail(product.getThumbnail())
-            .originPrice(product.getOriginPrice())
-            .totalSoldQuantity(product.getTotalQuantity())
-            .totalQuantity(product.getTotalQuantity())
+        .originPrice(product.getOriginPrice())
+        .totalSoldQuantity(product.getTotalQuantity())
+        .totalQuantity(product.getTotalQuantity())
         .extraImages(product.getProductExtraImages().stream().map(item -> item.getUrl()).toList())
         .build();
   }
