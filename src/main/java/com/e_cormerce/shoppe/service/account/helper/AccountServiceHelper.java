@@ -48,18 +48,26 @@ public class AccountServiceHelper {
   }
 
   public void applyProfileChanges(User user, ChangeUserProfileRequest request) {
+    System.out.println(request.getDob());
     if (request == null) return;
 
     if (request.getDob() != null) {
       user.setDob(request.getDob());
     }
-
-    String newUsername = request.getUsername();
-    if (newUsername != null && !newUsername.isBlank()) {
-      if (userRepository.existsByUsername(newUsername)) {
+    if (request.getUsername() != null && !request.getUsername().isBlank()) {
+      if (userRepository.existsByUsername(request.getUsername())) {
         throw new AppException(ErrorCode.EXISTED_USERNAME);
       }
-      user.setUsername(newUsername);
+      user.setUsername(request.getUsername());
+    }
+
+    if (request.getAddress() != null) {
+      AddressDto newAddress = request.getAddress();
+      this.updateAddress(newAddress, user);
+    }
+
+    if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
+      this.updatePhoneNumber(request.getPhoneNumber(), user);
     }
   }
 

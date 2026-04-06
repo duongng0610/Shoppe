@@ -28,9 +28,9 @@ public class AccountController {
         .body(ApiResponse.builder().message("change password successfully").success(true).build());
   }
 
-  @PatchMapping(value = "/profile", consumes = "multipart/form-data")
+  @PutMapping(value = "/profile", consumes = "multipart/form-data")
   public ResponseEntity<ApiResponse> updateProfile(
-      @RequestPart(value = "data", required = false) ChangeUserProfileRequest request,
+      @RequestPart(value = "request", required = false) ChangeUserProfileRequest request,
       @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
     var res = accountService.updateProfile(request, avatar);
     return ResponseEntity.ok()
