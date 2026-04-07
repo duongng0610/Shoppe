@@ -10,9 +10,11 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConversationLineDto {
-  Object id;
-  Object otherId;
-  Object otherAvatar;
-  LocalDateTime createdAt;
+  String id;
+  String otherId;
+  String otherAvatar;
+  String otherName;
+  String lastContent;
+  String lastContentAt;
   LocalDateTime lastReadAt;
 }

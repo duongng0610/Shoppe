@@ -1,25 +1,32 @@
 package com.e_cormerce.shoppe.service.conversation;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import com.e_cormerce.shoppe.dto.response.conversation.MessageMediaDto;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+
 import com.e_cormerce.shoppe.dto.request.chat.MessageRequest;
-import com.e_cormerce.shoppe.dto.response.chat.MessageResponse;
+import com.e_cormerce.shoppe.dto.response.conversation.ConversationLineDto;
+import com.e_cormerce.shoppe.dto.response.conversation.MessageDto;
 import com.e_cormerce.shoppe.entity.conversation.Conversation;
 import com.e_cormerce.shoppe.entity.conversation.ConversationMember;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.mapper.user.UserMapper;
+import com.e_cormerce.shoppe.projection.ConversationLineProjection;
 import com.e_cormerce.shoppe.repository.conversation.ConversationMemberRepository;
+import com.e_cormerce.shoppe.repository.conversation.ConversationMessageRepository;
 import com.e_cormerce.shoppe.repository.conversation.ConversationRepository;
+import com.e_cormerce.shoppe.repository.conversation.MessageMediaRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.conversation.helper.ConversationHelper;
+
 import jakarta.transaction.Transactional;
-import java.time.LocalDateTime;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -28,18 +35,19 @@ public class ConversationService {
   ConversationHelper conversationHelper;
   ConversationRepository conversationRepository;
   ConversationMemberRepository conversationMemberRepository;
+  ConversationMessageRepository conversationMessageRepository;
+  MessageMediaRepository messageMediaRepository;
   UserRepository userRepository;
   AuthService authService;
-  UserMapper userMapper;
 
-  public List<Conversation> getConversationByUser() {
+  public List<ConversationLineProjection> getConversationByUser() {
     String userId =
         SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-    return conversationRepository.findByMemberId(userId);
+    return conversationRepository.getConversationLines(userId);
   }
 
   @Transactional
-  public Conversation getConversationIdWithOtherUser(String targetId) {
+  public ConversationLineDto getConversationIdWithOtherUser(String targetId) {
     var target =
         userRepository
             .findById(targetId)
@@ -52,21 +60,56 @@ public class ConversationService {
     }
     String conversationId =
         conversationMemberRepository.findConversationIdByTwoMembers(userId, targetId);
-    Conversation conversation = null;
+    Conversation conversation;
     if (conversationId == null) {
       var user = authService.getUserThroughAuthentication();
-      var con = conversationHelper.createConversation(user, target);
-      con.addMember(ConversationMember.builder().member(user).build());
-      con.addMember(ConversationMember.builder().member(target).build());
-      conversationRepository.save(con);
-      return con;
+      conversation = conversationHelper.createConversation(user, target);
+      conversation.addMember(ConversationMember.builder().member(user).build());
+      conversation.addMember(ConversationMember.builder().member(target).build());
+      conversation = conversationRepository.save(conversation);
+    } else {
+      conversation =
+          conversationRepository
+              .findById(conversationId)
+              .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_CONVERSATION));
     }
-    return conversationRepository.findById(conversationId).orElse(null);
+
+    var targetMember = conversationMemberRepository.findByConversationIdAndMemberId(conversation.getId(), targetId);
+    return ConversationLineDto.builder()
+        .id(conversation.getId())
+        .otherId(target.getId())
+        .otherAvatar(target.getAvatar())
+        .otherName(target.getUsername())
+        .lastContent(conversation.getLastContent())
+        .lastContentAt(
+            conversation.getLastContentAt() == null ? null : conversation.getLastContentAt().toString())
+        .lastReadAt(targetMember == null ? null : targetMember.getLastReadAt())
+        .build();
+  }
+
+  public List<MessageDto> getMessages(String conversationId, int limit, int offset) {
+    var messages = conversationMessageRepository.getMessages(conversationId, limit, offset);
+    return messages.stream()
+        .map( 
+            message ->
+                MessageDto.builder()
+                    .id(message.getId())
+                    .content(message.getContent())
+                    .senderId(message.getSenderId())
+                    .createdAt(message.getCreatedAt())
+                    .updatedAt(message.getUpdatedAt())
+                        .medias(messageMediaRepository.findByMessageId(message.getId()))
+                    .build())
+        .toList();
   }
 
   @Transactional
-  public MessageResponse sendMessage(MessageRequest messageRequest) {
-    var user = authService.getUserThroughAuthentication();
+  public MessageDto sendMessage(MessageRequest messageRequest) {
+
+    var user =
+        userRepository
+            .findById(messageRequest.getUserId())
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
     if (messageRequest.getText() == null
         && (messageRequest.getImageUrls() == null || messageRequest.getImageUrls().isEmpty())) {
       throw new AppException(ErrorCode.INVALID_CREATE_MESSAGE);
@@ -85,11 +128,15 @@ public class ConversationService {
     conversation.setLastContentAt(LocalDateTime.now());
     conversation.setLastSenderId(user.getId());
     conversationRepository.save(conversation);
-    return MessageResponse.builder()
-        .from(userMapper.toUserDTO(user))
-        .text(messageRequest.getText())
-        .imageUrls(messageRequest.getImageUrls())
-        .createdAt(LocalDateTime.now())
+    var message = conversation.getMessages().get(conversation.getMessages().size() - 1);
+    return MessageDto.builder()
+        .id(message.getId())
+        .content(message.getContent())
+        .senderId(user.getId())
+        .createdAt(message.getCreatedAt())
+        .updatedAt(message.getUpdatedAt())
+            .medias(messageRequest.getImageUrls().stream().map( item->{
+                return  MessageMediaDto.builder().url(item).build();}).toList())
         .build();
   }
 }
