@@ -1,7 +1,11 @@
-package com.e_cormerce.shoppe.event;
+package com.e_cormerce.shoppe.event.listener;
 
 import com.e_cormerce.shoppe.enums.notification.NotificationType;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
+import com.e_cormerce.shoppe.event.OrderApprovedEvent;
+import com.e_cormerce.shoppe.event.OrderCancelledEvent;
+import com.e_cormerce.shoppe.event.OrderCreatedEvent;
+import com.e_cormerce.shoppe.event.SendMessageEvent;
 import com.e_cormerce.shoppe.service.notification.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +18,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class OrderNotificationListener {
+public class NotificationListener {
 
   NotificationService notificationService;
 
@@ -75,5 +79,10 @@ public class OrderNotificationListener {
           "Đơn hàng " + event.getOrderId() + " đã bị hủy bởi shop.",
           event.getVariant().getThumbnail());
     }
+  }
+
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void listenSendMessage(SendMessageEvent messageEvent) {
+      notificationService.createNotification(messageEvent.getUser(),NotificationType.MESSAGE,messageEvent.getMessageId(),"Tin nhắn mới",messageEvent.getContent(),null);
   }
 }

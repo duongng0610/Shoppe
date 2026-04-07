@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.e_cormerce.shoppe.dto.response.conversation.MessageMediaDto;
+import com.e_cormerce.shoppe.event.SendMessageEvent;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +41,7 @@ public class ConversationService {
   MessageMediaRepository messageMediaRepository;
   UserRepository userRepository;
   AuthService authService;
+    ApplicationEventPublisher eventPublisher;
 
   public List<ConversationLineProjection> getConversationByUser() {
     String userId =
@@ -129,6 +132,7 @@ public class ConversationService {
     conversation.setLastSenderId(user.getId());
     conversationRepository.save(conversation);
     var message = conversation.getMessages().get(conversation.getMessages().size() - 1);
+    eventPublisher.publishEvent(SendMessageEvent.builder().messageId(message.getId()).content(message.getContent()).user(user).createdAt(message.getCreatedAt()).build());
     return MessageDto.builder()
         .id(message.getId())
         .content(message.getContent())

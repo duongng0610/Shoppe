@@ -64,6 +64,8 @@ public class SellerController {
         .body(ApiResponse.builder().message("approve order successfully").success(true).build());
   }
 
+
+
   @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_SELLER')")
   @PatchMapping("/{id}/order/cancel")
   public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
