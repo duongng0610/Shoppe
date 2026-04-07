@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.repository.conversation;
 
+import com.e_cormerce.shoppe.dto.response.conversation.MessageMediaDto;
 import com.e_cormerce.shoppe.entity.conversation.MessageMedia;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,11 +13,11 @@ public interface MessageMediaRepository extends JpaRepository<MessageMedia, Stri
   @Query(
       value =
           """
-        SELECT *
+        SELECT url
         FROM message_medias
         WHERE message_id = :messageId
           AND deleted = false
       """,
       nativeQuery = true)
-  List<MessageMedia> findByMessageId(String messageId);
+  List<MessageMediaDto> findByMessageId(String messageId);
 }

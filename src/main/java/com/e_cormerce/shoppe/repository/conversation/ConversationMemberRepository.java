@@ -34,6 +34,18 @@ public interface ConversationMemberRepository extends JpaRepository<Conversation
   @Query(
       value =
           """
+        SELECT *
+        FROM conversation_members
+        WHERE conversation_id = :conversationId
+          AND member_id = :memberId
+        LIMIT 1
+      """,
+      nativeQuery = true)
+  ConversationMember findByConversationIdAndMemberId(String conversationId, String memberId);
+
+  @Query(
+      value =
+          """
         SELECT EXISTS (
           SELECT 1
           FROM conversation_members
