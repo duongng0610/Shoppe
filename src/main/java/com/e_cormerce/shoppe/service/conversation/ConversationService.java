@@ -135,7 +135,7 @@ public class ConversationService {
         .senderId(user.getId())
         .createdAt(message.getCreatedAt())
         .updatedAt(message.getUpdatedAt())
-            .medias(messageRequest.getImageUrls().stream().map(item->{
+            .medias(messageRequest.getImageUrls().stream().map( item->{
                 return  MessageMediaDto.builder().url(item).build();}).toList())
         .build();
   }
