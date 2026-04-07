@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.event;
 
 import com.e_cormerce.shoppe.enums.notification.NotificationType;
+import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.service.notification.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +25,55 @@ public class OrderNotificationListener {
     notificationService.createNotification(
         event.getClient(),
         NotificationType.ORDER,
-        event.getOrder().getId(),
+        event.getOrderId(),
         "Đặt thành công đơn hàng",
-        "Đơn hàng " + event.getOrder().getId() + " đã được đặt thành công.",
+        "Đơn hàng " + event.getOrderId() + " đã được đặt thành công.",
         event.getVariant().getThumbnail());
 
     notificationService.createNotification(
         event.getSeller(),
         NotificationType.ORDER,
-        event.getOrder().getId(),
+        event.getOrderId(),
         "Sản phẩm đang chờ xác nhận",
         "Bạn có một đơn hàng mới từ " + event.getClient().getUsername(),
         event.getVariant().getThumbnail());
+  }
+
+  @Async
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handleOrderApproved(OrderApprovedEvent event) {
+
+    notificationService.createNotification(
+        event.getClient(),
+        NotificationType.ORDER,
+        event.getOrderId(),
+        "Đơn hàng đã được xác nhận",
+        "Đơn hàng " + event.getOrderId() + " đã được xác nhận.",
+        event.getVariant().getThumbnail());
+  }
+
+  @Async
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handleOrderApproved(OrderCancelledEvent event) {
+    String status = event.getOrderStatus();
+
+    if (status.equals(OrderStatus.CANCELLED_BY_CLIENT.toString())) {
+      notificationService.createNotification(
+          event.getClient(),
+          NotificationType.ORDER,
+          event.getOrderId(),
+          "Đơn hàng đã bị hủy",
+          "Đơn hàng " + event.getOrderId() + " đã bị huỷ bởi bạn.",
+          event.getVariant().getThumbnail());
+
+    } else {
+      notificationService.createNotification(
+          event.getClient(),
+          NotificationType.ORDER,
+          event.getOrderId(),
+          "Đơn hàng đã bị hủy",
+          "Đơn hàng " + event.getOrderId() + " đã bị hủy bởi shop.",
+          event.getVariant().getThumbnail());
+    }
   }
 }

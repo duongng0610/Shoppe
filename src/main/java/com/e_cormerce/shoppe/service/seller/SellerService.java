@@ -3,18 +3,27 @@ package com.e_cormerce.shoppe.service.seller;
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
 import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
+import com.e_cormerce.shoppe.entity.order.Order;
+import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.enums.order.OrderStatus;
+import com.e_cormerce.shoppe.event.OrderApprovedEvent;
+import com.e_cormerce.shoppe.event.OrderCancelledEvent;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.repository.order.OrderRepository;
+import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.repository.seller.SellerInfoRepository;
 import com.e_cormerce.shoppe.service.address.AddressService;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
 import com.e_cormerce.shoppe.service.seller.helper.UploadProductImagesHelper;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,8 +34,11 @@ public class SellerService {
   UploadProductImagesHelper uploadProductImagesHelper;
   ProductService productService;
   SellerInfoRepository sellerInfoRepository;
+  OrderRepository orderRepository;
+  VariantRepository variantRepository;
   AuthService authService;
   AddressService addressService;
+  ApplicationEventPublisher eventPublisher;
 
   public void createProduct(
       CreateProductRequest request,
@@ -74,5 +86,58 @@ public class SellerService {
 
   public List<ProductCardResponse> getProductCardsBySeller(String id, int limit, int offset) {
     return productService.getProductOfSeller(id, limit, offset);
+  }
+
+  @Transactional
+  public void approveOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+
+    Variant variant = order.getVariant();
+
+    int availableQuantity = variant.getQuantity();
+    int orderQuantity = order.getQuantity();
+
+    if (availableQuantity < orderQuantity) {
+      throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY_FOR_ORDER);
+    }
+
+    order.setStatus(OrderStatus.ACCEPTED);
+    variant.setQuantity(availableQuantity - orderQuantity);
+    variant.setQuantitySold(variant.getQuantitySold() + orderQuantity);
+
+    eventPublisher.publishEvent(
+        OrderApprovedEvent.builder()
+            .orderId(orderId)
+            .client(order.getClient())
+            .variant(variant)
+            .build());
+  }
+
+  @Transactional
+  public void cancelOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+
+    Variant variant = order.getVariant();
+    int availableQuantity = variant.getQuantity();
+    int orderQuantity = order.getQuantity();
+
+    variant.setQuantity(availableQuantity + orderQuantity);
+
+    order.setStatus(OrderStatus.CANCELLED_BY_SELLER);
+    variant.setQuantity(availableQuantity + orderQuantity);
+
+    eventPublisher.publishEvent(
+        OrderCancelledEvent.builder()
+            .orderStatus(OrderStatus.CANCELLED_BY_SELLER.toString())
+            .orderId(orderId)
+            .client(order.getClient())
+            .variant(variant)
+            .build());
   }
 }

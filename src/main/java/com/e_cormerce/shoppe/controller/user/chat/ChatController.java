@@ -14,15 +14,14 @@ import org.springframework.stereotype.Controller;
 public class ChatController {
   ConversationService conversationService;
 
-  //    @MessageMapping("/message/{id}")
-  //    @SendTo("/topic/conservation/{id}")
-  //    public MessageResponse demo(@Valid MessageRequest message, @PathVariable String id) throws
-  // Exception {
-  //        String time = new SimpleDateFormat("HH:mm").format(new Date());
-  //        var res = conversationService.
-  //        //handle
-  //        return new MessageResponse( message.getText(), time);
-  //    }
+  //      @MessageMapping("/message/{id}")
+  //      @SendTo("/topic/conservation/{id}")
+  //      public MessageResponse demo(@Valid MessageRequest message, @PathVariable String id) throws
+  //   Exception {
+  //          String time = new SimpleDateFormat("HH:mm").format(new Date());
+  //          var res = conversationService.
+  //          return new MessageResponse.(message.getText(), time);
+  //      }
 
   @MessageMapping("/message")
   @SendTo("/topic/conservation")
