@@ -29,6 +29,6 @@ public class ProductReviewImage {
   String url;
 
   @ManyToOne
-  @JoinColumn(name = "product_id", nullable = false)
-  Product product;
+  @JoinColumn(name = "product_review_id", nullable = false)
+  ProductReview productReview;
 }

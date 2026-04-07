@@ -66,6 +66,8 @@ public class AppConfigHelper {
         Permission.builder().val(PermissionEnum.REQUEST_RETURN_ORDER.getVal()).build());
     clientPermissions.add(
         Permission.builder().val(PermissionEnum.REVIEW_RECEIVED_ORDER.getVal()).build());
+    clientPermissions.add(
+        Permission.builder().val(PermissionEnum.CANCEL_ORDER_BY_CLIENT.getVal()).build());
 
     return clientPermissions;
   }
@@ -82,6 +84,8 @@ public class AppConfigHelper {
     sellerPermissions.add(
         Permission.builder().val(PermissionEnum.GET_STATUS_ORDER.getVal()).build());
     sellerPermissions.add(Permission.builder().val(PermissionEnum.ACCEPT_ORDER.getVal()).build());
+    sellerPermissions.add(
+        Permission.builder().val(PermissionEnum.CANCEL_ORDER_BY_SELLER.getVal()).build());
     sellerPermissions.add(
         Permission.builder().val(PermissionEnum.APPROVE_RETURN_REQUEST.getVal()).build());
 

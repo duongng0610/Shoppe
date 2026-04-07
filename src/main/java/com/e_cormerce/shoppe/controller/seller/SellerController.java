@@ -3,6 +3,7 @@ package com.e_cormerce.shoppe.controller.seller;
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
+import com.e_cormerce.shoppe.service.order.OrderService;
 import com.e_cormerce.shoppe.service.seller.SellerService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SellerController {
   SellerService sellerService;
+  OrderService orderService;
 
   /**
    * POST: /seller/products. -Tạo sản phẩm với request gửi lên phải có content-type:multipart/
@@ -52,5 +54,21 @@ public class SellerController {
       @PathVariable String id, @RequestParam Integer limit, @RequestParam Integer offset) {
     var res = sellerService.getProductCardsBySeller(id, limit, offset);
     return ResponseEntity.ok(ApiResponse.builder().data(res).build());
+  }
+
+  @PreAuthorize("hasAuthority('PERMISSION_ACCEPT_ORDER')")
+  @PatchMapping("/{id}/order/approve")
+  public ResponseEntity<ApiResponse> approveOrder(@PathVariable String id) {
+    sellerService.approveOrder(id);
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder().message("approve order successfully").success(true).build());
+  }
+
+  @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_SELLER')")
+  @PatchMapping("/{id}/order/cancel")
+  public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
+    sellerService.cancelOrder(id);
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
   }
 }

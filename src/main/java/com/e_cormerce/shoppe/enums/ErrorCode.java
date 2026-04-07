@@ -49,7 +49,9 @@ public enum ErrorCode {
   INVALID_CREATE_CONVERSATION("Not chat yourself", 1029, HttpStatus.BAD_REQUEST),
   NOT_EXIST_CONVERSATION("Not exist conversation", 1030, HttpStatus.BAD_REQUEST),
   INVALID_CREATE_MESSAGE("Message must have content", 1031, HttpStatus.BAD_REQUEST),
-  ;
+  NOT_EXISTED_ORDER("Order is not existed", 1032, HttpStatus.BAD_REQUEST),
+  NOT_ENOUGH_QUANTITY_FOR_ORDER(
+      "Quantity of product in inventory is not enough for order", 1033, HttpStatus.BAD_REQUEST);
 
   String message;
   int code;

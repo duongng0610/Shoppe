@@ -10,9 +10,9 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class OrderCreatedEvent {
+public class OrderCancelledEvent {
   String orderId;
+  String orderStatus;
   User client;
-  User seller;
   Variant variant;
 }

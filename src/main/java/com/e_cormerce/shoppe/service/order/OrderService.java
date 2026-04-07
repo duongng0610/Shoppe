@@ -8,6 +8,7 @@ import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
+import com.e_cormerce.shoppe.event.OrderCancelledEvent;
 import com.e_cormerce.shoppe.event.OrderCreatedEvent;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
@@ -55,7 +56,7 @@ public class OrderService {
 
     eventPublisher.publishEvent(
         OrderCreatedEvent.builder()
-            .order(order)
+            .orderId(order.getId())
             .client(client)
             .seller(seller)
             .variant(variant)
@@ -66,5 +67,30 @@ public class OrderService {
         .clientId(client.getId())
         .sellerId(seller.getId())
         .build();
+  }
+
+  @Transactional
+  public void cancelOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+
+    Variant variant = order.getVariant();
+    int availableQuantity = variant.getQuantity();
+    int orderQuantity = order.getQuantity();
+
+    variant.setQuantity(availableQuantity + orderQuantity);
+
+    order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
+    variant.setQuantity(availableQuantity + orderQuantity);
+
+    eventPublisher.publishEvent(
+        OrderCancelledEvent.builder()
+            .orderId(orderId)
+            .orderStatus(OrderStatus.CANCELLED_BY_CLIENT.toString())
+            .client(order.getClient())
+            .variant(variant)
+            .build());
   }
 }

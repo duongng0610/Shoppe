@@ -33,4 +33,12 @@ public class OrderController {
                 .data(result)
                 .build());
   }
+
+  @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_CLIENT')")
+  @PatchMapping("/{id}/cancel")
+  public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
+    orderService.cancelOrder(id);
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
+  }
 }
