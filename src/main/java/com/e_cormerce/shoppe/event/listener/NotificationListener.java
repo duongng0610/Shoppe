@@ -81,8 +81,14 @@ public class NotificationListener {
     }
   }
 
+  @Async
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void listenSendMessage(SendMessageEvent messageEvent) {
-      notificationService.createNotification(messageEvent.getUser(),NotificationType.MESSAGE,messageEvent.getMessageId(),"Tin nhắn mới",messageEvent.getContent(),null);
+      notificationService.createNotification(messageEvent.getUser(),
+              NotificationType.MESSAGE,
+              messageEvent.getMessageId(),
+              "Tin nhắn mới",
+              messageEvent.getUser().getUsername()+": "+messageEvent.getContent(),
+              messageEvent.getUser().getAvatar());
   }
 }

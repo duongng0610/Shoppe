@@ -17,9 +17,23 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
     FROM notifications
     WHERE user_id = :userId
       AND is_read = false
+      AND type != "MESSAGE" 
 """,
       nativeQuery = true)
   long countUnReadNotificationsByUser(@Param("userId") String userId);
+
+    // Đếm số notification chưa đọc
+    @Query(
+            value =
+                    """
+              SELECT COUNT(*)
+              FROM notifications
+              WHERE user_id = :userId
+                AND is_read = false
+                AND type = "MESSAGE" 
+          """,
+            nativeQuery = true)
+    long countUnReadMessagesNotificationsByUser(@Param("userId") String userId);
 
   // Lấy danh sách notification đã đọc
   @Query(
@@ -30,6 +44,7 @@ public interface NotificationRepository extends JpaRepository<Notification, Stri
     WHERE user_id = :userId
     ORDER BY created_at DESC
     LIMIT :limit OFFSET :offset
+    AND type != "MESSAGE" 
 """,
       nativeQuery = true)
   List<Notification> getNotificationsByUser(

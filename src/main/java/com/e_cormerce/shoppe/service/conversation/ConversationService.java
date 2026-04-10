@@ -3,8 +3,11 @@ package com.e_cormerce.shoppe.service.conversation;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.dto.response.conversation.MessageMediaDto;
+import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.event.SendMessageEvent;
+import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -41,7 +44,8 @@ public class ConversationService {
   MessageMediaRepository messageMediaRepository;
   UserRepository userRepository;
   AuthService authService;
-    ApplicationEventPublisher eventPublisher;
+
+      ApplicationEventPublisher eventPublisher;
 
   public List<ConversationLineProjection> getConversationByUser() {
     String userId =
@@ -132,7 +136,8 @@ public class ConversationService {
     conversation.setLastSenderId(user.getId());
     conversationRepository.save(conversation);
     var message = conversation.getMessages().get(conversation.getMessages().size() - 1);
-    eventPublisher.publishEvent(SendMessageEvent.builder().messageId(message.getId()).content(message.getContent()).user(user).createdAt(message.getCreatedAt()).build());
+    User other = conversationMemberRepository.findOtherByOtherId(user.getId(),messageRequest.getConversationId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_CONVERSATION));
+    eventPublisher.publishEvent(SendMessageEvent.builder().messageId(message.getId()).content(message.getContent()).user(other).createdAt(message.getCreatedAt()).build());
     return MessageDto.builder()
         .id(message.getId())
         .content(message.getContent())

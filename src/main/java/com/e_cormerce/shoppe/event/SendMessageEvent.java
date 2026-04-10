@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.event;
 
+import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
