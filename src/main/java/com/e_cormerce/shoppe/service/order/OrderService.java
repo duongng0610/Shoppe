@@ -1,7 +1,9 @@
 package com.e_cormerce.shoppe.service.order;
 
+import com.e_cormerce.shoppe.dto.common.order.OrderDetailDto;
 import com.e_cormerce.shoppe.dto.request.order.CreateOrderRequest;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
+import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.Address;
@@ -11,9 +13,12 @@ import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.event.OrderCancelledEvent;
 import com.e_cormerce.shoppe.event.OrderCreatedEvent;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.mapper.order.OrderDetailsMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.service.order.helper.CreateOrderHelper;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
   CreateOrderHelper createOrderHelper;
   OrderRepository orderRepository;
+  OrderDetailsMapper orderDetailsMapper;
   ApplicationEventPublisher eventPublisher;
 
   @Transactional
@@ -76,6 +82,10 @@ public class OrderService {
             .findById(orderId)
             .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
 
+    if (order.getStatus() != OrderStatus.PENDING) {
+      throw new AppException(ErrorCode.UNABlE_CANCEL_ORDER);
+    }
+
     Variant variant = order.getVariant();
     int availableQuantity = variant.getQuantity();
     int orderQuantity = order.getQuantity();
@@ -92,5 +102,29 @@ public class OrderService {
             .client(order.getClient())
             .variant(variant)
             .build());
+  }
+
+  @Transactional(readOnly = true)
+  public GetOrderDetailResponse getOrdersByClient() {
+    String clientId = createOrderHelper.getUserId();
+
+    List<OrderDetailDto> orderDetails =
+        orderRepository.findOrderOfClient(clientId).stream()
+            .map(orderDetailsMapper::toResponse)
+            .collect(Collectors.toList());
+
+    return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
+  }
+
+  @Transactional(readOnly = true)
+  public GetOrderDetailResponse getOrdersBySeller() {
+    String sellerId = createOrderHelper.getUserId();
+
+    List<OrderDetailDto> orderDetails =
+        orderRepository.findOrderOfSeller(sellerId).stream()
+            .map(orderDetailsMapper::toResponse)
+            .collect(Collectors.toList());
+
+    return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
   }
 }

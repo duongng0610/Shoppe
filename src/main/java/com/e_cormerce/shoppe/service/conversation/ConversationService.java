@@ -1,15 +1,9 @@
 package com.e_cormerce.shoppe.service.conversation;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import com.e_cormerce.shoppe.dto.response.conversation.MessageMediaDto;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-
 import com.e_cormerce.shoppe.dto.request.chat.MessageRequest;
 import com.e_cormerce.shoppe.dto.response.conversation.ConversationLineDto;
 import com.e_cormerce.shoppe.dto.response.conversation.MessageDto;
+import com.e_cormerce.shoppe.dto.response.conversation.MessageMediaDto;
 import com.e_cormerce.shoppe.entity.conversation.Conversation;
 import com.e_cormerce.shoppe.entity.conversation.ConversationMember;
 import com.e_cormerce.shoppe.enums.ErrorCode;
@@ -22,11 +16,14 @@ import com.e_cormerce.shoppe.repository.conversation.MessageMediaRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.conversation.helper.ConversationHelper;
-
 import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -74,7 +71,9 @@ public class ConversationService {
               .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_CONVERSATION));
     }
 
-    var targetMember = conversationMemberRepository.findByConversationIdAndMemberId(conversation.getId(), targetId);
+    var targetMember =
+        conversationMemberRepository.findByConversationIdAndMemberId(
+            conversation.getId(), targetId);
     return ConversationLineDto.builder()
         .id(conversation.getId())
         .otherId(target.getId())
@@ -82,7 +81,9 @@ public class ConversationService {
         .otherName(target.getUsername())
         .lastContent(conversation.getLastContent())
         .lastContentAt(
-            conversation.getLastContentAt() == null ? null : conversation.getLastContentAt().toString())
+            conversation.getLastContentAt() == null
+                ? null
+                : conversation.getLastContentAt().toString())
         .lastReadAt(targetMember == null ? null : targetMember.getLastReadAt())
         .build();
   }
@@ -90,7 +91,7 @@ public class ConversationService {
   public List<MessageDto> getMessages(String conversationId, int limit, int offset) {
     var messages = conversationMessageRepository.getMessages(conversationId, limit, offset);
     return messages.stream()
-        .map( 
+        .map(
             message ->
                 MessageDto.builder()
                     .id(message.getId())
@@ -98,7 +99,7 @@ public class ConversationService {
                     .senderId(message.getSenderId())
                     .createdAt(message.getCreatedAt())
                     .updatedAt(message.getUpdatedAt())
-                        .medias(messageMediaRepository.findByMessageId(message.getId()))
+                    .medias(messageMediaRepository.findByMessageId(message.getId()))
                     .build())
         .toList();
   }
@@ -135,8 +136,13 @@ public class ConversationService {
         .senderId(user.getId())
         .createdAt(message.getCreatedAt())
         .updatedAt(message.getUpdatedAt())
-            .medias(messageRequest.getImageUrls().stream().map( item->{
-                return  MessageMediaDto.builder().url(item).build();}).toList())
+        .medias(
+            messageRequest.getImageUrls().stream()
+                .map(
+                    item -> {
+                      return MessageMediaDto.builder().url(item).build();
+                    })
+                .toList())
         .build();
   }
 }

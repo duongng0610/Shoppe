@@ -1,9 +1,13 @@
 package com.e_cormerce.shoppe.controller.seller;
 
+import com.e_cormerce.shoppe.dto.request.order.UpdateOrderTrackingLocationRequest;
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
+import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
+import com.e_cormerce.shoppe.dto.response.order.UpdateOrderTrackingLocationResponse;
 import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
 import com.e_cormerce.shoppe.service.order.OrderService;
+import com.e_cormerce.shoppe.service.order.OrderTrackingService;
 import com.e_cormerce.shoppe.service.seller.SellerService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -23,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class SellerController {
   SellerService sellerService;
   OrderService orderService;
+  OrderTrackingService orderTrackingService;
 
   /**
    * POST: /seller/products. -Tạo sản phẩm với request gửi lên phải có content-type:multipart/
@@ -56,8 +61,22 @@ public class SellerController {
     return ResponseEntity.ok(ApiResponse.builder().data(res).build());
   }
 
+  @PostMapping("/{orderId}/orders/trackings")
+  @PreAuthorize("hasAuthority('PERMISSION_UPDATE_ORDER_TRACKING_LOCATION')")
+  public ResponseEntity<ApiResponse<UpdateOrderTrackingLocationResponse>> updateTracking(
+      @PathVariable String orderId,
+      @Valid @RequestBody UpdateOrderTrackingLocationRequest request) {
+    var result = orderTrackingService.updateTracking(orderId, request);
+    return ResponseEntity.ok(
+        ApiResponse.<UpdateOrderTrackingLocationResponse>builder()
+            .data(result)
+            .message("Tracking updated successfully")
+            .success(true)
+            .build());
+  }
+
   @PreAuthorize("hasAuthority('PERMISSION_ACCEPT_ORDER')")
-  @PatchMapping("/{id}/order/approve")
+  @PatchMapping("/{id}/orders/approve")
   public ResponseEntity<ApiResponse> approveOrder(@PathVariable String id) {
     sellerService.approveOrder(id);
     return ResponseEntity.ok()
@@ -65,10 +84,30 @@ public class SellerController {
   }
 
   @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_SELLER')")
-  @PatchMapping("/{id}/order/cancel")
+  @PatchMapping("/{id}/orders/cancel")
   public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
     sellerService.cancelOrder(id);
     return ResponseEntity.ok()
         .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
+  }
+
+  @PreAuthorize("hasAuthority('PERMISSION_SHIP_ORDER')")
+  @PatchMapping("/{id}/orders/ship")
+  public ResponseEntity<ApiResponse> shipOrder(@PathVariable String id) {
+    sellerService.shipOrder(id);
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder().message("ship order successfully").success(true).build());
+  }
+
+  @GetMapping("/orders")
+  @PreAuthorize("hasAuthority('PERMISSION_VIEW_SELLER_ORDERS')")
+  public ResponseEntity<ApiResponse<GetOrderDetailResponse>> getSellerOrders() {
+    var result = orderService.getOrdersBySeller();
+    return ResponseEntity.ok(
+        ApiResponse.<GetOrderDetailResponse>builder()
+            .data(result)
+            .message("get orders successfully")
+            .success(true)
+            .build());
   }
 }

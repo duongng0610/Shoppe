@@ -9,11 +9,10 @@ import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.event.OrderApprovedEvent;
 import com.e_cormerce.shoppe.event.OrderCancelledEvent;
+import com.e_cormerce.shoppe.event.OrderShippedEvent;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
-import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.repository.seller.SellerInfoRepository;
-import com.e_cormerce.shoppe.service.address.AddressService;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
@@ -35,9 +34,7 @@ public class SellerService {
   ProductService productService;
   SellerInfoRepository sellerInfoRepository;
   OrderRepository orderRepository;
-  VariantRepository variantRepository;
   AuthService authService;
-  AddressService addressService;
   ApplicationEventPublisher eventPublisher;
 
   public void createProduct(
@@ -123,6 +120,10 @@ public class SellerService {
             .findById(orderId)
             .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
 
+    if (order.getStatus() != OrderStatus.PENDING) {
+      throw new AppException(ErrorCode.UNABlE_CANCEL_ORDER);
+    }
+
     Variant variant = order.getVariant();
     int availableQuantity = variant.getQuantity();
     int orderQuantity = order.getQuantity();
@@ -135,6 +136,28 @@ public class SellerService {
     eventPublisher.publishEvent(
         OrderCancelledEvent.builder()
             .orderStatus(OrderStatus.CANCELLED_BY_SELLER.toString())
+            .orderId(orderId)
+            .client(order.getClient())
+            .variant(variant)
+            .build());
+  }
+
+  @Transactional
+  public void shipOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+
+    if (order.getStatus() != OrderStatus.ACCEPTED) {
+      throw new AppException(ErrorCode.UNABlE_SHIP_ORDER);
+    }
+
+    Variant variant = order.getVariant();
+    order.setStatus(OrderStatus.SHIPPING);
+
+    eventPublisher.publishEvent(
+        OrderShippedEvent.builder()
             .orderId(orderId)
             .client(order.getClient())
             .variant(variant)

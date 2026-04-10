@@ -76,4 +76,41 @@ public class OrderNotificationListener {
           event.getVariant().getThumbnail());
     }
   }
+
+  @Async
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handleOrderShipped(OrderShippedEvent event) {
+
+    notificationService.createNotification(
+        event.getClient(),
+        NotificationType.ORDER,
+        event.getOrderId(),
+        "Đơn hàng đã bắt đầu được giao",
+        "Đơn hàng " + event.getOrderId() + " đã bắt đầu được giao.",
+        event.getVariant().getThumbnail());
+  }
+
+  @Async
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handleUpdateTracking(OrderTrackingUpdatedEvent event) {
+    String status = event.getStatus();
+
+    if (status.equals(OrderStatus.ARRIVED.toString())) {
+      notificationService.createNotification(
+          event.getClient(),
+          NotificationType.ORDER,
+          event.getOrderId(),
+          "Đơn hàng đã giao đến nơi",
+          "Đơn hàng " + event.getOrderId() + " đã giao đến nơi tại " + event.getAddress(),
+          null);
+    } else if (status.equals(OrderStatus.SHIPPING.toString())) {
+      notificationService.createNotification(
+          event.getClient(),
+          NotificationType.ORDER,
+          event.getOrderId(),
+          "Đơn hàng đang giao",
+          "Đơn hàng " + event.getOrderId() + " đang ở vị trí " + event.getAddress(),
+          null);
+    }
+  }
 }

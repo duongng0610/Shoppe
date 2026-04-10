@@ -1,13 +1,11 @@
 package com.e_cormerce.shoppe.repository.conversation;
 
+import com.e_cormerce.shoppe.entity.conversation.ConversationMessage;
+import com.e_cormerce.shoppe.projection.MessageProjection;
 import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import com.e_cormerce.shoppe.entity.conversation.ConversationMessage;
-import com.e_cormerce.shoppe.projection.MessageProjection;
 
 @Repository
 public interface ConversationMessageRepository extends JpaRepository<ConversationMessage, String> {

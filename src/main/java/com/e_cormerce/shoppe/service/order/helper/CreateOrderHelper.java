@@ -7,6 +7,7 @@ import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.mapper.address.AddressMapper;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
@@ -28,6 +29,7 @@ public class CreateOrderHelper {
   VariantRepository variantRepository;
   UserRepository userRepository;
   AuthService authService;
+  AddressMapper addressMapper;
 
   public Variant getVariant(@NotBlank String variantId) {
     return variantRepository
@@ -46,14 +48,7 @@ public class CreateOrderHelper {
   }
 
   public Address getShippingAddress(AddressDto addressDto) {
-    String fullAddress =
-        addressDto.getWard() + ", " + addressDto.getDistrict() + ", " + addressDto.getProvince();
-
-    return Address.builder()
-        .province(addressDto.getProvince())
-        .district(addressDto.getDistrict())
-        .ward(addressDto.getWard())
-        .build();
+    return addressMapper.toAddress(addressDto);
   }
 
   private String getProductName(Variant variant) {
@@ -76,5 +71,9 @@ public class CreateOrderHelper {
   public void getOrderInfo(Order order, Variant variant) {
     order.setProductName(getProductName(variant));
     order.setVariantName(getVariantName(variant));
+  }
+
+  public String getUserId() {
+    return authService.getUserId();
   }
 }

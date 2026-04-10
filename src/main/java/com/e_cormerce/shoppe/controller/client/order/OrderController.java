@@ -3,7 +3,10 @@ package com.e_cormerce.shoppe.controller.client.order;
 import com.e_cormerce.shoppe.dto.request.order.CreateOrderRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
+import com.e_cormerce.shoppe.dto.response.order.GetCurrentTrackingResponse;
+import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.service.order.OrderService;
+import com.e_cormerce.shoppe.service.order.OrderTrackingService;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderController {
   OrderService orderService;
+  OrderTrackingService orderTrackingService;
 
   @PostMapping()
   @PreAuthorize("hasAuthority('PERMISSION_CREATE_ORDER')")
@@ -40,5 +44,30 @@ public class OrderController {
     orderService.cancelOrder(id);
     return ResponseEntity.ok()
         .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
+  }
+
+  @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_CLIENT')")
+  @GetMapping("/{orderId}/trackings/current")
+  public ResponseEntity<ApiResponse<GetCurrentTrackingResponse>> getCurrentTracking(
+      @PathVariable String orderId) {
+    var result = orderTrackingService.getCurrentTracking(orderId);
+    return ResponseEntity.ok(
+        ApiResponse.<GetCurrentTrackingResponse>builder()
+            .data(result)
+            .message("get order tracking successfully")
+            .success(true)
+            .build());
+  }
+
+  @GetMapping
+  @PreAuthorize("hasAuthority('PERMISSION_CLIENT_VIEW_ORDERS')")
+  public ResponseEntity<ApiResponse<GetOrderDetailResponse>> getClientOrders() {
+    var result = orderService.getOrdersByClient();
+    return ResponseEntity.ok(
+        ApiResponse.<GetOrderDetailResponse>builder()
+            .data(result)
+            .message("get orders successfully")
+            .success(true)
+            .build());
   }
 }

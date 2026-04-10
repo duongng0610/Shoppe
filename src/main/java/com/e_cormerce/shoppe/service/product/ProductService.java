@@ -123,7 +123,7 @@ public class ProductService {
     User seller = shopFuture.join();
     Category category = categoryFuture.join();
 
-    UserDto sellerResponse = userMapper.toUserDTO(seller);
+    UserDto sellerResponse = userMapper.toDto(seller);
     CategoryDto categoryResponse = categoryMapper.toCategoryDTO(category);
 
     List<VariantDetailResponse> variantResponses =
