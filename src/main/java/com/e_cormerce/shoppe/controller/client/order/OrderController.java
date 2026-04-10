@@ -4,6 +4,7 @@ import com.e_cormerce.shoppe.dto.request.order.CreateOrderRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
 import com.e_cormerce.shoppe.service.order.OrderService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -18,27 +19,35 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderController {
-  OrderService orderService;
+    OrderService orderService;
 
-  @PostMapping()
-  @PreAuthorize("hasAuthority('PERMISSION_CREATE_ORDER')")
-  public ResponseEntity<ApiResponse<CreateOrderResponse>> create(
-      @RequestBody @Valid CreateOrderRequest request) {
-    var result = orderService.create(request);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(
-            ApiResponse.<CreateOrderResponse>builder()
-                .success(true)
-                .message("create order successfully")
-                .data(result)
-                .build());
-  }
 
-  @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_CLIENT')")
-  @PatchMapping("/{id}/cancel")
-  public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
-    orderService.cancelOrder(id);
-    return ResponseEntity.ok()
-        .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
-  }
+    @PostMapping()
+    @PreAuthorize("hasAuthority('PERMISSION_CREATE_ORDER')")
+    public ResponseEntity<ApiResponse<CreateOrderResponse>> create(
+            @RequestBody @Valid CreateOrderRequest request) {
+        var result = orderService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.<CreateOrderResponse>builder()
+                                .success(true)
+                                .message("create order successfully")
+                                .data(result)
+                                .build());
+    }
+
+    @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_CLIENT')")
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
+        orderService.cancelOrder(id);
+        return ResponseEntity.ok()
+                .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
+    }
+
+
+    @PostMapping("{id}/payment")
+    public String submidOrder(@PathVariable String id,
+                              HttpServletRequest request) {
+        return orderService.getUrlPaymentByOrder(id, request);
+    }
 }
