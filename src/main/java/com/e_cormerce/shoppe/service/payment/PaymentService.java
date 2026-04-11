@@ -63,9 +63,9 @@ public class PaymentService {
     }
 
     public OrderTransactionDto getTransaction(String id) {
-        OrderTransaction transaction = transactionRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_TRANSACTION));
+        OrderTransaction transaction = transactionRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_TRANSACTION));
         var order = orderMapper.toOrderDto(transaction.getOrder());
-        var user = userMapper.toUserDTO(transaction.getUser());
+        var user = userMapper.toDto(transaction.getUser());
         return OrderTransactionDto.builder().order(order).amount(transaction.getAmount()).user(user).transactionDate(transaction.getCreatedAt()).status(transaction.getStatus()).build();
     }
 

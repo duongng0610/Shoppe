@@ -1,7 +1,9 @@
 package com.e_cormerce.shoppe.service.order;
 
+import com.e_cormerce.shoppe.dto.common.order.OrderDetailDto;
 import com.e_cormerce.shoppe.dto.request.order.CreateOrderRequest;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
+import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.Address;
@@ -11,16 +13,16 @@ import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.event.OrderCancelledEvent;
 import com.e_cormerce.shoppe.event.OrderCreatedEvent;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.mapper.order.OrderDetailsMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.service.order.helper.CreateOrderHelper;
-import com.e_cormerce.shoppe.service.vnpay.VnPayService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,85 +30,101 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderService {
-    CreateOrderHelper createOrderHelper;
-    OrderRepository orderRepository;
-    ApplicationEventPublisher eventPublisher;
-    VnPayService vnPayService;
+  CreateOrderHelper createOrderHelper;
+  OrderRepository orderRepository;
+  OrderDetailsMapper orderDetailsMapper;
+  ApplicationEventPublisher eventPublisher;
 
-    @Transactional
-    public CreateOrderResponse create(@Valid CreateOrderRequest request) {
-        Variant variant = createOrderHelper.getVariant(request.getVariantId());
-        User seller = variant.getProduct().getSeller();
-        User client = createOrderHelper.getClient();
-        Address shippingAddress = createOrderHelper.getShippingAddress(request.getShippingAddress());
-        if (variant.getQuantity() < request.getQuantity()) {
-            throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
-        }
-        Order order =
-                Order.builder()
-                        .quantity(request.getQuantity())
-                        .variant(variant)
-                        .status(OrderStatus.PENDING)
-                        .client(client)
-                        .seller(seller)
-                        .shippingAddress(shippingAddress)
-                        .thumbnail(variant.getThumbnail())
-                        .shippingPhoneNumber(request.getShippingPhoneNumber())
-                        .totalPrice(createOrderHelper.getTotalPrice(variant, request.getQuantity()))
-                        .build();
+  @Transactional
+  public CreateOrderResponse create(@Valid CreateOrderRequest request) {
+    Variant variant = createOrderHelper.getVariant(request.getVariantId());
+    User seller = variant.getProduct().getSeller();
+    User client = createOrderHelper.getClient();
+    Address shippingAddress = createOrderHelper.getShippingAddress(request.getShippingAddress());
+    if (variant.getQuantity() < request.getQuantity()) {
+      throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
+    }
+    Order order =
+        Order.builder()
+            .quantity(request.getQuantity())
+            .variant(variant)
+            .status(OrderStatus.PENDING)
+            .client(client)
+            .seller(seller)
+            .shippingAddress(shippingAddress)
+            .shippingPhoneNumber(request.getShippingPhoneNumber())
+            .totalPrice(createOrderHelper.getTotalPrice(variant, request.getQuantity()))
+            .build();
 
-        createOrderHelper.getOrderInfo(order, variant);
+    createOrderHelper.getOrderInfo(order, variant);
 
-        orderRepository.save(order);
+    orderRepository.save(order);
 
-        eventPublisher.publishEvent(
-                OrderCreatedEvent.builder()
-                        .orderId(order.getId())
-                        .client(client)
-                        .seller(seller)
-                        .variant(variant)
-                        .build());
+    eventPublisher.publishEvent(
+        OrderCreatedEvent.builder()
+            .orderId(order.getId())
+            .client(client)
+            .seller(seller)
+            .variant(variant)
+            .build());
 
-        return CreateOrderResponse.builder()
-                .orderId(order.getId())
-                .clientId(client.getId())
-                .sellerId(seller.getId())
-                .build();
+    return CreateOrderResponse.builder()
+        .orderId(order.getId())
+        .clientId(client.getId())
+        .sellerId(seller.getId())
+        .build();
+  }
+
+  @Transactional
+  public void cancelOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+
+    if (order.getStatus() != OrderStatus.PENDING) {
+      throw new AppException(ErrorCode.UNABlE_CANCEL_ORDER);
     }
 
-    @Transactional
-    public void cancelOrder(String orderId) {
-        Order order =
-                orderRepository
-                        .findById(orderId)
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+    Variant variant = order.getVariant();
+    int availableQuantity = variant.getQuantity();
+    int orderQuantity = order.getQuantity();
 
-        Variant variant = order.getVariant();
-        int availableQuantity = variant.getQuantity();
-        int orderQuantity = order.getQuantity();
+    variant.setQuantity(availableQuantity + orderQuantity);
 
-        variant.setQuantity(availableQuantity + orderQuantity);
+    order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
+    variant.setQuantity(availableQuantity + orderQuantity);
 
-        order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
-        variant.setQuantity(availableQuantity + orderQuantity);
+    eventPublisher.publishEvent(
+        OrderCancelledEvent.builder()
+            .orderId(orderId)
+            .orderStatus(OrderStatus.CANCELLED_BY_CLIENT.toString())
+            .client(order.getClient())
+            .variant(variant)
+            .build());
+  }
 
-        eventPublisher.publishEvent(
-                OrderCancelledEvent.builder()
-                        .orderId(orderId)
-                        .orderStatus(OrderStatus.CANCELLED_BY_CLIENT.toString())
-                        .client(order.getClient())
-                        .variant(variant)
-                        .build());
-    }
+  @Transactional(readOnly = true)
+  public GetOrderDetailResponse getOrdersByClient() {
+    String clientId = createOrderHelper.getUserId();
 
-    public String getUrlPaymentByOrder(String id, HttpServletRequest request) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        Order order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
-        if (!userId.equals(orderRepository.getClientId(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER)))) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
-        }
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        String vnpayUrl = vnPayService.createOrder(order.getTotalPrice().intValue(), order.getId(), userId, "Thanh toán đơn hàng " + id, baseUrl);
-        return vnpayUrl;
-    }
+    List<OrderDetailDto> orderDetails =
+        orderRepository.findOrderOfClient(clientId).stream()
+            .map(orderDetailsMapper::toResponse)
+            .collect(Collectors.toList());
+
+    return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
+  }
+
+  @Transactional(readOnly = true)
+  public GetOrderDetailResponse getOrdersBySeller() {
+    String sellerId = createOrderHelper.getUserId();
+
+    List<OrderDetailDto> orderDetails =
+        orderRepository.findOrderOfSeller(sellerId).stream()
+            .map(orderDetailsMapper::toResponse)
+            .collect(Collectors.toList());
+
+    return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
+  }
 }

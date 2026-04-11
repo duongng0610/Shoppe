@@ -9,7 +9,6 @@ public interface MessageProjection {
 
   String getSenderId();
 
-
   LocalDateTime getCreatedAt();
 
   LocalDateTime getUpdatedAt();

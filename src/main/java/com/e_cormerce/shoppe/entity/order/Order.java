@@ -81,4 +81,7 @@ public class Order {
 
     @Column(name = "thumbnail", nullable = false)
     String thumbnail;
+
+    @Column(name = "variant_name", nullable = true)
+    String variantName;
 }

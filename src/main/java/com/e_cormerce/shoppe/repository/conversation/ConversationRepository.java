@@ -61,7 +61,8 @@ public interface ConversationRepository extends JpaRepository<Conversation, Stri
       LIMIT 1
       """,
       nativeQuery = true)
-  Optional<ConversationLineProjection> getConversationLineByTargetId(String memberId, String targetId);
+  Optional<ConversationLineProjection> getConversationLineByTargetId(
+      String memberId, String targetId);
 
   @Query(
       value =

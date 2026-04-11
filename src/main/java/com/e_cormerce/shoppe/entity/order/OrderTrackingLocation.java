@@ -1,8 +1,7 @@
 package com.e_cormerce.shoppe.entity.order;
 
-import com.e_cormerce.shoppe.entity.user.Address;
 import jakarta.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,7 +11,7 @@ import org.hibernate.annotations.Where;
 @Entity
 @Table(
     name = "order_tracking_locations",
-    indexes = {@Index(name = "idx_order", columnList = "order_id")})
+    indexes = {@Index(name = "idx_order_id", columnList = "order_id")})
 @Getter
 @Setter
 @Builder
@@ -29,18 +28,20 @@ public class OrderTrackingLocation {
   @Column(columnDefinition = "boolean default false")
   boolean deleted;
 
-  @Column(name = "is_last_update")
-  boolean isLastUpdate = true;
-
-  @Column(name = "created_at")
+  @Column(name = "created_at", nullable = false)
   @CreationTimestamp
-  LocalDate createdAt;
+  LocalDateTime createdAt;
 
-  @ManyToOne
-  @JoinColumn(name = "address_id", nullable = false)
-  Address address;
+  @Column(name = "address", nullable = false)
+  String address;
 
-  @ManyToOne
+  @Column(name = "arrived_at", nullable = false)
+  LocalDateTime arrivedAt;
+
+  @Column(name = "remaining_distance", nullable = false)
+  Long remainingDistance;
+
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "order_id", nullable = false)
   Order order;
 }

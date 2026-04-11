@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.controller.user.conversation;
 
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
+import com.e_cormerce.shoppe.dto.response.conversation.ConversationLineDto;
 import com.e_cormerce.shoppe.dto.response.conversation.MessageDto;
 import com.e_cormerce.shoppe.projection.ConversationLineProjection;
 import com.e_cormerce.shoppe.service.conversation.ConversationService;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.e_cormerce.shoppe.dto.response.conversation.ConversationLineDto;
 
 @RestController
 @RequestMapping("/user/conversations")
@@ -45,6 +45,9 @@ public class ConversationController {
       @PathVariable String id, @RequestParam int limit, @RequestParam int offset) {
     var data = conversationService.getMessages(id, limit, offset);
     return ResponseEntity.ok(
-        ApiResponse.<List<MessageDto>>builder().data(data).message("Get messages successfully").build());
+        ApiResponse.<List<MessageDto>>builder()
+            .data(data)
+            .message("Get messages successfully")
+            .build());
   }
 }

@@ -52,7 +52,16 @@ public enum ErrorCode {
     NOT_EXISTED_ORDER("Order is not existed", 1032, HttpStatus.BAD_REQUEST),
     NOT_ENOUGH_QUANTITY_FOR_ORDER(
             "Quantity of product in inventory is not enough for order", 1033, HttpStatus.BAD_REQUEST),
-    NOT_EXIST_TRANSACTION("Transaction is not existed", 1034, HttpStatus.BAD_REQUEST),
+    UNABlE_CANCEL_ORDER(
+            "Order can not be cancelled because it was approved", 1034, HttpStatus.BAD_REQUEST),
+    NOT_EXISTED_TRACKING("Tracking is not existed", 1035, HttpStatus.BAD_REQUEST),
+    UNABLE_UPDATE_TRACKING("This tracking is unable to update", 1036, HttpStatus.BAD_REQUEST),
+    GEOCODING_FAILED("Failed to geocode address", 1037, HttpStatus.BAD_REQUEST),
+    UNABLE_GET_CURRENT_TRACKING("Order is not being delivered", 1038, HttpStatus.BAD_REQUEST),
+    INVALID_ORDER_STATUS("Order status is invalid", 1039, HttpStatus.BAD_REQUEST),
+    UNABlE_SHIP_ORDER(
+            "This order can not be shipped because it was not approved", 1034, HttpStatus.BAD_REQUEST),
+    NOT_EXISTED_TRANSACTION("Tracsaction is not existed", 1040, HttpStatus.BAD_REQUEST),
     ;
 
     String message;

@@ -1,8 +1,7 @@
 package com.e_cormerce.shoppe.dto.request.chat;
 
-import java.util.List;
-
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,8 +15,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MessageRequest {
-    @NotBlank
-            String userId;
+  @NotBlank String userId;
 
   String text;
 
