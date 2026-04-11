@@ -23,6 +23,13 @@ public class NotificationController {
         ApiResponse.builder().data(notificationService.countUnReadNotifications()).build());
   }
 
+    // 🔥 1. Đếm tin nhan chưa đọc
+    @GetMapping("messages/count")
+    public ResponseEntity<ApiResponse> getCountMessage() {
+        return ResponseEntity.ok(
+                ApiResponse.builder().data(notificationService.countUnReadMessageNotifications()).build());
+    }
+
   // 🔥 2. Lấy danh sách notification (có phân trang)
   @GetMapping
   public ResponseEntity<ApiResponse> getUnread(
@@ -32,7 +39,7 @@ public class NotificationController {
   }
 
   // 🔥 3. Mark as read
-  @PatchMapping("/read")
+  @PutMapping("/read")
   public ResponseEntity<ApiResponse> read(@RequestBody ReadNotificationRequest request) {
     notificationService.readNotifications(request.getIds());
     return ResponseEntity.ok(ApiResponse.builder().message("Doc thong bao thanh cong").build());

@@ -1,16 +1,16 @@
 package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.enums.transaction.TargetTypeTransaction;
 import com.e_cormerce.shoppe.enums.transaction.TransactionStatus;
 import jakarta.persistence.*;
-import java.util.Date;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -22,34 +22,35 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE transactions SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class OrderTransaction {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
-  @Column(columnDefinition = "boolean default false")
-  boolean deleted;
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
-  @ManyToOne
-  @JoinColumn(name = "from_id", nullable = false)
-  User from;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    User user;
 
-  @ManyToOne
-  @JoinColumn(name = "to_id", nullable = false)
-  User to;
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
+    Order order;
 
-  @ManyToOne
-  @JoinColumn(name = "order_id", nullable = false)
-  Order order;
+    @Column(name = "amount", nullable = false)
+    BigDecimal amount;
 
-  @NotNull String message;
 
-  @Column(name = "status", nullable = false)
-  TransactionStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(
+            columnDefinition =
+                    "ENUM('SUCCESS','FAIL','ERROR')",
+            nullable = false)
+    TransactionStatus status;
 
-  @CreationTimestamp
-  @Column(name = "created_at", nullable = false)
-  @NotNull
-  Date createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false)
+    LocalDateTime createdAt;
 
-  @Column @NotNull TargetTypeTransaction target_type_transaction;
+
 }

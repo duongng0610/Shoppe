@@ -1,3 +1,7 @@
 package com.e_cormerce.shoppe.enums.transaction;
 
-public enum TransactionStatus {}
+public enum TransactionStatus {
+    SUCCESS,
+    FAIL,
+    ERROR
+}

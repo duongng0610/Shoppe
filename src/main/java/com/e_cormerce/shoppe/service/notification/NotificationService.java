@@ -50,6 +50,11 @@ public class NotificationService {
     return notificationRepository.countUnReadNotificationsByUser(authService.getUserId());
   }
 
+
+    public long countUnReadMessageNotifications() {
+        return notificationRepository.countUnReadMessagesNotificationsByUser(authService.getUserId());
+    }
+
   // 🔸 Lấy danh sách notification (đã read + chưa read vì query của bạn đang lấy all)
   public List<Notification> getNotifications(int limit, int offset) {
 
