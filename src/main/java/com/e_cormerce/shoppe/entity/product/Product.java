@@ -7,6 +7,9 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -48,6 +51,11 @@ public class Product {
 
   @Column(name = "discount_percentage", columnDefinition = "float default 0")
   Float discountPercentage;
+
+  @Column(name = "rate", nullable = false)
+  @Min(value = 1, message = "Rating must be at least 1")
+  @Max(value = 5, message = "Rating must not exceed 5")
+  Integer rate;
 
   @Column(name = "total_quantity", nullable = false, columnDefinition = "int default 0")
   Integer totalQuantity;

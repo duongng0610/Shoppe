@@ -20,7 +20,7 @@ import org.hibernate.annotations.Where;
 @Table(
     name = "categories",
     indexes = {
-      @Index(name = "idx_categories_parent", columnList = "parent_id"),
+      @Index(name = "idx_categories_path_to_parent", columnList = "path_to_parent"),
       @Index(name = "idx_categories_val", columnList = "val")
     })
 @SQLDelete(sql = "UPDATE categories SET deleted=true where id=?")
@@ -42,10 +42,6 @@ public class Category {
   @Column(name = "created_at", updatable = false)
   private LocalDateTime createdAt;
 
-  // owner side
-  @ManyToOne
-  @JoinColumn(name = "parent_id")
-  @Nullable
-  @JsonIgnore
-  Category parent;
+  @Column(name = "path_to_parent")
+  String pathToParent;
 }
