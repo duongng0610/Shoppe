@@ -6,8 +6,7 @@ public enum NotificationType {
   PRODUCT("PRODUCT"),
   ACCOUNT("ACCOUNT"),
   SYSTEM("SYSTEM"),
-  MESSAGE("MESSAGE")
-  ;
+  MESSAGE("MESSAGE");
 
   private final String value;
 

@@ -48,4 +48,9 @@ public interface ProductRepository extends JpaRepository<Product, String> {
           "SELECT * FROM products p  WHERE seller_id=:sellerId and p.status = 'APPROVED'  LIMIT :limit OFFSET :offset",
       nativeQuery = true)
   List<Product> findProductsOfSeller(String sellerId, int limit, int offset);
+
+  @Query(
+      value = "SELECT * FROM products p  WHERE seller_id=:sellerId  LIMIT :limit OFFSET :offset",
+      nativeQuery = true)
+  List<Product> findProductsOfSellerForSeller(String sellerId, int limit, int offset);
 }

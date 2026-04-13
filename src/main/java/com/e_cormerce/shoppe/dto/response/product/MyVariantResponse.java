@@ -5,19 +5,20 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class VariantDetailResponse {
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class MyVariantResponse {
   String id;
   BigDecimal price;
   String thumbnail;
-  long quantity;
+  Long quantity;
   List<VariantAttributeDto> attributes;
-  long soldQuantity;
+  Long soldQuantity;
+  Boolean deleted;
   LocalDateTime createdAt;
 }

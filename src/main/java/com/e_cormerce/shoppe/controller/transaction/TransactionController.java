@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionController {
-    PaymentService paymentService;
+  PaymentService paymentService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse> getTransaction(@PathVariable String id) throws AppException {
-        return ResponseEntity.ok(ApiResponse.builder().data(paymentService.getTransaction(id)).success(true).build());
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse> getTransaction(@PathVariable String id) throws AppException {
+    return ResponseEntity.ok(
+        ApiResponse.builder().data(paymentService.getTransaction(id)).success(true).build());
+  }
 }

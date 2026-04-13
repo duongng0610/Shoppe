@@ -3,8 +3,8 @@ package com.e_cormerce.shoppe.service.product;
 import com.e_cormerce.shoppe.dto.common.catgory.CategoryDto;
 import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
-import com.e_cormerce.shoppe.dto.response.product.GetProductDetailResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
+import com.e_cormerce.shoppe.dto.response.product.ProductDetailResponse;
 import com.e_cormerce.shoppe.dto.response.product.VariantDetailResponse;
 import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.product.Product;
@@ -105,21 +105,25 @@ public class ProductService {
     return products.stream().map(productMapper::toProductDTO).toList();
   }
 
-  public GetProductDetailResponse getProductDetail(String id) {
+  public ProductDetailResponse getProductDetail(String id) {
     Product product =
         productRepository
             .findById(id)
             .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
+    CompletableFuture<List<ProductExtraImage>> imagesFuture =
+        productQueryDBHelper.getExtraImagesOfProduct(id);
     CompletableFuture<List<Type>> typesFuture = productQueryDBHelper.getTypes(id);
-    //    CompletableFuture<List<Variant>> variantsFuture = productQueryDBHelper.getVariants(id);
+    CompletableFuture<List<Variant>> variantsFuture = productQueryDBHelper.getVariants(id);
     CompletableFuture<User> shopFuture = productQueryDBHelper.getSeller(id);
     CompletableFuture<Category> categoryFuture = productQueryDBHelper.getCategory(id);
 
-    CompletableFuture.allOf(typesFuture, shopFuture, categoryFuture).join();
+    CompletableFuture.allOf(typesFuture, variantsFuture, shopFuture, categoryFuture, imagesFuture)
+        .join();
 
     List<Type> types = typesFuture.join();
-    List<Variant> variants = product.getVariants();
+    List<Variant> variants = variantsFuture.join();
+    List<ProductExtraImage> images = imagesFuture.join();
     User seller = shopFuture.join();
     Category category = categoryFuture.join();
 
@@ -130,7 +134,8 @@ public class ProductService {
         getProductDetailsHelper.createVariantDetail(variants);
     var typeResponses = getProductDetailsHelper.createTypesResponse(types);
 
-    return GetProductDetailResponse.builder()
+    return ProductDetailResponse.builder()
+        .hasVariant(product.isHasVariant())
         .name(product.getName())
         .id(product.getId())
         .category(categoryResponse)
@@ -141,7 +146,7 @@ public class ProductService {
         .originPrice(product.getOriginPrice())
         .totalSoldQuantity(product.getTotalQuantity())
         .totalQuantity(product.getTotalQuantity())
-        .extraImages(product.getProductExtraImages().stream().map(item -> item.getUrl()).toList())
+        .extraImages(images.stream().map(item -> item.getUrl()).toList())
         .build();
   }
 

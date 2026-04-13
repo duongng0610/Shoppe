@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.service.seller;
 
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
+import com.e_cormerce.shoppe.dto.response.product.MyProductResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
 import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
@@ -11,7 +12,9 @@ import com.e_cormerce.shoppe.event.OrderApprovedEvent;
 import com.e_cormerce.shoppe.event.OrderCancelledEvent;
 import com.e_cormerce.shoppe.event.OrderShippedEvent;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
+import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.repository.seller.SellerInfoRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
@@ -36,6 +39,16 @@ public class SellerService {
   OrderRepository orderRepository;
   AuthService authService;
   ApplicationEventPublisher eventPublisher;
+  ProductRepository productRepository;
+  ProductMapper productMapper;
+
+  public List<MyProductResponse> getMyProducts(int limit, int offset) {
+    String sellerId = authService.getUserId();
+    int page = offset / limit; // convert offset → page
+
+    var products = productRepository.findProductsOfSellerForSeller(sellerId, limit, offset);
+    return products.stream().map(p -> productMapper.toMyProductDTO(p)).toList();
+  }
 
   public void createProduct(
       CreateProductRequest request,

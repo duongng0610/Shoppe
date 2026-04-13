@@ -5,11 +5,13 @@ import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.dto.response.order.UpdateOrderTrackingLocationResponse;
+import com.e_cormerce.shoppe.dto.response.product.MyProductResponse;
 import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
 import com.e_cormerce.shoppe.service.order.OrderService;
 import com.e_cormerce.shoppe.service.order.OrderTrackingService;
 import com.e_cormerce.shoppe.service.seller.SellerService;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,20 @@ public class SellerController {
   SellerService sellerService;
   OrderService orderService;
   OrderTrackingService orderTrackingService;
+
+  @GetMapping("/products")
+  //    @PreAuthorize("hasAuthority('PERMISSION_VIEW_MY_PRODUCTS')")
+  public ResponseEntity<ApiResponse<List<MyProductResponse>>> getAllProducts(
+      @PathParam("limit") int limit, @PathParam("offset") int offset) {
+    var res = sellerService.getMyProducts(limit, offset);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(
+            ApiResponse.<List<MyProductResponse>>builder()
+                .data(res)
+                .success(true)
+                .message("get my product successfully")
+                .build());
+  }
 
   /**
    * POST: /seller/products. -Tạo sản phẩm với request gửi lên phải có content-type:multipart/
@@ -82,8 +98,6 @@ public class SellerController {
     return ResponseEntity.ok()
         .body(ApiResponse.builder().message("approve order successfully").success(true).build());
   }
-
-
 
   @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_SELLER')")
   @PatchMapping("/{id}/orders/cancel")

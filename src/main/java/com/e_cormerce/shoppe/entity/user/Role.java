@@ -29,7 +29,7 @@ public class Role {
   boolean deleted;
 
   // owner side
-  @ManyToMany(cascade = CascadeType.PERSIST)
+  @ManyToMany(cascade = CascadeType.ALL)
   @JoinTable(
       name = "role_permission",
       joinColumns = @JoinColumn(name = "role_id"),

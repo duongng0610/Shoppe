@@ -1,9 +1,11 @@
 package com.e_cormerce.shoppe.service.product.helper;
 
 import com.e_cormerce.shoppe.entity.category.Category;
+import com.e_cormerce.shoppe.entity.product.ProductExtraImage;
 import com.e_cormerce.shoppe.entity.product.Type;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.repository.product.ProductExtraImageRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.repository.product.TypeRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
@@ -22,6 +24,7 @@ public class ProductQueryDBHelper {
   TypeRepository typeRepository;
   ProductRepository productRepository;
   VariantRepository variantRepository;
+  ProductExtraImageRepository productExtraImageRepository;
 
   @Async("queryDBExecutor")
   public CompletableFuture<List<Type>> getTypes(String product_id) {
@@ -41,5 +44,10 @@ public class ProductQueryDBHelper {
   @Async("queryDBExecutor")
   public CompletableFuture<List<Variant>> getVariants(String product_id) {
     return variantRepository.findVariantsOfProduct(product_id);
+  }
+
+  @Async("queryDBExecutor")
+  public CompletableFuture<List<ProductExtraImage>> getExtraImagesOfProduct(String product_id) {
+    return productExtraImageRepository.findExtraImagesOfProduct(product_id);
   }
 }

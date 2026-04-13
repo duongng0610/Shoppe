@@ -149,6 +149,7 @@ public class AppConfigHelper {
   }
 
   public void createRoles() {
+
     if (!roleRepository.existsByVal(RoleEnum.CLIENT.getValue())) {
       Role clientRole =
           Role.builder()
@@ -207,6 +208,20 @@ public class AppConfigHelper {
 
       userRepository.save(admin);
     }
+  }
+
+  private void createPermissionsAgain() {
+    var client = roleRepository.findByVal("CLIENT").orElseThrow();
+
+    var seller = roleRepository.findByVal("SELLER").orElseThrow();
+    var admin = roleRepository.findByVal("ADMIN").orElseThrow();
+
+    client.setPermissions(createPermissionsOfClient());
+    seller.setPermissions(createPermissionsOfSeller());
+    admin.setPermissions(createPermissionsOfAdmin());
+    roleRepository.save(client);
+    roleRepository.save(seller);
+    roleRepository.save(admin);
   }
 
   public void createDefaultCategories() {

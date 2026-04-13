@@ -1,8 +1,10 @@
 package com.e_cormerce.shoppe.entity.product;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -33,4 +35,8 @@ public class ProductReviewImage {
   @ManyToOne
   @JoinColumn(name = "product_review_id", nullable = false)
   ProductReview productReview;
+
+  @Column(name = "created_at", nullable = false)
+  @CreationTimestamp
+  LocalDateTime createdAt;
 }

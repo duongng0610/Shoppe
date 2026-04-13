@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Component
 public class VnPayProperties {
-    String tmnCode;
-    String hashSecret;
-    String url;
-    String returnUrl;
+  String tmnCode;
+  String hashSecret;
+  String url;
+  String returnUrl;
 }

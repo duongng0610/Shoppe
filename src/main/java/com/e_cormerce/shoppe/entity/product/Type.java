@@ -32,7 +32,7 @@ public class Type {
   boolean deleted;
 
   // owner side
-  @ManyToOne
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "product_id", nullable = false)
   @JsonIgnore
   Product product;
@@ -42,6 +42,6 @@ public class Type {
       mappedBy = "type",
       cascade = CascadeType.ALL,
       orphanRemoval = true,
-      fetch = FetchType.LAZY)
+      fetch = FetchType.EAGER)
   List<TypeValue> typeValues;
 }

@@ -76,11 +76,19 @@ public class Product {
   Category category;
 
   // inverse side
-  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "product",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
   List<Type> types;
 
   // inverse side
-  @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(
+      mappedBy = "product",
+      cascade = CascadeType.ALL,
+      orphanRemoval = true,
+      fetch = FetchType.LAZY)
   List<Variant> variants;
 
   // inverse side

@@ -3,10 +3,13 @@ package com.e_cormerce.shoppe.entity.product;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.lang.Nullable;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Getter
@@ -18,6 +21,8 @@ import org.springframework.lang.Nullable;
 @Table(
     name = "variants",
     indexes = {@Index(name = "idx_product", columnList = "product_id")})
+@SQLDelete(sql = "UPDATE type_value SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class Variant {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -50,6 +55,9 @@ public class Variant {
   Product product;
 
   @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  @Nullable
   List<VariantValue> variantValues;
+
+  @Column(name = "created_at", nullable = false)
+  @CreationTimestamp
+  LocalDateTime createdAt;
 }
