@@ -1,7 +1,11 @@
 package com.e_cormerce.shoppe.repository.conversation;
 
+import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.entity.conversation.ConversationMember;
 import java.util.List;
+import java.util.Optional;
+
+import com.e_cormerce.shoppe.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;
@@ -13,13 +17,13 @@ public interface ConversationMemberRepository extends JpaRepository<Conversation
   @Query(
       value =
           """
-        SELECT *
-        FROM conversation_members
-        WHERE member_id = :memberId
-        order by last_activity_at desc
+        SELECT u.*
+              FROM conversation_members cm
+        JOIN users u on cm.member_id= u.id
+         WHERE member_id != :memberId and conversation_id = :conversation_id
       """,
       nativeQuery = true)
-  List<ConversationMember> findByMemberId(String memberId);
+  Optional<User> findOtherByOtherId(String memberId, String conversation_id);
 
   @Query(
       value =

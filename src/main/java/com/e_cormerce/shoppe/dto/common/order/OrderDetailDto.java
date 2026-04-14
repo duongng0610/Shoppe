@@ -17,7 +17,7 @@ import lombok.experimental.FieldDefaults;
 public class OrderDetailDto {
   String id;
   String productName;
-  String variantThumbnail;
+  String thumbnail;
   String clientUsername;
   String sellerUsername;
   int quantity;

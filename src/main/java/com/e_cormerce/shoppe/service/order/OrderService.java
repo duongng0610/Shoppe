@@ -13,7 +13,7 @@ import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.event.OrderCancelledEvent;
 import com.e_cormerce.shoppe.event.OrderCreatedEvent;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.mapper.order.OrderDetailsMapper;
+import com.e_cormerce.shoppe.mapper.order.OrderMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.service.order.helper.CreateOrderHelper;
 import jakarta.validation.Valid;
@@ -32,7 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class OrderService {
   CreateOrderHelper createOrderHelper;
   OrderRepository orderRepository;
-  OrderDetailsMapper orderDetailsMapper;
+  OrderMapper orderMapper;
   ApplicationEventPublisher eventPublisher;
 
   @Transactional
@@ -110,7 +110,7 @@ public class OrderService {
 
     List<OrderDetailDto> orderDetails =
         orderRepository.findOrderOfClient(clientId).stream()
-            .map(orderDetailsMapper::toResponse)
+            .map(orderMapper::toResponse)
             .collect(Collectors.toList());
 
     return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
@@ -122,7 +122,7 @@ public class OrderService {
 
     List<OrderDetailDto> orderDetails =
         orderRepository.findOrderOfSeller(sellerId).stream()
-            .map(orderDetailsMapper::toResponse)
+            .map(orderMapper::toResponse)
             .collect(Collectors.toList());
 
     return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
