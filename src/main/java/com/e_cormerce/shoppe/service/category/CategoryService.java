@@ -44,10 +44,14 @@ public class CategoryService {
             .val(request.getName().toLowerCase())
             .thumbnail(imageService.uploadSingleImage(thumbnail))
             .build();
-    /** nếu khác null thì mơi theem parent , còn ko thì vẫn tạo với mức mặc định. */
-    if (request.getParentId() != null) {
-      category.setParent(categoryHelper.findById(request.getParentId()));
-    }
+
+      if (request.getParentId() != null) {
+          Category parent = categoryHelper.findParent(request.getParentId());
+          category.setPathToParent(
+                  parent.getPathToParent() == null ? parent.getId()
+                          : parent.getPathToParent() + "/" + parent.getId()
+          );
+      }
 
     categoryRepository.save(category);
     synonymsRepository.save(

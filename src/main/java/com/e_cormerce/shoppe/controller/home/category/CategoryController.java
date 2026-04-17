@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(path = "/categories")
 @RequiredArgsConstructor
@@ -42,10 +44,10 @@ public class CategoryController {
   }
 
   @GetMapping("/{id}/details")
-  public ResponseEntity<ApiResponse<CategoryDetailResponse>> getDetails(@PathVariable String id) {
+  public ResponseEntity<ApiResponse> getDetails(@PathVariable String id) {
     var res = categoryService.getCategoryDetailResponse(id);
     return ResponseEntity.ok(
-        ApiResponse.<CategoryDetailResponse>builder().success(true).data(res).build());
+        ApiResponse.builder().success(true).data(res).build());
   }
 
   @GetMapping("{id}/products")

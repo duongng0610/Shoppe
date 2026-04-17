@@ -4,17 +4,18 @@ import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.notification.NotificationType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(
-    name = "notifications",
-    indexes = {@Index(name = "idx_user", columnList = "user_id")})
+        name = "notifications",
+        indexes = {@Index(name = "idx_user", columnList = "user_id")})
 @Getter
 @Setter
 @Builder
@@ -24,41 +25,46 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE notifications SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class Notification {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
-  @Column(columnDefinition = "boolean default false")
-  boolean deleted;
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
-  @Column(nullable = false)
-  String title;
+    @Column(nullable = false)
+    String title;
 
-  @Column(nullable = false)
-  String content;
+    @Column(nullable = false)
+    String content;
 
-  @Column(name = "created_at", nullable = false)
-  @CreationTimestamp
-  LocalDateTime createdAt;
+    @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
+    LocalDateTime createdAt;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JsonIgnore
-  @JoinColumn(name = "user_id", nullable = false)
-  User user;
+    @Column(name = "updated_at")
+    LocalDateTime updatedAt;
 
-  @Column(name = "read_at")
-  LocalDateTime readAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    @JoinColumn(name = "user_id", nullable = false)
+    User user;
 
-  @Column(name = "is_read", columnDefinition = "boolean default false")
-  Boolean isRead;
+    @Column(name = "read_at")
+    LocalDateTime readAt;
 
-  @Enumerated(EnumType.STRING)
-  @Column(columnDefinition = "ENUM('ORDER', 'TRANSACTION', 'PRODUCT', 'ACCOUNT','SYSTEM')")
-  NotificationType type;
+    @Column(name = "is_read", columnDefinition = "boolean default false")
+    Boolean isRead;
 
-  @Column(name = "target_id")
-  String targetId;
+    @Enumerated(EnumType.STRING)
+    @Column(columnDefinition = "ENUM('ORDER', 'TRANSACTION', 'PRODUCT', 'ACCOUNT','SYSTEM')")
+    NotificationType type;
 
-  @Column(name = "image")
-  String image;
+    @Column(name = "target_id")
+    String targetId;
+
+    @Column(name = "image")
+    String image;
+
+
 }

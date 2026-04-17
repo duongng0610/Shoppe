@@ -15,18 +15,27 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
   boolean existsByVal(String val);
 
-  @Query(value = "SELECT * FROM categories WHERE parent_id IS NULL", nativeQuery = true)
+  @Query(value = "SELECT * FROM categories WHERE path_to_parent IS NULL", nativeQuery = true)
   List<Category> findDefault();
 
-  @Query(value = "SELECT * FROM categories WHERE parent_id = :id ", nativeQuery = true)
+  @Query(value = "SELECT * FROM categories WHERE SUBSTRING_INDEX(path_to_parent, '/', -1) = :id", nativeQuery = true )
   List<Category> findChildren(@Param("id") String id);
 
-  @Query(
-      value =
-          "SELECT c1.id, c1.val,c1.thumbnail, c1.deleted, c1.created_at, c2.val "
-              + "FROM categories c1 "
-              + "JOIN categories c2 on c1.parent_id = c2.id "
-              + "WHERE c1.id = :id ",
-      nativeQuery = true)
-  Optional<CategoryDetailResponse> findCategoryDetailsById(@Param("id") String id);
+    @Query(
+            value = """
+        SELECT c1.id,
+               c1.val,
+               c1.thumbnail,
+               c1.deleted,
+               c1.created_at as createdAt,
+               c2.val AS parentVal
+        FROM categories c1
+        LEFT JOIN categories c2
+          ON c1.path_to_parent LIKE '%/%'
+         AND c2.id = SUBSTRING_INDEX(c1.path_to_parent, '/', -1)
+        WHERE c1.id = :id
+        """,
+            nativeQuery = true
+    )
+    Optional<CategoryDetailResponse> findCategoryDetailsById(@Param("id") String id);
 }

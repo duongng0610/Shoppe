@@ -3,6 +3,9 @@ package com.e_cormerce.shoppe.entity.user;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -12,16 +15,20 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Table(
-    name = "permissions",
-    indexes = {@Index(name = "idx_permissions_val", columnList = "val")})
+        name = "permissions",
+        indexes = {@Index(name = "idx_permissions_val", columnList = "val")})
 public class Permission {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
-  @Column(nullable = false, unique = true)
-  String val;
+    @Column(nullable = false, unique = true)
+    String val;
 
-  @Column(columnDefinition = "boolean default false")
-  boolean deleted;
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    LocalDateTime createdAt;
 }

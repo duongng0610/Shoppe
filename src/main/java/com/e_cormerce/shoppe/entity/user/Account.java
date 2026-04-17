@@ -1,56 +1,66 @@
 package com.e_cormerce.shoppe.entity.user;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.util.Date;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.antlr.v4.runtime.misc.NotNull;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(
-    name = "accounts",
-    indexes = {@Index(name = "idx_email", columnList = "email")})
+        name = "accounts",
+        indexes = {@Index(name = "idx_email", columnList = "email")})
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@SQLDelete(sql = "UPDATE accounts SET deleted=true where id=?")
+@Where(clause = "deleted = false")
 public class Account {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
-  @Column(unique = true, nullable = false)
-  String email;
+    @Column(unique = true, nullable = false)
+    String email;
 
-  @Column(nullable = false)
-  String password;
+    @Column(nullable = false)
+    String password;
 
-  @Column(name = "created_at", nullable = false)
-  @NotNull
-  Date created_at;
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    LocalDateTime createdAt;
 
-  @Column(name = "updated_at")
-  Date updatedAt;
+    @Column(name = "updated_at")
+    Date updatedAt;
 
-  @Column(name = "last_login_   at")
-  @NotNull
-  LocalDateTime lastLoginAt;
+    @Column(name = "last_login_at")
+    LocalDateTime lastLoginAt;
 
-  @Column(name = "last_active_at")
-  @NotNull
-  LocalDateTime lastActiveAt;
+    @Column(name = "last_active_at")
+    LocalDateTime lastActiveAt;
 
-  @Column(name = "is_active")
-  @NotNull
-  boolean isActive;
+    @Column(name = "is_active")
+    Boolean isActive;
 
-  @Column(columnDefinition = "boolean default false")
-  boolean deleted;
+    @Column(name = "is_banned", nullable = false, columnDefinition = "boolean default false")
+    Boolean isBanned;
 
-  // inverse side
-  @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
-  User user;
+    @Column(columnDefinition = "boolean default false")
+    Boolean deleted;
+
+    // owner side
+    @ManyToOne
+    @JoinColumn(name = "role_id", nullable = false)
+    Role role;
+
+    // inverse side
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    User user;
 }

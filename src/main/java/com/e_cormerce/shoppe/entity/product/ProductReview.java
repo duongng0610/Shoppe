@@ -2,20 +2,22 @@ package com.e_cormerce.shoppe.entity.product;
 
 import com.e_cormerce.shoppe.entity.user.User;
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Entity
 @Table(
-    name = "product_reviews",
-    indexes = {
-      @Index(name = "idx_product_reviews_product", columnList = "product_id"),
-      @Index(name = "idx_product_reviews_client", columnList = "client_id")
-    })
+        name = "product_reviews",
+        indexes = {
+                @Index(name = "idx_product_reviews_product", columnList = "product_id"),
+                @Index(name = "idx_product_reviews_client", columnList = "client_id")
+        })
 @Getter
 @Setter
 @Builder
@@ -25,28 +27,31 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE product_reviews SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class ProductReview {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
-  @Column(columnDefinition = "boolean default false")
-  boolean deleted;
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
-  @Column(nullable = false)
-  int rate;
+    @Column(nullable = false)
+    int rate;
 
-  @Column(columnDefinition = "TEXT", nullable = false)
-  String description;
+    @Column(columnDefinition = "TEXT", nullable = false)
+    String description;
 
-  @Column(name = "created_at", nullable = false)
-  @CreationTimestamp
-  LocalDateTime createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    LocalDateTime createdAt;
 
-  @ManyToOne
-  @JoinColumn(name = "client_id", nullable = false)
-  User client;
+    @Column(name = "updated_at")
+    Date updatedAt;
 
-  @ManyToOne
-  @JoinColumn(name = "product_id", nullable = false)
-  Product product;
+    @ManyToOne
+    @JoinColumn(name = "client_id", nullable = false)
+    User client;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
+    Product product;
 }

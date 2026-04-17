@@ -10,11 +10,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CategoryDetailResponse {
-
   String id;
   String val;
   String thumbnail;
   boolean deleted;
-  Date created_at;
+  Date createdAt;
   String parentVal;
 }
