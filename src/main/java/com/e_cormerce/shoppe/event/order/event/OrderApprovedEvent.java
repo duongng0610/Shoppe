@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.event;
+package com.e_cormerce.shoppe.event.order.event;
 
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;
@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class OrderShippedEvent {
-  String orderId;
-  User client;
-  Variant variant;
+public class OrderApprovedEvent {
+    String orderId;
+    User client;
+    Variant variant;
 }

@@ -40,17 +40,14 @@ public class OrderTransaction {
     @Column(name = "amount", nullable = false)
     BigDecimal amount;
 
-
     @Enumerated(EnumType.STRING)
-    @Column(
-            columnDefinition =
-                    "ENUM('SUCCESS','FAIL','ERROR')",
-            nullable = false)
+    @Column(columnDefinition = "ENUM('SUCCESS','FAIL','ERROR')", nullable = false)
     TransactionStatus status;
 
-    @CreationTimestamp
     @Column(name = "created_at", nullable = false)
+    @CreationTimestamp
     LocalDateTime createdAt;
 
-
+    @Column(name = "updated_at")
+    LocalDateTime updatedAt;
 }

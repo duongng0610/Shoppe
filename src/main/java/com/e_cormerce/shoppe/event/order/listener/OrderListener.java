@@ -1,7 +1,8 @@
-package com.e_cormerce.shoppe.event;
+package com.e_cormerce.shoppe.event.order.listener;
 
 import com.e_cormerce.shoppe.enums.notification.NotificationType;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
+import com.e_cormerce.shoppe.event.order.event.*;
 import com.e_cormerce.shoppe.service.notification.NotificationService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class NotificationListener {
+public class OrderListener {
 
     NotificationService notificationService;
 
@@ -47,7 +48,7 @@ public class NotificationListener {
                 event.getClient(),
                 NotificationType.ORDER,
                 event.getOrderId(),
-                "Đơn hàng đã được xác nhận",
+                "Cập nhật đơn hàng",
                 "Đơn hàng " + event.getOrderId() + " đã được xác nhận.",
                 event.getVariant().getThumbnail());
     }
@@ -62,7 +63,7 @@ public class NotificationListener {
                     event.getClient(),
                     NotificationType.ORDER,
                     event.getOrderId(),
-                    "Đơn hàng đã bị hủy",
+                    "Cập nhật đơn hàng",
                     "Đơn hàng " + event.getOrderId() + " đã bị huỷ bởi bạn.",
                     event.getVariant().getThumbnail());
 
@@ -71,7 +72,7 @@ public class NotificationListener {
                     event.getClient(),
                     NotificationType.ORDER,
                     event.getOrderId(),
-                    "Đơn hàng đã bị hủy",
+                    "Cập nhật đơn hàng",
                     "Đơn hàng " + event.getOrderId() + " đã bị hủy bởi shop.",
                     event.getVariant().getThumbnail());
         }
@@ -85,7 +86,7 @@ public class NotificationListener {
                 event.getClient(),
                 NotificationType.ORDER,
                 event.getOrderId(),
-                "Đơn hàng đã bắt đầu được giao",
+                "Cập nhật đơn hàng",
                 "Đơn hàng " + event.getOrderId() + " đã bắt đầu được giao.",
                 event.getVariant().getThumbnail());
     }
@@ -100,7 +101,7 @@ public class NotificationListener {
                     event.getClient(),
                     NotificationType.ORDER,
                     event.getOrderId(),
-                    "Đơn hàng đã giao đến nơi",
+                    "Cập nhật đơn hàng",
                     "Đơn hàng " + event.getOrderId() + " đã giao đến nơi tại " + event.getAddress(),
                     null);
         } else if (status.equals(OrderStatus.SHIPPING.toString())) {

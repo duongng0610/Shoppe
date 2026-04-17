@@ -1,9 +1,8 @@
 package com.e_cormerce.shoppe.dto.response.order;
 
+import java.math.BigDecimal;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.math.BigDecimal;
 
 @Data
 @AllArgsConstructor
@@ -11,9 +10,9 @@ import java.math.BigDecimal;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDto {
-    String id;
-    String productName;
-    String thumbnail;
-    BigDecimal totalPrice;
-    Integer quantity;
+  String id;
+  String productName;
+  String thumbnail;
+  BigDecimal totalPrice;
+  Integer quantity;
 }

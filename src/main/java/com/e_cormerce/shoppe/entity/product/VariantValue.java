@@ -4,11 +4,15 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table(
-    name = "variant_values",
-    indexes = {@Index(name = "idx_variant", columnList = "variant_id")})
+        name = "variant_values",
+        indexes = {@Index(name = "idx_variant", columnList = "variant_id")})
 @Getter
 @Setter
 @Builder
@@ -16,20 +20,27 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class VariantValue {
-  @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
-  String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    String id;
 
-  @Column(columnDefinition = "boolean default false")
-  boolean deleted;
+    @Column(columnDefinition = "boolean default false")
+    boolean deleted;
 
-  // owner side
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "variant_id", nullable = false)
-  @JsonIgnore
-  Variant variant;
+    // owner side
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "variant_id", nullable = false)
+    @JsonIgnore
+    Variant variant;
 
-  @ManyToOne(fetch = FetchType.EAGER)
-  @JoinColumn(name = "attribute_id", nullable = false)
-  TypeValue value;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "attribute_id", nullable = false)
+    TypeValue value;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    Date updatedAt;
 }

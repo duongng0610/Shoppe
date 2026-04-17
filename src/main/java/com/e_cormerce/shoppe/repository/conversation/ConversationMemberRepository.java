@@ -1,11 +1,9 @@
 package com.e_cormerce.shoppe.repository.conversation;
 
-import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.entity.conversation.ConversationMember;
+import com.e_cormerce.shoppe.entity.user.User;
 import java.util.List;
 import java.util.Optional;
-
-import com.e_cormerce.shoppe.entity.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.NativeQuery;
 import org.springframework.data.jpa.repository.Query;

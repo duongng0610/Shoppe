@@ -1,6 +1,5 @@
-package com.e_cormerce.shoppe.event;
+package com.e_cormerce.shoppe.event.product.event;
 
-import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,9 +11,9 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class SendMessageEvent {
-    String messageId;
-    String content;
-    User user;
-    LocalDateTime createdAt;
+public class CreatingProduct {
+    User seller;
+    String productId;
+    LocalDateTime creationDate;
+
 }

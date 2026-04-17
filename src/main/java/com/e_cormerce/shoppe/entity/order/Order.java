@@ -49,13 +49,13 @@ public class Order {
     @Column(nullable = false)
     int quantity;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
-    @CreationTimestamp
+    @Column(name = "updated_at")
     LocalDateTime updatedAt;
+
 
     @ManyToOne
     @JoinColumn(name = "variant_id", nullable = false)
@@ -84,4 +84,6 @@ public class Order {
 
     @Column(name = "variant_name", nullable = true)
     String variantName;
+
+
 }

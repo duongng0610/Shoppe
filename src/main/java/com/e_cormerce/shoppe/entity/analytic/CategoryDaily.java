@@ -1,6 +1,6 @@
-package com.e_cormerce.shoppe.entity.category;
+package com.e_cormerce.shoppe.entity.analytic;
 
-import com.e_cormerce.shoppe.entity.product.Product;
+import com.e_cormerce.shoppe.entity.category.Category;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,8 +12,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "category_daily_sales",
+        name = "category_daily",
         indexes = {
+                @Index(name = "idx_category_id", columnList = "category_id"),
                 @Index(name = "idx_category_id", columnList = "category_id"),
         })
 @Getter
@@ -22,22 +23,28 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CategoryDailySales {
+public class CategoryDaily {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
     @Column(name = "view_date", nullable = false)
-    LocalDate viewSale;
+    LocalDate viewDate;
+
+    @Column(name = "total_searches", nullable = false, columnDefinition = "int default 0")
+    Integer totalSearches;
 
     @Column(name = "total_revenue", precision = 15, scale = 2, nullable = false)
     BigDecimal totalRevenue;
+
+    @Column(name = "total_orders", nullable = false, columnDefinition = "int default 0")
+    Integer totalOrders;
 
     @Column(name = "created_at", nullable = false)
     @CreationTimestamp
     LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
     @ManyToOne

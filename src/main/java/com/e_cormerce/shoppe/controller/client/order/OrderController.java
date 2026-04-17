@@ -60,7 +60,7 @@ public class OrderController {
   }
 
   @GetMapping
-  @PreAuthorize("hasAuthority('PERMISSION_CLIENT_VIEW_ORDERS')")
+  @PreAuthorize("hasAuthority('PERMISSION_VIEW_CLIENT_ORDERS')")
   public ResponseEntity<ApiResponse<GetOrderDetailResponse>> getClientOrders() {
     var result = orderService.getOrdersByClient();
     return ResponseEntity.ok(

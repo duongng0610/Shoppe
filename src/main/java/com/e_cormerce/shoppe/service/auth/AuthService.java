@@ -29,9 +29,6 @@ import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.util.HashUtil;
 import io.jsonwebtoken.Claims;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,155 +40,156 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 @EnableConfigurationProperties({JwtProperties.class})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class AuthService {
-  private final ShoppingCartRepository shoppingCartRepository;
-  SellerInfoRepository sellerInfoRepository;
-  UserRepository userRepository;
-  AccountRepository accountRepository;
-  RoleRepository roleRepository;
-  RefreshTokenRepository refreshTokenRepository;
-  InvalidTokenRepository invalidTokenRepository;
-  AddressMapper addressMapper;
-  BCryptPasswordEncoder bCryptPasswordEncoder;
-  JwtService jwtService;
-  TokenService tokenService;
-  UserMapper userMapper;
-  JwtProperties jwtProperties;
-  AddressRepository addressRepository;
+    private final ShoppingCartRepository shoppingCartRepository;
+    SellerInfoRepository sellerInfoRepository;
+    UserRepository userRepository;
+    AccountRepository accountRepository;
+    RoleRepository roleRepository;
+    RefreshTokenRepository refreshTokenRepository;
+    InvalidTokenRepository invalidTokenRepository;
+    AddressMapper addressMapper;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+    JwtService jwtService;
+    TokenService tokenService;
+    UserMapper userMapper;
+    JwtProperties jwtProperties;
+    AddressRepository addressRepository;
 
-  @Transactional(timeout = 5)
-  public String logIn(LogInRequest request) {
-    Account account =
-        accountRepository
-            .findByEmail(request.getEmail())
-            .orElseThrow(() -> new AppException(ErrorCode.INVALID_ACCOUNT));
+    @Transactional(timeout = 5)
+    public String logIn(LogInRequest request) {
+        Account account =
+                accountRepository
+                        .findByEmail(request.getEmail())
+                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_ACCOUNT));
 
-    boolean authenticated =
-        bCryptPasswordEncoder.matches(request.getPassword(), account.getPassword());
+        boolean authenticated =
+                bCryptPasswordEncoder.matches(request.getPassword(), account.getPassword());
 
-    if (!authenticated) {
-      throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        if (!authenticated) {
+            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        }
+
+        var user = account.getUser();
+        return tokenService.generateAccessToken(user);
     }
 
-    var user = account.getUser();
-    return tokenService.generateAccessToken(user);
-  }
+    @Transactional(timeout = 5)
+    public void registerUser(AbstractRegisterRequest request, RoleEnum roleEnum) {
+        if (accountRepository.existsByEmail(request.getEmail())) {
+            throw new AppException(ErrorCode.EXISTED_ACCOUNT);
+        }
 
-  @Transactional(timeout = 5)
-  public void registerUser(AbstractRegisterRequest request, RoleEnum roleEnum) {
-    if (accountRepository.existsByEmail(request.getEmail())) {
-      throw new AppException(ErrorCode.EXISTED_ACCOUNT);
+
+        Role role =
+                roleRepository
+                        .findByVal(roleEnum.getValue())
+                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
+
+        var account =
+                Account.builder()
+                        .email(request.getEmail())
+                        .password(bCryptPasswordEncoder.encode(request.getPassword()))
+                        .role(role)
+                        .build();
+
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new AppException(ErrorCode.INVALID_USERNAME);
+        }
+
+        var user =
+                User.builder()
+                        .account(account)
+                        .username(request.getUsername())
+                        .createdAt(LocalDateTime.now())
+                        .build();
+
+        if (request.getClass() == RegisterSellerRequest.class
+                || request.getClass() == RegisterShipperRequest.class) {
+
+            var addressDto =
+                    request.getClass() == RegisterShipperRequest.class
+                            ? ((RegisterShipperRequest) request).getAddress()
+                            : ((RegisterSellerRequest) request).getAddress();
+
+            var address =
+                    addressRepository
+                            .findByEntireAddress(
+                                    addressDto.getProvince(), addressDto.getDistrict(), addressDto.getWard())
+                            .orElseGet(
+                                    () -> {
+                                        Address addAddress =
+                                                Address.builder()
+                                                        .province(addressDto.getProvince())
+                                                        .district(addressDto.getDistrict())
+                                                        .ward(addressDto.getWard())
+                                                        .build();
+                                        return addressRepository.save(addAddress);
+                                    });
+
+            user.setAddress(address);
+        }
+
+        userRepository.save(user);
+        if (role.getVal().equals(RoleEnum.CLIENT.getValue())) {
+            ShoppingCart shoppingCart = ShoppingCart.builder().client(user).totalQuantity(0).build();
+            shoppingCartRepository.save(shoppingCart);
+        } else if (role.getVal().equals(RoleEnum.SELLER.getValue())) {
+            SellerInfo sellerInfo =
+                    SellerInfo.builder().seller(user).build();
+            sellerInfoRepository.save(sellerInfo);
+        }
     }
 
-    var account =
-        Account.builder()
-            .email(request.getEmail())
-            .created_at(new Date())
-            .password(bCryptPasswordEncoder.encode(request.getPassword()))
-            .build();
+    @Transactional(timeout = 5)
+    public void logOut(String accessToken) {
 
-    Role role =
-        roleRepository
-            .findByVal(roleEnum.getValue())
-            .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
+        Claims accessTokenClaims =
+                jwtService.extractClaims(accessToken, jwtProperties.getAccessTokenSecret());
 
-    if (userRepository.existsByUsername(request.getUsername())) {
-      throw new AppException(ErrorCode.INVALID_USERNAME);
+        String refreshTokenId = (String) accessTokenClaims.get("refreshTokenId");
+
+        InvalidToken invalidToken =
+                InvalidToken.builder()
+                        .val(HashUtil.sha256(accessToken))
+                        .invalidDate(LocalDate.now())
+                        .build();
+
+        invalidTokenRepository.save(invalidToken);
+
+        RefreshToken refreshToken =
+                refreshTokenRepository
+                        .findById(refreshTokenId)
+                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+        refreshToken.setRevoked(true);
+        refreshTokenRepository.save(refreshToken);
     }
 
-    var user =
-        User.builder()
-            .account(account)
-            .username(request.getUsername())
-            .role(role)
-            .createdAt(LocalDateTime.now())
-            .build();
-
-    if (request.getClass() == RegisterSellerRequest.class
-        || request.getClass() == RegisterShipperRequest.class) {
-
-      var addressDto =
-          request.getClass() == RegisterShipperRequest.class
-              ? ((RegisterShipperRequest) request).getAddress()
-              : ((RegisterSellerRequest) request).getAddress();
-
-      var address =
-          addressRepository
-              .findByEntireAddress(
-                  addressDto.getProvince(), addressDto.getDistrict(), addressDto.getWard())
-              .orElseGet(
-                  () -> {
-                    Address addAddress =
-                        Address.builder()
-                            .province(addressDto.getProvince())
-                            .district(addressDto.getDistrict())
-                            .ward(addressDto.getWard())
-                            .build();
-                    return addressRepository.save(addAddress);
-                  });
-
-      user.setAddress(address);
+    public UserDto verify() {
+        UserDto res = userRepository.getUserDto(this.getUserId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+        return res;
     }
 
-    userRepository.save(user);
-    if (role.getVal().equals(RoleEnum.CLIENT.getValue())) {
-      ShoppingCart shoppingCart = ShoppingCart.builder().client(user).totalQuantity(0).build();
-      shoppingCartRepository.save(shoppingCart);
-    } else if (role.getVal().equals(RoleEnum.SELLER.getValue())) {
-      SellerInfo sellerInfo =
-          SellerInfo.builder().seller(user).follower(0).rating(0).productCount(0).build();
-      sellerInfoRepository.save(sellerInfo);
+    public User getUserThroughAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
     }
-  }
 
-  @Transactional(timeout = 5)
-  public void logOut(String accessToken) {
-
-    Claims accessTokenClaims =
-        jwtService.extractClaims(accessToken, jwtProperties.getAccessTokenSecret());
-
-    String refreshTokenId = (String) accessTokenClaims.get("refreshTokenId");
-
-    InvalidToken invalidToken =
-        InvalidToken.builder()
-            .val(HashUtil.sha256(accessToken))
-            .invalidDate(LocalDate.now())
-            .build();
-
-    invalidTokenRepository.save(invalidToken);
-
-    RefreshToken refreshToken =
-        refreshTokenRepository
-            .findById(refreshTokenId)
-            .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
-
-    refreshToken.setRevoked(true);
-    refreshTokenRepository.save(refreshToken);
-  }
-
-  public UserDto verify() {
-    var user = this.getUserThroughAuthentication();
-    var res = userMapper.toDto(user);
-    res.setRole(user.getRole().getVal());
-    return res;
-  }
-
-  public User getUserThroughAuthentication() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    String userId = (String) authentication.getPrincipal();
-
-    return userRepository
-        .findById(userId)
-        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-  }
-
-  public String getUserId() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return (String) authentication.getPrincipal();
-  }
+    public String getUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (String) authentication.getPrincipal();
+    }
 }
