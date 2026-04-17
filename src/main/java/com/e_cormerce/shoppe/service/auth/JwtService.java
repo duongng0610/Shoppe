@@ -1,7 +1,8 @@
 package com.e_cormerce.shoppe.service.auth;
 
-import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.entity.user.Role;
 import com.e_cormerce.shoppe.properties.JwtProperties;
+import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -29,17 +30,18 @@ import java.util.*;
 public class JwtService {
 
     JwtProperties jwtProperties;
+    RoleRepository roleRepository;
 
     /**
      * Tạo access token.
      */
-    public String generateAccessToken(User user, String refreshTokenId) {
+    public String generateAccessToken(String userId, Role role, String refreshTokenId) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("authorities", buildScope());
+        claims.put("authorities", buildScope(role));
         claims.put("refreshTokenId", refreshTokenId);
         return createToken(
                 claims,
-                user,
+                userId,
                 jwtProperties.getAccessTokenExpirationTime(),
                 jwtProperties.getAccessTokenSecret());
     }
@@ -47,24 +49,24 @@ public class JwtService {
     /**
      * Tạo refresh token.
      */
-    public String generateRefreshToken(User user) {
+    public String generateRefreshToken(String userId) {
         Map<String, Object> claims = new HashMap<>();
         return createToken(
                 claims,
-                user,
+                userId,
                 jwtProperties.getRefreshTokenExpirationTime(),
                 jwtProperties.getRefreshTokenSecret());
     }
 
     private String createToken(
-            Map<String, Object> claims, User user, long expiration, String secretKey) {
+            Map<String, Object> claims, String userId, long expiration, String secretKey) {
         return Jwts.builder()
                 .setHeader(
                         Map.of(
                                 "typ", "JWT",
                                 "alg", "HS256"))
                 .addClaims(claims)
-                .setSubject(user.getId())
+                .setSubject(userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(Instant.now().plus(expiration, ChronoUnit.SECONDS).toEpochMilli()))
                 .signWith(getKey(secretKey), SignatureAlgorithm.HS256)
@@ -75,16 +77,16 @@ public class JwtService {
     /**
      * Lấy role + permisison.
      */
-    private List<String> buildScope(String roleId) {
-        List<String> result = new ArrayList<>();
-        result.add("ROLE_" + user.getRole().getVal());
-        user.getRole()
-                .getPermissions()
-                .forEach(
-                        permission -> {
-                            result.add("PERMISSION_" + permission.getVal());
-                        });
-        return result;
+    private List<String> buildScope(Role role) {
+        var permissions = roleRepository.getPermissionsByRole(role.getId());
+        var res = permissions.stream().map(permission -> {
+            StringBuilder s = new StringBuilder("PERMISSION_");
+            s.append(permission);
+            return s.toString();
+        }).toList();
+        res.add("ROLE_" + role.getVal());
+
+        return res;
     }
 
     /**
