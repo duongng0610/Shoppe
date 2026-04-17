@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.entity.user;
 
 import com.e_cormerce.shoppe.entity.notification.Notification;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -38,8 +39,15 @@ public class User {
     @Column(nullable = false, unique = true)
     String username;
 
+    @Column(name = "avatar")
     String avatar;
+
+    @Past
+    @Column(name = "dob")
     LocalDate dob;
+
+
+    @Column(name = "phone_number")
     String phoneNumber;
 
     @CreationTimestamp

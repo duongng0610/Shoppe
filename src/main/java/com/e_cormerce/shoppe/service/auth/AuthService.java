@@ -78,8 +78,8 @@ public class AuthService {
             throw new AppException(ErrorCode.INCORRECT_PASSWORD);
         }
 
-        var user = account.getUser();
-        return tokenService.generateAccessToken(user);
+
+        return tokenService.generateAccessToken(account.getId(), account.getRole());
     }
 
     @Transactional(timeout = 5)
