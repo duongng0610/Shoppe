@@ -10,13 +10,11 @@ import com.e_cormerce.shoppe.entity.seller.SellerInfo;
 import com.e_cormerce.shoppe.entity.token.InvalidToken;
 import com.e_cormerce.shoppe.entity.token.RefreshToken;
 import com.e_cormerce.shoppe.entity.user.Account;
-import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.Role;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.user.RoleEnum;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.mapper.address.AddressMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.properties.JwtProperties;
 import com.e_cormerce.shoppe.repository.seller.SellerInfoRepository;
@@ -24,7 +22,6 @@ import com.e_cormerce.shoppe.repository.shopping_cart.ShoppingCartRepository;
 import com.e_cormerce.shoppe.repository.token.InvalidTokenRepository;
 import com.e_cormerce.shoppe.repository.token.RefreshTokenRepository;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
-import com.e_cormerce.shoppe.repository.user.AddressRepository;
 import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.util.HashUtil;
@@ -56,13 +53,11 @@ public class AuthService {
     RoleRepository roleRepository;
     RefreshTokenRepository refreshTokenRepository;
     InvalidTokenRepository invalidTokenRepository;
-    AddressMapper addressMapper;
     BCryptPasswordEncoder bCryptPasswordEncoder;
     JwtService jwtService;
     TokenService tokenService;
     UserMapper userMapper;
     JwtProperties jwtProperties;
-    AddressRepository addressRepository;
 
     @Transactional()
     public String logIn(LogInRequest request) {
@@ -120,22 +115,14 @@ public class AuthService {
                             ? ((RegisterShipperRequest) request).getAddress()
                             : ((RegisterSellerRequest) request).getAddress();
 
-            var address =
-                    addressRepository
-                            .findByEntireAddress(
-                                    addressDto.getProvince(), addressDto.getDistrict(), addressDto.getWard())
-                            .orElseGet(
-                                    () -> {
-                                        Address addAddress =
-                                                Address.builder()
-                                                        .province(addressDto.getProvince())
-                                                        .district(addressDto.getDistrict())
-                                                        .ward(addressDto.getWard())
-                                                        .build();
-                                        return addressRepository.save(addAddress);
-                                    });
+            var phoneNumber = request.getClass() == RegisterShipperRequest.class
+                    ? ((RegisterShipperRequest) request).getPhoneNumber()
+                    : null;
 
-            user.setAddress(address);
+            user.setProvince(addressDto.getProvince());
+            user.setDistrict(addressDto.getDistrict());
+            user.setWard(addressDto.getWard());
+            user.setPhoneNumber(phoneNumber);
         }
 
         userRepository.save(user);

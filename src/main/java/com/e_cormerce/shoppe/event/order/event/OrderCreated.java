@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.event.order.event;
 
+import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -9,9 +10,9 @@ import lombok.experimental.FieldDefaults;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class OrderTrackingUpdatedEvent {
+public class OrderCreated {
     String orderId;
     User client;
-    String status;
-    String address;
+    User seller;
+    Variant variant;
 }

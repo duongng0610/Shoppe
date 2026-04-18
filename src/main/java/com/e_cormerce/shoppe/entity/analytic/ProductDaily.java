@@ -1,11 +1,11 @@
 package com.e_cormerce.shoppe.entity.analytic;
 
 
-import com.e_cormerce.shoppe.entity.product.Product;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -15,7 +15,8 @@ import java.time.LocalDateTime;
 @Table(
         name = "product_daily",
         indexes = {
-                @Index(name = "idx_product", columnList = "product_id"),
+                @Index(name = "idx_product", columnList = "product_id,date"),
+                @Index(name = "idx_seller_product", columnList = "seller_id,product_id,date"),
         })
 @Getter
 @Setter
@@ -23,23 +24,21 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@IdClass(ProductDailyId.class)
 public class ProductDaily {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
 
+    @Id
     @Column(name = "date", nullable = false)
     LocalDate date;
 
     @Column(name = "total_views", nullable = false, columnDefinition = "int default 0")
-    Integer totalViews;
+    int totalViews;
 
     @Column(name = "total_orders", nullable = false, columnDefinition = "int default 0")
-    Integer totalOrders;
+    int totalOrders;
 
     @Column(name = "total_units_sold", nullable = false, columnDefinition = "int default 0")
-    Integer totalUnitsSold;
-
+    int totalUnitsSold;
 
     @Column(name = "total_revenue", precision = 15, scale = 2, nullable = false)
     BigDecimal totalRevenue;
@@ -48,11 +47,19 @@ public class ProductDaily {
     @CreationTimestamp
     LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    Product product;
+    @Id
+    @Column(name = "product_id", nullable = false)
+    String productId;
+
+
+    @Column(name = "seller_id", nullable = false)
+    String sellerId;
+
+    @Column(name = "category_id", nullable = false)
+    String categoryId;
 
 }

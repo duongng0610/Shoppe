@@ -1,18 +1,13 @@
 package com.e_cormerce.shoppe.service.account;
 
-import com.e_cormerce.shoppe.dto.common.address.AddressDto;
 import com.e_cormerce.shoppe.dto.request.account.ChangePasswordRequest;
-import com.e_cormerce.shoppe.dto.request.account.ChangeShipInfo;
 import com.e_cormerce.shoppe.dto.request.account.ChangeUserProfileRequest;
-import com.e_cormerce.shoppe.dto.response.account.ChangeShipInfoResponse;
 import com.e_cormerce.shoppe.dto.response.account.ChangeUserProfileResponse;
 import com.e_cormerce.shoppe.dto.response.account.UserProfileResponse;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
-import com.e_cormerce.shoppe.mapper.address.AddressMapper;
-import com.e_cormerce.shoppe.repository.user.AddressRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.account.helper.AccountServiceHelper;
 import lombok.AccessLevel;
@@ -30,63 +25,42 @@ import org.springframework.web.multipart.MultipartFile;
 @Log4j2
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountService {
-  UserRepository userRepository;
-  BCryptPasswordEncoder bCryptPasswordEncoder;
-  AccountServiceHelper accountServiceHelper;
-  AddressRepository addressRepository;
-  AddressMapper addressMapper;
+    UserRepository userRepository;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+    AccountServiceHelper accountServiceHelper;
 
-  public void changePassword(ChangePasswordRequest request) {
-    User user = accountServiceHelper.getUser();
-    Account account = accountServiceHelper.getAccount(user);
+    public void changePassword(ChangePasswordRequest request) {
+        User user = accountServiceHelper.getUser();
+        Account account = accountServiceHelper.getAccount(user);
 
-    if (!accountServiceHelper.isTrueOldPassword(request.getOldPassword(), account)) {
-      throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        if (!accountServiceHelper.isTrueOldPassword(request.getOldPassword(), account)) {
+            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        }
+
+        accountServiceHelper.updatePassword(request.getNewPassword(), account);
     }
 
-    accountServiceHelper.updatePassword(request.getNewPassword(), account);
-  }
+    public ChangeUserProfileResponse updateProfile(
+            ChangeUserProfileRequest request, MultipartFile avatar) {
+        User user = accountServiceHelper.getUser();
 
-  public ChangeUserProfileResponse updateProfile(
-      ChangeUserProfileRequest request, MultipartFile avatar) {
-    User user = accountServiceHelper.getUser();
+        accountServiceHelper.applyProfileChanges(user, request);
+        accountServiceHelper.applyAvatarChange(user, avatar);
 
-    accountServiceHelper.applyProfileChanges(user, request);
-    accountServiceHelper.applyAvatarChange(user, avatar);
+        userRepository.save(user);
 
-    userRepository.save(user);
-
-    return ChangeUserProfileResponse.builder()
-        .dob(user.getDob())
-        .avatar(user.getAvatar())
-        .username(user.getUsername())
-        .build();
-  }
-
-  public ChangeShipInfoResponse updateShipInfo(ChangeShipInfo request) {
-    User user = accountServiceHelper.getUser();
-
-    if (request.getAddress() != null) {
-      AddressDto newAddress = request.getAddress();
-      accountServiceHelper.updateAddress(newAddress, user);
+        return ChangeUserProfileResponse.builder()
+                .dob(user.getDob())
+                .avatar(user.getAvatar())
+                .username(user.getUsername())
+                .build();
     }
 
-    if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
-      accountServiceHelper.updatePhoneNumber(request.getPhoneNumber(), user);
+
+    public UserProfileResponse getUserProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return userRepository
+                .getUserProfileById(authentication.getPrincipal().toString())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
     }
-
-    userRepository.save(user);
-
-    return ChangeShipInfoResponse.builder()
-        .phoneNumber(user.getPhoneNumber())
-        .address(addressMapper.toDto(user.getAddress()))
-        .build();
-  }
-
-  public UserProfileResponse getUserProfile() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    return userRepository
-        .getUserProfileById(authentication.getPrincipal().toString())
-        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-  }
 }

@@ -1,7 +1,6 @@
 package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.product.Variant;
-import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import jakarta.persistence.*;
@@ -9,6 +8,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
@@ -53,6 +53,7 @@ public class Order {
     @CreationTimestamp
     LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
@@ -69,9 +70,14 @@ public class Order {
     @JoinColumn(name = "seller_id", nullable = false)
     User seller;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "shipping_address_id", nullable = false)
-    Address shippingAddress;
+    @Column(name = "shipping_province")
+    String province;
+
+    @Column(name = "shipping_district")
+    String district;
+
+    @Column(name = "shipping_ward")
+    String ward;
 
     @Column(name = "shipping_phone_number", nullable = false)
     String shippingPhoneNumber;

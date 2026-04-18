@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
@@ -40,6 +41,7 @@ public class OrderRefundRequestMedia {
     @CreationTimestamp
     LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 }

@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ public class MessageMedia {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Column(name = "url", nullable = false)
     String url;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,18 +37,16 @@ public class MessageMedia {
     @JsonIgnore
     ConversationMessage message;
 
-    @Column(columnDefinition = "boolean default false")
+    @Column(columnDefinition = "boolean default false", nullable = false)
     boolean deleted;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false, nullable = false)
     LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
-    @PreUpdate
-    void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+
 }
