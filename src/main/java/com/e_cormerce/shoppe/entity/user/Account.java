@@ -13,7 +13,9 @@ import java.util.Date;
 @Entity
 @Table(
         name = "accounts",
-        indexes = {@Index(name = "idx_email", columnList = "email")})
+        indexes = {@Index(name = "idx_email", columnList = "email"),
+                @Index(name = "idx_account_role", columnList = "role_id")
+        })
 @Getter
 @Setter
 @Builder
