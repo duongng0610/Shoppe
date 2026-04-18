@@ -42,10 +42,10 @@ public interface UserRepository extends JpaRepository<User, String> {
                     + "u.id, "
                     + "u.username, "
                     + "u.avatar, "
-                    + "r.val AS role, "
+                    + "r.val AS role "
                     + "FROM users u "
                     + "JOIN accounts ac ON u.id = ac.id "
-                    + "JOIN role r ON u.role_id = r.id "
+                    + "JOIN role r ON ac.role_id = r.id "
                     + "WHERE u.id = :id;", nativeQuery = true)
     Optional<UserDto> getUserDto(String id);
 }

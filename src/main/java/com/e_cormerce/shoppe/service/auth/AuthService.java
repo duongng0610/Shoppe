@@ -64,7 +64,7 @@ public class AuthService {
     JwtProperties jwtProperties;
     AddressRepository addressRepository;
 
-    @Transactional(timeout = 5)
+    @Transactional()
     public String logIn(LogInRequest request) {
         Account account =
                 accountRepository

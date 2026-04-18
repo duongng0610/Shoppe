@@ -22,6 +22,7 @@ import java.security.Key;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @EnableConfigurationProperties({JwtProperties.class})
@@ -79,11 +80,9 @@ public class JwtService {
      */
     private List<String> buildScope(Role role) {
         var permissions = roleRepository.getPermissionsByRole(role.getId());
-        var res = permissions.stream().map(permission -> {
-            StringBuilder s = new StringBuilder("PERMISSION_");
-            s.append(permission);
-            return s.toString();
-        }).toList();
+        var res = permissions.stream().map(permission ->
+                "PERMISSION_" + permission
+        ).collect(Collectors.toList());
         res.add("ROLE_" + role.getVal());
 
         return res;
