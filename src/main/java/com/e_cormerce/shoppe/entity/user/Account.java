@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
@@ -39,6 +40,7 @@ public class Account {
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     Date updatedAt;
 
@@ -49,13 +51,13 @@ public class Account {
     LocalDateTime lastActiveAt;
 
     @Column(name = "is_active")
-    Boolean isActive;
+    boolean isActive;
 
     @Column(name = "is_banned", nullable = false, columnDefinition = "boolean default false")
-    Boolean isBanned;
+    boolean isBanned = false;
 
     @Column(columnDefinition = "boolean default false")
-    Boolean deleted;
+    boolean deleted = false;
 
     // owner side
     @ManyToOne

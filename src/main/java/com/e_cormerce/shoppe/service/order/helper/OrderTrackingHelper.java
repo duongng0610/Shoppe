@@ -4,10 +4,8 @@ import com.e_cormerce.shoppe.dto.request.order.UpdateOrderTrackingLocationReques
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.order.OrderTrackingLocation;
 import com.e_cormerce.shoppe.entity.user.User;
-import com.e_cormerce.shoppe.mapper.address.AddressMapper;
 import com.e_cormerce.shoppe.repository.order.OrderTrackingLocationRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
-import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +14,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.LocalDateTime;
+
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -23,26 +23,25 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class OrderTrackingHelper {
 
-  WebClient.Builder webClientBuilder;
-  OrderTrackingLocationRepository orderTrackingLocationRepository;
-  AuthService authService;
-  AddressMapper addressMapper;
+    WebClient.Builder webClientBuilder;
+    OrderTrackingLocationRepository orderTrackingLocationRepository;
+    AuthService authService;
 
-  public OrderTrackingLocation createOrderTrackingLocation(
-      UpdateOrderTrackingLocationRequest request, Order order) {
+    public OrderTrackingLocation createOrderTrackingLocation(
+            UpdateOrderTrackingLocationRequest request, Order order) {
 
-    OrderTrackingLocation location =
-        OrderTrackingLocation.builder()
-            .order(order)
-            .address(request.getAddress())
-            .arrivedAt(LocalDateTime.now())
-            .remainingDistance(request.getRemainingDistance())
-            .build();
+        OrderTrackingLocation location =
+                OrderTrackingLocation.builder()
+                        .order(order)
+                        .address(request.getAddress())
+                        .arrivedAt(LocalDateTime.now())
+                        .remainingDistance(request.getRemainingDistance())
+                        .build();
 
-    return location;
-  }
+        return location;
+    }
 
-  public User getClient() {
-    return authService.getUserThroughAuthentication();
-  }
+    public User getClient() {
+        return authService.getUserThroughAuthentication();
+    }
 }

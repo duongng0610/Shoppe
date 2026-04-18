@@ -8,6 +8,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,7 @@ public class Notification {
     @CreationTimestamp
     LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
@@ -53,8 +55,8 @@ public class Notification {
     @Column(name = "read_at")
     LocalDateTime readAt;
 
-    @Column(name = "is_read", columnDefinition = "boolean default false")
-    Boolean isRead;
+    @Column(name = "is_read", nullable = false, columnDefinition = "boolean default false")
+    boolean isRead;
 
     @Enumerated(EnumType.STRING)
     @Column(columnDefinition = "ENUM('ORDER', 'TRANSACTION', 'PRODUCT', 'ACCOUNT','SYSTEM')")

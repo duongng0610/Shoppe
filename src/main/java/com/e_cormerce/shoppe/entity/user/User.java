@@ -7,10 +7,12 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.Set;
 
 @Entity
@@ -53,6 +55,10 @@ public class User {
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 
+    @UpdateTimestamp
+    @Column(name = "updated_at")
+    Date updatedAt;
+
 
     // owner side
     @OneToOne(fetch = FetchType.LAZY)
@@ -60,13 +66,14 @@ public class User {
     @JoinColumn(name = "id")
     Account account;
 
-    // owner side
-    @ManyToOne(
-            fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "address_id")
-    Address address;
+    @Column(name = "province")
+    String province;
 
+    @Column(name = "district")
+    String district;
+
+    @Column(name = "ward")
+    String ward;
 
     // inverse side
     @OneToMany(

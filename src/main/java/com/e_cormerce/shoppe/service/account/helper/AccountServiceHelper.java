@@ -3,12 +3,10 @@ package com.e_cormerce.shoppe.service.account.helper;
 import com.e_cormerce.shoppe.dto.common.address.AddressDto;
 import com.e_cormerce.shoppe.dto.request.account.ChangeUserProfileRequest;
 import com.e_cormerce.shoppe.entity.user.Account;
-import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
-import com.e_cormerce.shoppe.repository.user.AddressRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.media.ImageService;
@@ -23,81 +21,67 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountServiceHelper {
-  AccountRepository accountRepository;
-  AddressRepository addressRepository;
-  UserRepository userRepository;
-  AuthService authService;
-  BCryptPasswordEncoder bCryptPasswordEncoder;
-  ImageService imageService;
+    AccountRepository accountRepository;
+    UserRepository userRepository;
+    AuthService authService;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+    ImageService imageService;
 
-  public Account getAccount(User user) {
-    return accountRepository.findAccountByUserId(user.getId());
-  }
-
-  public User getUser() {
-    return authService.getUserThroughAuthentication();
-  }
-
-  public boolean isTrueOldPassword(String oldPassword, Account account) {
-    return bCryptPasswordEncoder.matches(oldPassword, account.getPassword());
-  }
-
-  public void updatePassword(String newPassword, Account account) {
-    account.setPassword(bCryptPasswordEncoder.encode(newPassword));
-    accountRepository.save(account);
-  }
-
-  public void applyProfileChanges(User user, ChangeUserProfileRequest request) {
-    System.out.println(request.getDob());
-    if (request == null) return;
-
-    if (request.getDob() != null) {
-      user.setDob(request.getDob());
-    }
-    if (request.getUsername() != null && !request.getUsername().isBlank()) {
-      if (userRepository.existsByUsername(request.getUsername())) {
-        throw new AppException(ErrorCode.EXISTED_USERNAME);
-      }
-      user.setUsername(request.getUsername());
+    public Account getAccount(User user) {
+        return accountRepository.findAccountByUserId(user.getId());
     }
 
-    if (request.getAddress() != null) {
-      AddressDto newAddress = request.getAddress();
-      this.updateAddress(newAddress, user);
+    public User getUser() {
+        return authService.getUserThroughAuthentication();
     }
 
-    if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
-      this.updatePhoneNumber(request.getPhoneNumber(), user);
+    public boolean isTrueOldPassword(String oldPassword, Account account) {
+        return bCryptPasswordEncoder.matches(oldPassword, account.getPassword());
     }
-  }
 
-  public void applyAvatarChange(User user, MultipartFile avatar) {
-    if (avatar == null || avatar.isEmpty()) return;
+    public void updatePassword(String newPassword, Account account) {
+        account.setPassword(bCryptPasswordEncoder.encode(newPassword));
+        accountRepository.save(account);
+    }
 
-    String newAvatar = imageService.uploadSingleImage(avatar);
-    user.setAvatar(newAvatar);
-  }
+    public void applyProfileChanges(User user, ChangeUserProfileRequest request) {
+        System.out.println(request.getDob());
+        if (request == null) return;
 
-  public void updateAddress(AddressDto newAddress, User user) {
-    Address address =
-        addressRepository
-            .findByEntireAddress(
-                newAddress.getProvince(), newAddress.getDistrict(), newAddress.getWard())
-            .orElseGet(
-                () -> {
-                  Address addAddress =
-                      Address.builder()
-                          .province(newAddress.getProvince())
-                          .district(newAddress.getDistrict())
-                          .ward(newAddress.getWard())
-                          .build();
-                  return addressRepository.save(addAddress);
-                });
+        if (request.getDob() != null) {
+            user.setDob(request.getDob());
+        }
+        if (request.getUsername() != null && !request.getUsername().isBlank()) {
+            if (userRepository.existsByUsername(request.getUsername())) {
+                throw new AppException(ErrorCode.EXISTED_USERNAME);
+            }
+            user.setUsername(request.getUsername());
+        }
 
-    user.setAddress(address);
-  }
+        if (request.getAddress() != null) {
+            AddressDto newAddress = request.getAddress();
+            this.updateAddress(newAddress, user);
+        }
 
-  public void updatePhoneNumber(String phoneNumber, User user) {
-    user.setPhoneNumber(phoneNumber);
-  }
+        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
+            this.updatePhoneNumber(request.getPhoneNumber(), user);
+        }
+    }
+
+    public void applyAvatarChange(User user, MultipartFile avatar) {
+        if (avatar == null || avatar.isEmpty()) return;
+
+        String newAvatar = imageService.uploadSingleImage(avatar);
+        user.setAvatar(newAvatar);
+    }
+
+    public void updateAddress(AddressDto newAddress, User user) {
+        user.setProvince(newAddress.getProvince());
+        user.setDistrict(newAddress.getDistrict());
+        user.setWard(newAddress.getWard());
+    }
+
+    public void updatePhoneNumber(String phoneNumber, User user) {
+        user.setPhoneNumber(phoneNumber);
+    }
 }

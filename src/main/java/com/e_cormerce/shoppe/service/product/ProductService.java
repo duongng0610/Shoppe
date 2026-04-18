@@ -14,7 +14,7 @@ import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
-import com.e_cormerce.shoppe.event.product.event.CreatingProduct;
+import com.e_cormerce.shoppe.event.product.event.ProductCreated;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.CategoryMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
@@ -101,7 +101,7 @@ public class ProductService {
 
         productRepository.save(product);
 
-        eventPublisher.publishEvent(CreatingProduct.builder().productId(product.getId()).seller(user).build());
+        eventPublisher.publishEvent(ProductCreated.builder().productId(product.getId()).seller(user).build());
 
         return product;
     }

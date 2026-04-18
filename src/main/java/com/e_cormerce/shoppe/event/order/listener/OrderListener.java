@@ -21,7 +21,7 @@ public class OrderListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderCreated(OrderCreatedEvent event) {
+    public void handleOrderCreated(OrderCreated event) {
 
         notificationService.createNotification(
                 event.getClient(),
@@ -42,7 +42,7 @@ public class OrderListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderApproved(OrderApprovedEvent event) {
+    public void handleOrderApproved(OrderApproved event) {
 
         notificationService.createNotification(
                 event.getClient(),
@@ -55,7 +55,7 @@ public class OrderListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderApproved(OrderCancelledEvent event) {
+    public void handleOrderApproved(OrderCancelledByClient event) {
         String status = event.getOrderStatus();
 
         if (status.equals(OrderStatus.CANCELLED_BY_CLIENT.toString())) {
@@ -80,7 +80,7 @@ public class OrderListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderShipped(OrderShippedEvent event) {
+    public void handleOrderShipped(OrderShipped event) {
 
         notificationService.createNotification(
                 event.getClient(),
@@ -93,7 +93,7 @@ public class OrderListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleUpdateTracking(OrderTrackingUpdatedEvent event) {
+    public void handleUpdateTracking(OrderLocationUpdated event) {
         String status = event.getStatus();
 
         if (status.equals(OrderStatus.ARRIVED.toString())) {

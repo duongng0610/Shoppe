@@ -1,17 +1,17 @@
 package com.e_cormerce.shoppe.service.order;
 
+import com.e_cormerce.shoppe.dto.common.address.AddressDto;
 import com.e_cormerce.shoppe.dto.common.order.OrderDetailDto;
 import com.e_cormerce.shoppe.dto.request.order.CreateOrderRequest;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
 import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.Variant;
-import com.e_cormerce.shoppe.entity.user.Address;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
-import com.e_cormerce.shoppe.event.order.event.OrderCancelledEvent;
-import com.e_cormerce.shoppe.event.order.event.OrderCreatedEvent;
+import com.e_cormerce.shoppe.event.order.event.OrderCancelledByClient;
+import com.e_cormerce.shoppe.event.order.event.OrderCreated;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.order.OrderMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
@@ -41,7 +41,7 @@ public class OrderService {
         Variant variant = createOrderHelper.getVariant(request.getVariantId());
         User seller = variant.getProduct().getSeller();
         User client = createOrderHelper.getClient();
-        Address shippingAddress = createOrderHelper.getShippingAddress(request.getShippingAddress());
+        AddressDto address = request.getAddress();
         if (variant.getQuantity() < request.getQuantity()) {
             throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
         }
@@ -52,7 +52,9 @@ public class OrderService {
                         .status(OrderStatus.PENDING)
                         .client(client)
                         .seller(seller)
-                        .shippingAddress(shippingAddress)
+                        .province(address.getProvince())
+                        .district(address.getDistrict())
+                        .ward(address.getWard())
                         .shippingPhoneNumber(request.getShippingPhoneNumber())
                         .totalPrice(createOrderHelper.getTotalPrice(variant, request.getQuantity()))
                         .build();
@@ -62,7 +64,7 @@ public class OrderService {
         orderRepository.save(order);
 
         eventPublisher.publishEvent(
-                OrderCreatedEvent.builder()
+                OrderCreated.builder()
                         .orderId(order.getId())
                         .client(client)
                         .seller(seller)
@@ -97,7 +99,7 @@ public class OrderService {
         variant.setQuantity(availableQuantity + orderQuantity);
 
         eventPublisher.publishEvent(
-                OrderCancelledEvent.builder()
+                OrderCancelledByClient.builder()
                         .orderId(orderId)
                         .orderStatus(OrderStatus.CANCELLED_BY_CLIENT.toString())
                         .client(order.getClient())

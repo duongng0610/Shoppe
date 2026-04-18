@@ -10,6 +10,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
@@ -59,10 +60,10 @@ public class Product {
     Integer rate;
 
     @Column(name = "total_quantity", nullable = false, columnDefinition = "int default 0")
-    Integer totalQuantity;
+    int totalQuantity;
 
     @Column(name = "total_quantity_sold", columnDefinition = "float default 0")
-    Integer totalQuantitySold;
+    int totalQuantitySold;
 
     @Column(name = "has_variant", nullable = false)
     boolean hasVariant;
@@ -72,13 +73,14 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     @Column(
-            columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')") // , nullable = false)
+            columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')", nullable = false)
     ProductStatus status = ProductStatus.PENDING;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at")
     Date updatedAt;
 

@@ -8,9 +8,9 @@ import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
-import com.e_cormerce.shoppe.event.order.event.OrderApprovedEvent;
-import com.e_cormerce.shoppe.event.order.event.OrderCancelledEvent;
-import com.e_cormerce.shoppe.event.order.event.OrderShippedEvent;
+import com.e_cormerce.shoppe.event.order.event.OrderApproved;
+import com.e_cormerce.shoppe.event.order.event.OrderCancelledByClient;
+import com.e_cormerce.shoppe.event.order.event.OrderShipped;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
@@ -113,7 +113,7 @@ public class SellerService {
         variant.setQuantitySold(variant.getQuantitySold() + orderQuantity);
 
         eventPublisher.publishEvent(
-                OrderApprovedEvent.builder()
+                OrderApproved.builder()
                         .orderId(orderId)
                         .client(order.getClient())
                         .variant(variant)
@@ -141,7 +141,7 @@ public class SellerService {
         variant.setQuantity(availableQuantity + orderQuantity);
 
         eventPublisher.publishEvent(
-                OrderCancelledEvent.builder()
+                OrderCancelledByClient.builder()
                         .orderStatus(OrderStatus.CANCELLED_BY_SELLER.toString())
                         .orderId(orderId)
                         .client(order.getClient())
@@ -164,7 +164,7 @@ public class SellerService {
         order.setStatus(OrderStatus.SHIPPING);
 
         eventPublisher.publishEvent(
-                OrderShippedEvent.builder()
+                OrderShipped.builder()
                         .orderId(orderId)
                         .client(order.getClient())
                         .variant(variant)
