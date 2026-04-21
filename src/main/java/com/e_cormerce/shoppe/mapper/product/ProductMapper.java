@@ -15,7 +15,7 @@ import org.mapstruct.Mapping;
     componentModel = "spring",
     uses = {VariantMapper.class})
 public interface ProductMapper {
-  ProductCardResponse toProductDTO(Product product);
+  ProductCardResponse toProductCardDto(Product product);
 
   BaseProductResponse toBaseProductDTO(Product product);
 

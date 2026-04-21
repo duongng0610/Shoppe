@@ -14,16 +14,20 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateOrderRequest {
-    @NotBlank(message = "variant id is required")
+
+    @NotBlank(message = "phone number is required")
     String variantId;
+
 
     @Valid
     AddressDto address;
-    
+
     @NotBlank(message = "phone number is required")
     String shippingPhoneNumber;
 
     @NotNull(message = "order quantity is required")
     @Min(value = 1, message = "quantity must be >= 1")
     int quantity;
+
+
 }

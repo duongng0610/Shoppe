@@ -51,7 +51,8 @@ public class Type {
     List<TypeValue> typeValues;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 
     @UpdateTimestamp

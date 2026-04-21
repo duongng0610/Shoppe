@@ -14,13 +14,15 @@ import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
-import com.e_cormerce.shoppe.event.product.event.ProductCreated;
+import com.e_cormerce.shoppe.event.product.ProductCreated;
+import com.e_cormerce.shoppe.event.product.ProductViewed;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.CategoryMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
+import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.helper.CreateProductHelper;
 import com.e_cormerce.shoppe.service.product.helper.GetProductDetailsHelper;
@@ -33,6 +35,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
@@ -55,6 +58,7 @@ public class ProductService {
     CategoryMapper categoryMapper;
     GetProductDetailsHelper getProductDetailsHelper;
     ApplicationEventPublisher eventPublisher;
+    VariantRepository variantRepository;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
     public Product persistProduct(@Valid CreateProductRequest request, ProductImagesUrl urls) {
@@ -68,9 +72,9 @@ public class ProductService {
                         .createdAt(LocalDateTime.now())
                         .hasVariant(request.getHasVariant())
                         .thumbnail(urls.getThumbnailUrl())
+                        .discountPercentage(request.getDiscountPercentage())
                         .seller(user)
-                        .totalQuantity(0)
-                        .totalQuantitySold(0)
+                        .totalQuantity(request.getTotalQuantity())
                         .originPrice(request.getOriginPrice())
                         .build();
 
@@ -86,12 +90,14 @@ public class ProductService {
         }
         if (request.getHasVariant()) {
             if (urls.getVariantImageUrls() != null && !urls.getVariantImageUrls().isEmpty()) {
-                product.setVariants(
-                        createProductHelper.createVariants(
-                                request.getVariantRequests(), product, urls.getVariantImageUrls()));
+
+                for (int i = 0; i < request.getVariantRequests().size(); i++) {
+                    product.addVariant(createProductHelper.createVariant(request.getVariantRequests().get(i), product, urls.getVariantImageUrls().get(i)));
+                }
+
             }
         } else {
-            createProductHelper.createDefaultVariant(product);
+            product.addVariant(createProductHelper.createDefaultVariant(product));
         }
 
         product.setCategory(
@@ -101,14 +107,14 @@ public class ProductService {
 
         productRepository.save(product);
 
-        eventPublisher.publishEvent(ProductCreated.builder().productId(product.getId()).seller(user).build());
+        eventPublisher.publishEvent(ProductCreated.builder().product(productMapper.toProductCardDto(product)).seller(userMapper.toDto(user)).category(categoryMapper.toDto(product.getCategory())).build());
 
         return product;
     }
 
     public List<ProductCardResponse> getProductForHome(int limit, int offset) {
         List<Product> products = productRepository.findProductForHome(limit, offset);
-        return products.stream().map(productMapper::toProductDTO).toList();
+        return products.stream().map(productMapper::toProductCardDto).toList();
     }
 
     public ProductDetailResponse getProductDetail(String id) {
@@ -134,11 +140,13 @@ public class ProductService {
         Category category = categoryFuture.join();
 
         UserDto sellerResponse = userMapper.toDto(seller);
-        CategoryDto categoryResponse = categoryMapper.toCategoryDTO(category);
+        CategoryDto categoryResponse = categoryMapper.toDto(category);
 
         List<VariantDetailResponse> variantResponses =
                 getProductDetailsHelper.createVariantDetail(variants);
         var typeResponses = getProductDetailsHelper.createTypesResponse(types);
+
+        eventPublisher.publishEvent(ProductViewed.builder().viewedAt(LocalDateTime.now()).productId(id).build());
 
         return ProductDetailResponse.builder()
                 .hasVariant(product.isHasVariant())
@@ -158,6 +166,12 @@ public class ProductService {
 
     public List<ProductCardResponse> getProductOfSeller(String id, int limit, int offset) {
         List<Product> products = productRepository.findProductsOfSeller(id, limit, offset);
-        return products.stream().map(productMapper::toProductDTO).toList();
+        return products.stream().map(productMapper::toProductCardDto).toList();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void updateQuantity(String variantId, String productId, int quantityOrdered) {
+        variantRepository.updateQuantitySold(variantId, quantityOrdered);
+        productRepository.updateQuantitySold(productId, quantityOrdered);
     }
 }

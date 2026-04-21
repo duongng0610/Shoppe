@@ -36,15 +36,20 @@ public class ShoppingCart {
     @Column(name = "total_quantity", nullable = false)
     int totalQuantity;
 
+    @Column(name = "name", nullable = false, columnDefinition = "varchar(255) default 'Mặc định'")
+    String name;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "shoppingCart")
     List<ShoppingCartItem> shoppingCartItems;
+
 
     @ManyToOne
     @JoinColumn(name = "client_id", nullable = false)
     User client;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 
     @UpdateTimestamp

@@ -41,7 +41,7 @@ public class SellerOrder {
     }
 
     @PreAuthorize("hasAuthority('PERMISSION_ACCEPT_ORDER')")
-    @PatchMapping("/{id}//approve")
+    @PatchMapping("/{id}/approve")
     public ResponseEntity<ApiResponse> approveOrder(@PathVariable String id) {
         sellerService.approveOrder(id);
         return ResponseEntity.ok()
@@ -49,7 +49,7 @@ public class SellerOrder {
     }
 
     @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_SELLER')")
-    @PatchMapping("/{id}//cancel")
+    @PatchMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
         sellerService.cancelOrder(id);
         return ResponseEntity.ok()
@@ -57,7 +57,7 @@ public class SellerOrder {
     }
 
     @PreAuthorize("hasAuthority('PERMISSION_SHIP_ORDER')")
-    @PatchMapping("/{id}//ship")
+    @PatchMapping("/{id}/ship")
     public ResponseEntity<ApiResponse> shipOrder(@PathVariable String id) {
         sellerService.shipOrder(id);
         return ResponseEntity.ok()

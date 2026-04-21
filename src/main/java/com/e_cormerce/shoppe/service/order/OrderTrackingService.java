@@ -9,7 +9,7 @@ import com.e_cormerce.shoppe.entity.order.OrderTrackingLocation;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
-import com.e_cormerce.shoppe.event.order.event.OrderLocationUpdated;
+import com.e_cormerce.shoppe.event.order.OrderLocationUpdated;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.order.OrderTrackingLocationMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
@@ -65,9 +65,7 @@ public class OrderTrackingService {
 
         eventPublisher.publishEvent(
                 OrderLocationUpdated.builder()
-                        .client(client)
-                        .orderId(order.getId())
-                        .status(order.getStatus().toString())
+
                         .address(saved.getAddress())
                         .build());
 

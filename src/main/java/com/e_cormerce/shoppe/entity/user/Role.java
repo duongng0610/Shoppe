@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.user;
 
+import com.e_cormerce.shoppe.enums.user.RoleEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,6 +11,7 @@ import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity
@@ -27,14 +29,15 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
-    String val;
+    RoleEnum val;
 
     @Column(columnDefinition = "boolean default false")
     boolean deleted;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -43,11 +46,18 @@ public class Role {
 
 
     // owner side
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_permission",
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id"),
             indexes = {@Index(name = "idx_role", columnList = "role_id")})
     Set<Permission> permissions;
+
+    public void addPermission(Permission permission) {
+        if (this.permissions == null) {
+            permissions = new HashSet<Permission>();
+        }
+        permissions.add(permission);
+    }
 }

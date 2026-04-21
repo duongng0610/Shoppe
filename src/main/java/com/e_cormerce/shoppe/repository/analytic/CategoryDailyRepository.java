@@ -1,6 +1,6 @@
 package com.e_cormerce.shoppe.repository.analytic;
 
-import com.e_cormerce.shoppe.entity.analytic.CategoryDaily;
+import com.e_cormerce.shoppe.entity.analytic.category.CategoryDaily;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -15,22 +15,22 @@ public interface CategoryDailyRepository extends JpaRepository<CategoryDaily, St
     @Modifying
     @Transactional
     @Query(value = """
-                INSERT INTO category_daily (category_id, date, category_name, total_searches)
-                VALUES (:categoryId, :date, :categoryName, 1)
+                INSERT INTO category_daily (category_id, date, total_searches)
+                VALUES (:categoryId, :date, 1)
                 ON DUPLICATE KEY UPDATE
                     total_searches = total_searches + 1
             """, nativeQuery = true)
-    void increaseSearch(String categoryId, LocalDate date, String categoryName);
+    void increaseSearch(String categoryId, LocalDate date);
 
     @Modifying
     @Transactional
     @Query(value = """
-                INSERT INTO category_daily (category_id, date, category_name, total_new_products)
-                VALUES (:categoryId, :date, :categoryName, 1)
+                INSERT INTO category_daily (category_id, date, total_new_products)
+                VALUES (:categoryId, :date, 1)
                 ON DUPLICATE KEY UPDATE
                     total_new_products = total_new_products + 1
             """, nativeQuery = true)
-    void increaseNewProduct(String categoryId, LocalDate date, String categoryName);
+    void increaseNewProduct(String categoryId, LocalDate date);
 
 
 }

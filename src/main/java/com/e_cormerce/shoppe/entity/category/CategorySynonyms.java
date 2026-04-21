@@ -38,7 +38,8 @@ public class CategorySynonyms {
     String val;
 
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     LocalDateTime createdAt;
 

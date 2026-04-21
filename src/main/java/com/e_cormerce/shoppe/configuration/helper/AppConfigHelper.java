@@ -1,27 +1,29 @@
 package com.e_cormerce.shoppe.configuration.helper;
 
 import com.e_cormerce.shoppe.entity.category.Category;
+import com.e_cormerce.shoppe.entity.category.CategorySynonyms;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.Permission;
 import com.e_cormerce.shoppe.entity.user.Role;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
-import com.e_cormerce.shoppe.enums.user.PermissionEnum;
 import com.e_cormerce.shoppe.enums.user.RoleEnum;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
+import com.e_cormerce.shoppe.repository.catgory.SynonymsRepository;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
+import com.e_cormerce.shoppe.repository.user.PermissionRepository;
 import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
+import com.e_cormerce.shoppe.util.constants.DefaultCategory;
+import com.e_cormerce.shoppe.util.constants.RoleValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -35,161 +37,31 @@ public class AppConfigHelper {
     UserRepository userRepository;
     AccountRepository accountRepository;
     CategoryRepository categoryRepository;
+    SynonymsRepository synonymsRepository;
+    PermissionRepository permissionRepository;
 
-    private Set<Permission> createPermissionsOfClient() {
-        Set<Permission> clientPermissions = new HashSet<>();
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_INFO_CLIENT.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_ORDERS_NOTIFICATIONS_CLIENT.getVal()).build());
-        clientPermissions.add(
-                Permission.builder()
-                        .val(PermissionEnum.GET_MESSAGES_NOTIFICATIONS_CLIENT.getVal())
-                        .build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_CART_SHOPPING.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.ADD_CART_SHOPPING.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.DELETE_CART_ITEMS.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_CART_SHOPPING_DELETED.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.RESTORE_CART_SHOPPING_DELETED.getVal()).build());
-        clientPermissions.add(Permission.builder().val(PermissionEnum.CREATE_ORDER.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_SHIPPING_INFO.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_CLIENT_ORDERS.getVal()).build());
-        clientPermissions.add(Permission.builder().val(PermissionEnum.PAY_ORDER.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.REQUEST_RETURN_ORDER.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.REVIEW_RECEIVED_ORDER.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.CANCEL_ORDER_BY_CLIENT.getVal()).build());
-        clientPermissions.add(
-                Permission.builder().val(PermissionEnum.VIEW_CLIENT_ORDERS.getVal()).build());
 
-        return clientPermissions;
-    }
-
-    private Set<Permission> createPermissionsOfSeller() {
-        Set<Permission> sellerPermissions = new HashSet<>();
-        sellerPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_SHOP_OVERVIEW.getVal()).build());
-        sellerPermissions.add(Permission.builder().val(PermissionEnum.CREATE_PRODUCT.getVal()).build());
-        sellerPermissions.add(
-                Permission.builder().val(PermissionEnum.UPDATE_INFO_PRODUCT.getVal()).build());
-        sellerPermissions.add(Permission.builder().val(PermissionEnum.DELETE_PRODUCT.getVal()).build());
-        sellerPermissions.add(Permission.builder().val(PermissionEnum.GET_MY_PRODUCT.getVal()).build());
-        sellerPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_STATUS_ORDER.getVal()).build());
-        sellerPermissions.add(Permission.builder().val(PermissionEnum.ACCEPT_ORDER.getVal()).build());
-        sellerPermissions.add(
-                Permission.builder().val(PermissionEnum.CANCEL_ORDER_BY_SELLER.getVal()).build());
-        sellerPermissions.add(
-                Permission.builder().val(PermissionEnum.APPROVE_RETURN_REQUEST.getVal()).build());
-        sellerPermissions.add(
-                Permission.builder().val(PermissionEnum.VIEW_SELLER_ORDERS.getVal()).build());
-        sellerPermissions.add(
-                Permission.builder().val(PermissionEnum.UPDATE_ORDER_TRACKING_LOCATION.getVal()).build());
-        sellerPermissions.add(Permission.builder().val(PermissionEnum.SHIP_ORDER.getVal()).build());
-
-        return sellerPermissions;
-    }
-
-    private Set<Permission> createPermissionsOfAdmin() {
-        Set<Permission> adminPermissions = new HashSet<>();
-
-        adminPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_USERS_MANAGEMENT.getVal()).build());
-        adminPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_USER_DETAILS_MANAGEMENT.getVal()).build());
-        adminPermissions.add(Permission.builder().val(PermissionEnum.LOCK_USER.getVal()).build());
-        adminPermissions.add(Permission.builder().val(PermissionEnum.UNLOCK_USER.getVal()).build());
-        adminPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_PRODUCTS_MANAGEMENT.getVal()).build());
-        adminPermissions.add(Permission.builder().val(PermissionEnum.BAN_PRODUCT.getVal()).build());
-        adminPermissions.add(Permission.builder().val(PermissionEnum.UNBAN_PRODUCT.getVal()).build());
-        adminPermissions.add(
-                Permission.builder().val(PermissionEnum.APPROVE_PRODUCTS.getVal()).build());
-        adminPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_CATEGORIES_MANAGEMENT.getVal()).build());
-        adminPermissions.add(Permission.builder().val(PermissionEnum.ADD_CATEGORY.getVal()).build());
-        adminPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_TRANSACTIONS.getVal()).build());
-        adminPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_TRANSACTION_DETAILS.getVal()).build());
-
-        return adminPermissions;
-    }
-
-    private Set<Permission> createPermissionsOfShipper() {
-        Set<Permission> shipperPermissions = new HashSet<>();
-
-        shipperPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_SHIPPER_INFO.getVal()).build());
-        shipperPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_SHIPPER_OVERVIEW.getVal()).build());
-        shipperPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_SUGGESTED_ORDER.getVal()).build());
-        shipperPermissions.add(
-                Permission.builder().val(PermissionEnum.CHECKOUT_SUGGESTED_ORDER.getVal()).build());
-        shipperPermissions.add(
-                Permission.builder().val(PermissionEnum.APPROVE_SUGGESTED_ORDER.getVal()).build());
-        shipperPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_RECEIVED_ORDER.getVal()).build());
-        shipperPermissions.add(
-                Permission.builder().val(PermissionEnum.UPDATE_RECEIVED_ORDER.getVal()).build());
-        shipperPermissions.add(
-                Permission.builder().val(PermissionEnum.GET_SHIPPER_REVENUE.getVal()).build());
-
-        return shipperPermissions;
-    }
-
+    @Transactional
     public void createRoles() {
+        RoleValue.ROLE_PERMISSIONS.forEach((roleVal, permissionVals) -> {
+            Role role = roleRepository.findByVal(roleVal).orElseGet(() -> Role.builder().val(roleVal).build());
+            permissionVals.forEach(permissionVal -> {
+                Permission permission = permissionRepository.findByVal(permissionVal).orElseGet(() -> Permission.builder().val(permissionVal).build());
+                if (role.getPermissions() == null || (role.getPermissions() != null && !role.getPermissions().contains(permission))) {
+                    role.addPermission(permission);
+                }
+            });
+            roleRepository.save(role);
+        });
 
-        if (!roleRepository.existsByVal(RoleEnum.CLIENT.getValue())) {
-            Role clientRole =
-                    Role.builder()
-                            .val(RoleEnum.CLIENT.getValue())
-                            .permissions(createPermissionsOfClient())
-                            .build();
-            roleRepository.save(clientRole);
-        }
-        if (!roleRepository.existsByVal(RoleEnum.SELLER.getValue())) {
-            Role sellerRole =
-                    Role.builder()
-                            .val(RoleEnum.SELLER.getValue())
-                            .permissions(createPermissionsOfSeller())
-                            .build();
-            roleRepository.save(sellerRole);
-        }
-        if (!roleRepository.existsByVal(RoleEnum.ADMIN.getValue())) {
-            Role adminRole =
-                    Role.builder()
-                            .val(RoleEnum.ADMIN.getValue())
-                            .permissions(createPermissionsOfAdmin())
-                            .build();
-            roleRepository.save(adminRole);
-        }
-        if (!roleRepository.existsByVal(RoleEnum.SHIPPER.getValue())) {
-            Role shipperRole =
-                    Role.builder()
-                            .val(RoleEnum.SHIPPER.getValue())
-                            .permissions(createPermissionsOfShipper())
-                            .build();
-            roleRepository.save(shipperRole);
-        }
+
     }
 
     public void createAdmin(String email, String password, String username) {
         if (!accountRepository.existsByEmail(email)) {
-
             Role adminRole =
                     roleRepository
-                            .findByVal(RoleEnum.ADMIN.toString())
+                            .findByVal(RoleEnum.ADMIN)
                             .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
 
             Account adminAccount =
@@ -211,33 +83,20 @@ public class AppConfigHelper {
         }
     }
 
-    private void createPermissionsAgain() {
-        var client = roleRepository.findByVal("CLIENT").orElseThrow();
-
-        var seller = roleRepository.findByVal("SELLER").orElseThrow();
-        var admin = roleRepository.findByVal("ADMIN").orElseThrow();
-
-        client.setPermissions(createPermissionsOfClient());
-        seller.setPermissions(createPermissionsOfSeller());
-        admin.setPermissions(createPermissionsOfAdmin());
-        roleRepository.save(client);
-        roleRepository.save(seller);
-        roleRepository.save(admin);
-    }
 
     public void createDefaultCategories() {
-        createDefaultCategory("Fashion");
-        createDefaultCategory("Technology devices");
-        createDefaultCategory("Book");
-        createDefaultCategory("household appliances");
-        createDefaultCategory("Others");
-    }
-
-    private void createDefaultCategory(String name) {
-        if (!categoryRepository.existsByVal(name)) {
-            Category category = Category.builder().val(name).build();
-
-            categoryRepository.save(category);
+        var categories = DefaultCategory.DEFAULT_CATEGORIES;
+        for (int i = 0; i < categories.length; i++) {
+            String name = categories[i][0];
+            String thumbnail = categories[i][1];
+            if (!categoryRepository.existsByVal(name)) {
+                Category category = Category.builder().val(name).thumbnail(thumbnail).build();
+                categoryRepository.save(category);
+                synonymsRepository.save(CategorySynonyms.builder().val(name).category(category).build());
+            }
         }
+
     }
+
+
 }

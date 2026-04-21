@@ -1,8 +1,6 @@
 package com.e_cormerce.shoppe.entity.notification;
 
-import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.notification.NotificationType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -39,7 +37,8 @@ public class Notification {
     @Column(nullable = false)
     String content;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     LocalDateTime createdAt;
 
@@ -47,10 +46,9 @@ public class Notification {
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnore
-    @JoinColumn(name = "user_id", nullable = false)
-    User user;
+    @Column(name = "user_id", nullable = false)
+    String userId;
+
 
     @Column(name = "read_at")
     LocalDateTime readAt;

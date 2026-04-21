@@ -1,6 +1,5 @@
 package com.e_cormerce.shoppe.entity.user;
 
-import com.e_cormerce.shoppe.entity.notification.Notification;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Past;
 import lombok.*;
@@ -13,7 +12,6 @@ import org.hibernate.annotations.Where;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.Set;
 
 @Entity
 @Table(
@@ -52,7 +50,7 @@ public class User {
     String phoneNumber;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -75,11 +73,5 @@ public class User {
     @Column(name = "ward")
     String ward;
 
-    // inverse side
-    @OneToMany(
-            mappedBy = "user",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY)
-    Set<Notification> notifications;
+
 }

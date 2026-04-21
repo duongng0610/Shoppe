@@ -59,5 +59,29 @@ public class SellerProduct {
                 .body(ApiResponse.builder().success(true).message("create product successfully").build());
     }
 
+    @PreAuthorize("hasAuthority('PERMISSION_HIDE_PRODUCTS')")
+    @PatchMapping("/products/{id}/hidden")
+    public ResponseEntity<ApiResponse> hiddenProduct(@PathVariable String id) {
+        sellerService.hiddenProduct(id);
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("hidden product successfully")
+                        .build()
+        );
+    }
+
+    @PreAuthorize("hasAuthority('PERMISSION_HIDE_PRODUCTS')")
+    @PatchMapping("/products/{id}/unhidden")
+    public ResponseEntity<ApiResponse> unhiddenProduct(@PathVariable String id) {
+        sellerService.unhiddenProduct(id);
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("unhidden product successfully")
+                        .build()
+        );
+    }
+
 
 }

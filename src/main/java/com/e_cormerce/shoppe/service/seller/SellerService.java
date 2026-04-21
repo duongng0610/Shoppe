@@ -5,17 +5,25 @@ import com.e_cormerce.shoppe.dto.response.product.MyProductResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
 import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
+import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.entity.product.Variant;
+import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
-import com.e_cormerce.shoppe.event.order.event.OrderApproved;
-import com.e_cormerce.shoppe.event.order.event.OrderCancelledByClient;
-import com.e_cormerce.shoppe.event.order.event.OrderShipped;
+import com.e_cormerce.shoppe.enums.product.ProductStatus;
+import com.e_cormerce.shoppe.event.order.OrderApproved;
+import com.e_cormerce.shoppe.event.order.OrderArrived;
+import com.e_cormerce.shoppe.event.order.OrderCancelledByClient;
+import com.e_cormerce.shoppe.event.product.ProductHidden;
+import com.e_cormerce.shoppe.event.product.ProductUnhidden;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.mapper.order.OrderMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
+import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
-import com.e_cormerce.shoppe.repository.seller.SellerInfoRepository;
+import com.e_cormerce.shoppe.repository.product.VariantRepository;
+import com.e_cormerce.shoppe.repository.seller.SellerStatRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
@@ -37,12 +45,17 @@ import java.util.List;
 public class SellerService {
     UploadProductImagesHelper uploadProductImagesHelper;
     ProductService productService;
-    SellerInfoRepository sellerInfoRepository;
+    SellerStatRepository sellerStatRepository;
     OrderRepository orderRepository;
     AuthService authService;
     ApplicationEventPublisher eventPublisher;
     ProductRepository productRepository;
     ProductMapper productMapper;
+    OrderMapper orderMapper;
+    UserMapper userMapper;
+    VariantRepository variantRepository;
+    ProductRepository pRepository;
+
 
     public List<MyProductResponse> getMyProducts(int limit, int offset) {
         String sellerId = authService.getUserId();
@@ -82,8 +95,52 @@ public class SellerService {
 
     }
 
+    @Transactional
+    public void hiddenProduct(String productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
+
+        User currentUser = authService.getUserThroughAuthentication();
+
+        // check seller
+        if (!product.getSeller().getId().equals(currentUser.getId())) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        // check trạng thái
+        if (product.getStatus() != ProductStatus.ACTIVE) {
+            throw new AppException(ErrorCode.UNABLE_HIDDEN_PRODUCT);
+        }
+
+        productRepository.updateStatus(productId, ProductStatus.HIDDEN.getValue());
+
+        eventPublisher.publishEvent(ProductHidden.builder().product(productMapper.toProductCardDto(product)).seller(userMapper.toDto(product.getSeller())).build());
+    }
+
+    @Transactional
+    public void unhiddenProduct(String productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
+
+        User currentUser = authService.getUserThroughAuthentication();
+
+        // check seller
+        if (!product.getSeller().getId().equals(currentUser.getId())) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        // check trạng thái
+        if (product.getStatus() != ProductStatus.HIDDEN) {
+            throw new AppException(ErrorCode.UNABLE_UNHIDDEN_PRODUCT);
+        }
+
+        productRepository.updateStatus(productId, ProductStatus.ACTIVE.getValue());
+
+        eventPublisher.publishEvent(ProductUnhidden.builder().product(productMapper.toProductCardDto(product)).seller(userMapper.toDto(product.getSeller())).build());
+    }
+
     public SellerInfoResponse getSeller(String id) {
-        return sellerInfoRepository
+        return sellerStatRepository
                 .findSellerInfoBySellerId(id)
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SELLER));
     }
@@ -98,25 +155,39 @@ public class SellerService {
                 orderRepository
                         .findById(orderId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+        User currentUser = authService.getUserThroughAuthentication();
+        if (!order.getSeller().getId().equals(currentUser.getId())) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new AppException(ErrorCode.UNABLE_APPROVE_ORDER);
+        }
 
         Variant variant = order.getVariant();
+        Product product = variant.getProduct();
 
-        int availableQuantity = variant.getQuantity();
-        int orderQuantity = order.getQuantity();
-
-        if (availableQuantity < orderQuantity) {
+        if (variant.getQuantity() < order.getQuantity()) {
             throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY_FOR_ORDER);
         }
 
-        order.setStatus(OrderStatus.ACCEPTED);
-        variant.setQuantity(availableQuantity - orderQuantity);
-        variant.setQuantitySold(variant.getQuantitySold() + orderQuantity);
+        variant.setQuantity(variant.getQuantity() - order.getQuantity());
+        variant.setQuantitySold(variant.getQuantity() + order.getQuantity());//trigger
+        variantRepository.save(variant);
 
+
+        product.setTotalQuantity(product.getTotalQuantity() - order.getQuantity());//trigger
+        product.setTotalQuantitySold(product.getTotalQuantitySold() + order.getQuantity());//trigger
+        pRepository.save(product);
+
+
+        order.setStatus(OrderStatus.ACCEPTED);
+        orderRepository.save(order);
         eventPublisher.publishEvent(
                 OrderApproved.builder()
-                        .orderId(orderId)
-                        .client(order.getClient())
-                        .variant(variant)
+                        .order(orderMapper.toOrderDto(order))
+                        .client(userMapper.toDto(order.getClient()))
+                        .seller(userMapper.toDto(order.getSeller()))
                         .build());
     }
 
@@ -131,21 +202,16 @@ public class SellerService {
             throw new AppException(ErrorCode.UNABlE_CANCEL_ORDER);
         }
 
-        Variant variant = order.getVariant();
-        int availableQuantity = variant.getQuantity();
-        int orderQuantity = order.getQuantity();
-
-        variant.setQuantity(availableQuantity + orderQuantity);
 
         order.setStatus(OrderStatus.CANCELLED_BY_SELLER);
-        variant.setQuantity(availableQuantity + orderQuantity);
+
+        orderRepository.save(order);
 
         eventPublisher.publishEvent(
                 OrderCancelledByClient.builder()
-                        .orderStatus(OrderStatus.CANCELLED_BY_SELLER.toString())
-                        .orderId(orderId)
-                        .client(order.getClient())
-                        .variant(variant)
+                        .order(orderMapper.toOrderDto(order))
+                        .client(userMapper.toDto(order.getClient()))
+                        .seller(userMapper.toDto(order.getSeller()))
                         .build());
     }
 
@@ -162,12 +228,12 @@ public class SellerService {
 
         Variant variant = order.getVariant();
         order.setStatus(OrderStatus.SHIPPING);
-
+        orderRepository.save(order);
         eventPublisher.publishEvent(
-                OrderShipped.builder()
-                        .orderId(orderId)
-                        .client(order.getClient())
-                        .variant(variant)
+                OrderArrived.builder()
+                        .order(orderMapper.toOrderDto(order))
+                        .client(userMapper.toDto(order.getClient()))
+                        .seller(userMapper.toDto(order.getSeller()))
                         .build());
     }
 }
