@@ -30,7 +30,8 @@ public class OrderTrackingLocation {
     @Column(columnDefinition = "boolean default false")
     boolean deleted;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     LocalDateTime createdAt;
 

@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.user;
 
+import com.e_cormerce.shoppe.enums.user.AccountStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -37,7 +38,7 @@ public class Account {
     String password;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -50,11 +51,8 @@ public class Account {
     @Column(name = "last_active_at")
     LocalDateTime lastActiveAt;
 
-    @Column(name = "is_active")
-    boolean isActive;
-
-    @Column(name = "is_banned", nullable = false, columnDefinition = "boolean default false")
-    boolean isBanned = false;
+    @Enumerated(EnumType.STRING)
+    AccountStatus status;
 
     @Column(columnDefinition = "boolean default false")
     boolean deleted = false;

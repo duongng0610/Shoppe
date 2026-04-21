@@ -45,7 +45,8 @@ public class OrderTransaction {
     @Column(columnDefinition = "ENUM('SUCCESS','FAIL','ERROR')", nullable = false)
     TransactionStatus status;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     LocalDateTime createdAt;
 

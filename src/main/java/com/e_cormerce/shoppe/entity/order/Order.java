@@ -35,24 +35,21 @@ public class Order {
     boolean deleted;
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            columnDefinition =
-                    "ENUM('PENDING','ACCEPTED','CANCELLED_BY_CLIENT',"
-                            + "'CANCELLED_BY_SHIPPER','CANCELLED_BY_SELLER','SHIPPING','ARRIVED',"
-                            + "'PAID','RETURN_REQUEST_BY_CLIENT','RETURN_REQUEST_BY_SHIPPER','RETURNED','BOMB')",
-            nullable = false)
+    @Column(nullable = false)
     OrderStatus status;
 
     @Column(name = "total_price", precision = 15, scale = 2, nullable = false)
     BigDecimal totalPrice;
 
+
     @Column(nullable = false)
     int quantity;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     LocalDateTime createdAt;
 
+    
     @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
@@ -85,11 +82,11 @@ public class Order {
     @Column(name = "product_name", nullable = false)
     String productName;
 
-    @Column(name = "thumbnail", nullable = false)
-    String thumbnail;
+    @Column(name = "variant_thumbnail", nullable = false)
+    String variantThumbnail;
 
-    @Column(name = "variant_name", nullable = true)
-    String variantName;
+    @Column(name = "variant_attributes", columnDefinition = "json", nullable = true)
+    String variantAttributes;
 
 
 }

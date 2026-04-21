@@ -37,7 +37,8 @@ public class OrderRefundRequestMedia {
     @JoinColumn(name = "order_refund_request_id")
     OrderRefundRequest orderRefundRequest;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at", nullable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     @CreationTimestamp
     LocalDateTime createdAt;
 

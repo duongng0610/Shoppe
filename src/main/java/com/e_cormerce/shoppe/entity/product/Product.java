@@ -15,6 +15,7 @@ import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class Product {
     @Max(value = 5, message = "Rating must not exceed 5")
     Integer rate;
 
+
     @Column(name = "total_quantity", nullable = false, columnDefinition = "int default 0")
     int totalQuantity;
 
@@ -72,12 +74,12 @@ public class Product {
     boolean deleted;
 
     @Enumerated(EnumType.STRING)
-    @Column(
-            columnDefinition = "ENUM('BANNED', 'PENDING', 'APPROVED', 'HIDDEN')", nullable = false)
-    ProductStatus status = ProductStatus.PENDING;
+    @Column(nullable = false)
+    ProductStatus status;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 
     @UpdateTimestamp
@@ -85,7 +87,7 @@ public class Product {
     Date updatedAt;
 
     // owner side
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     Category category;
 
@@ -109,7 +111,14 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ProductExtraImage> productExtraImages;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seller_id", nullable = false)
     User seller;
+
+    public void addVariant(Variant variant) {
+        if (variants == null) {
+            variants = new ArrayList<>();
+        }
+        variants.add(variant);
+    }
 }

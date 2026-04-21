@@ -43,6 +43,7 @@ public class Variant {
     @Column(name = "quantity_sold")
     int quantitySold;
 
+
     @Column(name = "discount_percentage", columnDefinition = "float default 0")
     double discountPercentage;
 
@@ -61,7 +62,8 @@ public class Variant {
     List<VariantValue> variantValues;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false,
+            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 
     @UpdateTimestamp

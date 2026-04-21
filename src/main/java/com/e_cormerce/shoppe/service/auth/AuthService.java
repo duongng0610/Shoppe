@@ -4,20 +4,25 @@ import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
 import com.e_cormerce.shoppe.dto.request.auth.register.AbstractRegisterRequest;
 import com.e_cormerce.shoppe.dto.request.auth.register.RegisterSellerRequest;
-import com.e_cormerce.shoppe.dto.request.auth.register.RegisterShipperRequest;
+import com.e_cormerce.shoppe.entity.client.ClientStat;
 import com.e_cormerce.shoppe.entity.product.ShoppingCart;
-import com.e_cormerce.shoppe.entity.seller.SellerInfo;
+import com.e_cormerce.shoppe.entity.seller.SellerStat;
 import com.e_cormerce.shoppe.entity.token.InvalidToken;
 import com.e_cormerce.shoppe.entity.token.RefreshToken;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.Role;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.enums.user.AccountStatus;
 import com.e_cormerce.shoppe.enums.user.RoleEnum;
+import com.e_cormerce.shoppe.event.system.ClientRegistered;
+import com.e_cormerce.shoppe.event.system.SellerRegistered;
+import com.e_cormerce.shoppe.event.system.UserLoggedIn;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.properties.JwtProperties;
-import com.e_cormerce.shoppe.repository.seller.SellerInfoRepository;
+import com.e_cormerce.shoppe.repository.client.ClientStatRepository;
+import com.e_cormerce.shoppe.repository.seller.SellerStatRepository;
 import com.e_cormerce.shoppe.repository.shopping_cart.ShoppingCartRepository;
 import com.e_cormerce.shoppe.repository.token.InvalidTokenRepository;
 import com.e_cormerce.shoppe.repository.token.RefreshTokenRepository;
@@ -31,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -47,7 +53,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class AuthService {
     private final ShoppingCartRepository shoppingCartRepository;
-    SellerInfoRepository sellerInfoRepository;
+    SellerStatRepository sellerStatRepository;
     UserRepository userRepository;
     AccountRepository accountRepository;
     RoleRepository roleRepository;
@@ -58,6 +64,8 @@ public class AuthService {
     TokenService tokenService;
     UserMapper userMapper;
     JwtProperties jwtProperties;
+    ClientStatRepository clientStatRepository;
+    ApplicationEventPublisher eventPublisher;
 
     @Transactional()
     public String logIn(LogInRequest request) {
@@ -73,6 +81,9 @@ public class AuthService {
             throw new AppException(ErrorCode.INCORRECT_PASSWORD);
         }
 
+        account.setStatus(AccountStatus.ACTIVE);
+        accountRepository.save(account);
+        eventPublisher.publishEvent(UserLoggedIn.builder().date(LocalDateTime.now()).user(userMapper.toDto(account.getUser())).build());
 
         return tokenService.generateAccessToken(account.getId(), account.getRole());
     }
@@ -86,7 +97,7 @@ public class AuthService {
 
         Role role =
                 roleRepository
-                        .findByVal(roleEnum.getValue())
+                        .findByVal(roleEnum)
                         .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
 
         var account =
@@ -94,10 +105,12 @@ public class AuthService {
                         .email(request.getEmail())
                         .password(bCryptPasswordEncoder.encode(request.getPassword()))
                         .role(role)
+                        .status(AccountStatus.INACTIVE)
                         .build();
 
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new AppException(ErrorCode.INVALID_USERNAME);
+
         }
 
         var user =
@@ -108,37 +121,60 @@ public class AuthService {
                         .build();
 
         if (request.getClass() == RegisterSellerRequest.class
-                || request.getClass() == RegisterShipperRequest.class) {
+        ) {
 
-            var addressDto =
-                    request.getClass() == RegisterShipperRequest.class
-                            ? ((RegisterShipperRequest) request).getAddress()
-                            : ((RegisterSellerRequest) request).getAddress();
-
-            var phoneNumber = request.getClass() == RegisterShipperRequest.class
-                    ? ((RegisterShipperRequest) request).getPhoneNumber()
-                    : null;
+            var addressDto = ((RegisterSellerRequest) request).getAddress();
+            var phoneNumber = ((RegisterSellerRequest) request).getPhoneNumber();
 
             user.setProvince(addressDto.getProvince());
             user.setDistrict(addressDto.getDistrict());
             user.setWard(addressDto.getWard());
             user.setPhoneNumber(phoneNumber);
-        }
 
+
+        }
         userRepository.save(user);
-        if (role.getVal().equals(RoleEnum.CLIENT.getValue())) {
-            ShoppingCart shoppingCart = ShoppingCart.builder().client(user).totalQuantity(0).build();
+        if (role.getVal().equals(RoleEnum.CLIENT)) {
+            ClientStat clientStat = ClientStat.builder().client(user).build();
+            clientStatRepository.save(clientStat);
+            ShoppingCart shoppingCart = ShoppingCart.builder().client(user).totalQuantity(0).name("Mặc định").build();
             shoppingCartRepository.save(shoppingCart);
-        } else if (role.getVal().equals(RoleEnum.SELLER.getValue())) {
-            SellerInfo sellerInfo =
-                    SellerInfo.builder().seller(user).build();
-            sellerInfoRepository.save(sellerInfo);
+            eventPublisher.publishEvent(ClientRegistered.builder().date(LocalDateTime.now()).client(userMapper.toDto(user)).build());
+
+        } else if (role.getVal().equals(RoleEnum.SELLER)) {
+            SellerStat sellerStat =
+                    SellerStat.builder().seller(user).build();
+            sellerStatRepository.save(sellerStat);
+            eventPublisher.publishEvent(SellerRegistered.builder().date(LocalDateTime.now()).seller(userMapper.toDto(user)).build());
         }
     }
 
     @Transactional(timeout = 5)
     public void logOut(String accessToken) {
+        revokeToken(accessToken);
+        accountRepository.setStatus(getUserId(), AccountStatus.INACTIVE);
+    }
 
+    public UserDto verify() {
+        UserDto res = userRepository.getUserDto(this.getUserId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+        return res;
+    }
+
+    public User getUserThroughAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userId = (String) authentication.getPrincipal();
+
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+    }
+
+    public String getUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (String) authentication.getPrincipal();
+    }
+
+    private void revokeToken(String accessToken) {
         Claims accessTokenClaims =
                 jwtService.extractClaims(accessToken, jwtProperties.getAccessTokenSecret());
 
@@ -159,24 +195,5 @@ public class AuthService {
 
         refreshToken.setRevoked(true);
         refreshTokenRepository.save(refreshToken);
-    }
-
-    public UserDto verify() {
-        UserDto res = userRepository.getUserDto(this.getUserId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-        return res;
-    }
-
-    public User getUserThroughAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = (String) authentication.getPrincipal();
-
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-    }
-
-    public String getUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (String) authentication.getPrincipal();
     }
 }

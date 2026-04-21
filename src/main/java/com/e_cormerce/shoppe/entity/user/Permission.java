@@ -1,5 +1,6 @@
 package com.e_cormerce.shoppe.entity.user;
 
+import com.e_cormerce.shoppe.enums.user.PermissionEnum;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -24,14 +25,15 @@ public class Permission {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
-    String val;
+    PermissionEnum val;
 
     @Column(columnDefinition = "boolean default false")
     boolean deleted;
 
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
+    @Column(name = "created_at", updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 
     @UpdateTimestamp
