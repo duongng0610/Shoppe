@@ -82,7 +82,14 @@ public enum ErrorCode {
     UNABLE_APPROVE_REFUND("Unable to approve refund", 2010, HttpStatus.BAD_REQUEST),
     UNABLE_REJECT_REFUND("Unable to reject refund", 2011, HttpStatus.BAD_REQUEST),
     UNABLE_RETURN_ORDER("Unable to return order", 2012, HttpStatus.BAD_REQUEST),
-    UNABLE_UPDATE_ORDER("Unable to update order", 2013, HttpStatus.BAD_REQUEST);
+    UNABLE_UPDATE_ORDER("Unable to update order", 2013, HttpStatus.BAD_REQUEST),
+    NOT_EXIST_ADDRESS("Address is not existed", 2014, HttpStatus.BAD_REQUEST),
+    NOT_EXIST_SHOP("Shop  is not existed", 2015, HttpStatus.CONFLICT),
+    ERROR_EXTERNAL_API("External api is error", 2016, HttpStatus.INTERNAL_SERVER_ERROR),
+    NOT_RESERVE_AVAILABLE("Không còn chỗ trống", 2017, HttpStatus.BAD_REQUEST),
+    RESERVATION_CONFLICT("Reservation conflict", 2018, HttpStatus.INTERNAL_SERVER_ERROR),
+
+    ;
 
     String message;
     int code;

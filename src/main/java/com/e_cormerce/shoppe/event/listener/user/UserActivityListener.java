@@ -154,7 +154,7 @@ public class UserActivityListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderPaid(OrderPaid event) throws JsonProcessingException {
+    public void handleOrderPaid(OrderPayment event) throws JsonProcessingException {
         var order = event.getOrder();
 
         UserActivity activity = UserActivity.builder()

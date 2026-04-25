@@ -37,10 +37,13 @@ public class Variant {
     @Column(nullable = false)
     String thumbnail;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "int default 0")
     int quantity;
 
-    @Column(name = "quantity_sold")
+    @Column(nullable = false, columnDefinition = "int default 0")
+    int reserved;
+
+    @Column(name = "quantity_sold", columnDefinition = "int default 0")
     int quantitySold;
 
 
@@ -60,6 +63,7 @@ public class Variant {
 
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<VariantValue> variantValues;
+
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false,

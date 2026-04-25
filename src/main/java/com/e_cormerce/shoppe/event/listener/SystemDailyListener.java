@@ -1,7 +1,7 @@
 package com.e_cormerce.shoppe.event.listener;
 
 import com.e_cormerce.shoppe.event.order.OrderCreated;
-import com.e_cormerce.shoppe.event.order.OrderPaid;
+import com.e_cormerce.shoppe.event.order.OrderPayment;
 import com.e_cormerce.shoppe.event.product.ProductCreated;
 import com.e_cormerce.shoppe.event.system.ClientRegistered;
 import com.e_cormerce.shoppe.event.system.SellerRegistered;
@@ -48,8 +48,12 @@ public class SystemDailyListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderPaid(OrderPaid event) {
-        systemDailyRepository.increaseTransactionAmount(event.getOrder().getTotalPrice(), event.getPaymentDate().toLocalDate());
+    public void handleOrderPaid(OrderPayment event) {
+        if (event.isSuccess()) {
+            systemDailyRepository.increaseTransactionAmount(event.getOrder().getTotalPrice(), event.getPaymentDate().toLocalDate());
+        } else {
+            systemDailyRepository.increaseFailedTransactionAmount(event.getOrder().getTotalPrice(), event.getPaymentDate().toLocalDate());
+        }
 
     }
 

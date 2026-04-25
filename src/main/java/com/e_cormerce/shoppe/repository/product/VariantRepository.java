@@ -40,7 +40,7 @@ public interface VariantRepository extends JpaRepository<Variant, String> {
 
     @Query(
             value =
-                    "SELECT product_id variants v WHERE v.id = :variant_id",
+                    "SELECT product_id from variants v WHERE v.id = :variant_id",
             nativeQuery = true)
     String getProductId(@Param("variant_id") String variant_id);
 
@@ -60,4 +60,15 @@ public interface VariantRepository extends JpaRepository<Variant, String> {
                     "update variants set quantity=quantity-:quantityOrdered, quantity_sold = quantity_sold + :quantityOrdered where id=:variant_id ",
             nativeQuery = true)
     List<String> updateQuantitySold(@Param("variant_id") String variant_id, int quantityOrdered);
+
+
+    @Query("select v from Variant v Join Fetch v.product p Join Fetch p.seller where v.id = :variantId")
+    Variant getVariantWithProductAndSeller(String variantId);
+
+
+    //so luong dong thay doi
+    @Modifying
+    @Query("update Variant v set v.reserved = v.reserved + :orderedQuantity where v.id= :id and reserved + :orderedQuantity <= quantity")
+    int reservedStock(String id, int orderedQuantity);
+
 }

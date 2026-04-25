@@ -8,6 +8,7 @@ import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
+import com.e_cormerce.shoppe.service.address.AddressService;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.media.ImageService;
 import lombok.AccessLevel;
@@ -26,6 +27,7 @@ public class AccountServiceHelper {
     AuthService authService;
     BCryptPasswordEncoder bCryptPasswordEncoder;
     ImageService imageService;
+    AddressService addressService;
 
     public Account getAccount(User user) {
         return accountRepository.findAccountByUserId(user.getId());
@@ -76,9 +78,7 @@ public class AccountServiceHelper {
     }
 
     public void updateAddress(AddressDto newAddress, User user) {
-        user.setProvince(newAddress.getProvince());
-        user.setDistrict(newAddress.getDistrict());
-        user.setWard(newAddress.getWard());
+        user.setAddress(addressService.getAddressByNames(newAddress));
     }
 
     public void updatePhoneNumber(String phoneNumber, User user) {

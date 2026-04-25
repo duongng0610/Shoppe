@@ -66,6 +66,17 @@ public interface SystemDailyRepository extends JpaRepository<SystemDaily, Intege
     @Modifying
     @Transactional
     @Query(value = """
+                INSERT INTO system_daily (date, total_transaction_count, total_failed_transaction_amount,updated_at)
+                VALUES (:date, 1,:paymentAmount,now())
+                ON DUPLICATE KEY UPDATE
+                    total_transaction_count = total_transaction_count + 1,
+                    total_failed_transaction_amount = total_failed_transaction_amount +:paymentAmount
+            """, nativeQuery = true)
+    void increaseFailedTransactionAmount(BigDecimal paymentAmount, LocalDate date);
+
+    @Modifying
+    @Transactional
+    @Query(value = """
                 INSERT INTO system_daily ( date, total_new_products)
                 VALUES ( :date, 1)
                 ON DUPLICATE KEY UPDATE

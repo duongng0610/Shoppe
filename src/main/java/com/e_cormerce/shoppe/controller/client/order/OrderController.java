@@ -1,12 +1,15 @@
 package com.e_cormerce.shoppe.controller.client.order;
 
 import com.e_cormerce.shoppe.dto.request.order.CreateOrderRequest;
+import com.e_cormerce.shoppe.dto.request.order.ShipCostOrderRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
+import com.e_cormerce.shoppe.dto.response.ghn.GhnShipFeeDataResponse;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
 import com.e_cormerce.shoppe.dto.response.order.GetCurrentTrackingResponse;
 import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.service.order.OrderService;
 import com.e_cormerce.shoppe.service.order.OrderTrackingService;
+import com.e_cormerce.shoppe.service.ship.ShippingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -24,16 +27,31 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderController {
     OrderService orderService;
+    ShippingService shippingService;
     OrderTrackingService orderTrackingService;
 
     @PostMapping()
     @PreAuthorize("hasAuthority('PERMISSION_CREATE_ORDER')")
     public ResponseEntity<ApiResponse<CreateOrderResponse>> create(
-            @RequestBody @Valid CreateOrderRequest request) throws JsonProcessingException {
-        var result = orderService.create(request);
+            @RequestBody @Valid CreateOrderRequest request, HttpServletRequest httpServletRequest) throws JsonProcessingException {
+        var result = orderService.create(request, httpServletRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         ApiResponse.<CreateOrderResponse>builder()
+                                .success(true)
+                                .message("create order successfully")
+                                .data(result)
+                                .build());
+    }
+
+    @GetMapping("/ship-cost")
+//    @PreAuthorize("hasAuthority('PERMISSION_GET_ORDER_SHIP')")
+    public ResponseEntity<ApiResponse<GhnShipFeeDataResponse>> getShipCost(@RequestBody @Valid ShipCostOrderRequest request) {
+
+        var result = shippingService.getShipCost(request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        ApiResponse.<GhnShipFeeDataResponse>builder()
                                 .success(true)
                                 .message("create order successfully")
                                 .data(result)

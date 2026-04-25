@@ -37,6 +37,12 @@ public interface SellerStatRepository extends JpaRepository<SellerStat, String> 
             nativeQuery = true)
     Optional<SellerInfoResponse> findSellerInfoBySellerId(String sellerId);
 
+    @Query(
+            value =
+                    "SELECT shop_id from seller_stats s  WHERE s.id = :sellerId", nativeQuery = true)
+    Optional<String> findShopIdBySellerId(String sellerId);
+
+
     @Modifying
     @Transactional
     @Query("""

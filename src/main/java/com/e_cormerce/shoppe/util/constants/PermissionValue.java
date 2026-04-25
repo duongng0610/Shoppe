@@ -36,7 +36,10 @@ public class PermissionValue {
             CANCEL_ORDER_BY_SELLER,
             APPROVE_RETURN_REQUEST,
             GET_SHOP_OVERVIEW,
-            VIEW_SELLER_ORDERS
+            VIEW_SELLER_ORDERS,
+            SHIP_ORDER,
+            UPDATE_ORDER_TRACKING_LOCATION
+
     );
 
     public static final Set<PermissionEnum> ADMIN_PERMISSIONS = Set.of(

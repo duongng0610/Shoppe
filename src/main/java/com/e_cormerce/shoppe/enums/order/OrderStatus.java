@@ -9,10 +9,9 @@ public enum OrderStatus {
     CANCELLED_BY_CLIENT,
     CANCELLED_BY_SELLER,
     SHIPPING,
-    ARRIVED,
     DELIVERED,
     RETURNED,
-    BOMB;
+    FAILED_DELIVERY;
 
     public static OrderStatus fromString(String status) {
         if (status == null || status.trim().isEmpty()) {

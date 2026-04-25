@@ -25,8 +25,8 @@ public class OrderNotificationListener {
                 NotificationType.ORDER,
                 event.getOrder().getId(),
                 "Đặt thành công đơn hàng",
-                "Đơn hàng " + event.getOrder().getProductName() + " đã được đặt thành công.",
-                event.getOrder().getThumbnail());
+                "Đơn hàng " + event.getOrder().getOrderName() + " đã được đặt thành công.",
+                event.getOrder().getOrderThumbnail());
 
         notificationService.createNotification(
                 event.getSeller().getId(),
@@ -34,7 +34,7 @@ public class OrderNotificationListener {
                 event.getOrder().getId(),
                 "Sản phẩm đang chờ xác nhận",
                 "Bạn có một đơn hàng mới từ " + event.getClient().getUsername(),
-                event.getOrder().getThumbnail());
+                event.getOrder().getOrderThumbnail());
 
     }
 
@@ -46,8 +46,8 @@ public class OrderNotificationListener {
                 NotificationType.ORDER,
                 event.getOrder().getId(),
                 "Cập nhật đơn hàng",
-                "Đơn hàng " + event.getOrder().getProductName() + " đã được xác nhận.",
-                event.getOrder().getThumbnail());
+                "Đơn hàng " + event.getOrder().getOrderName() + " đã được xác nhận.",
+                event.getOrder().getOrderThumbnail());
     }
 
     @Async
@@ -58,8 +58,8 @@ public class OrderNotificationListener {
                 NotificationType.ORDER,
                 event.getOrder().getId(),
                 "Cập nhật đơn hàng",
-                "Bạn đã hủy đơn hàng " + event.getOrder().getProductName() + " đã bị huỷ.",
-                event.getOrder().getThumbnail());
+                "Bạn đã hủy đơn hàng " + event.getOrder().getOrderName() + " đã bị huỷ.",
+                event.getOrder().getOrderThumbnail());
 
 
         notificationService.createNotification(
@@ -67,8 +67,8 @@ public class OrderNotificationListener {
                 NotificationType.ORDER,
                 event.getOrder().getId(),
                 "Cập nhật đơn hàng",
-                "Đơn hàng " + event.getOrder().getProductName() + " đã bị hủy bởi shop.",
-                event.getOrder().getThumbnail());
+                "Đơn hàng " + event.getOrder().getOrderName() + " đã bị hủy bởi shop.",
+                event.getOrder().getOrderThumbnail());
 
     }
 
@@ -81,8 +81,8 @@ public class OrderNotificationListener {
                 NotificationType.ORDER,
                 event.getOrder().getId(),
                 "Cập nhật đơn hàng",
-                "Đơn hàng " + event.getOrder().getProductName() + " đã bắt đầu được giao.",
-                event.getOrder().getThumbnail());
+                "Đơn hàng " + event.getOrder().getOrderName() + " đã bắt đầu được giao.",
+                event.getOrder().getOrderThumbnail());
     }
 
     @Async
@@ -95,8 +95,8 @@ public class OrderNotificationListener {
                 NotificationType.ORDER,
                 event.getOrder().getId(),
                 "Cập nhật vị trí đơn hàng",
-                "Đơn hàng " + event.getOrder().getProductName() + " đã giao đến nơi tại " + event.getAddress(),
-                event.getOrder().getThumbnail());
+                "Đơn hàng " + event.getOrder().getOrderName() + " đã giao đến nơi tại " + event.getAddress(),
+                event.getOrder().getOrderThumbnail());
 
 
     }
@@ -110,7 +110,29 @@ public class OrderNotificationListener {
                 event.getOrder().getId(),
                 "Đơn hàng đã đến nơi",
                 "Đơn hàng đã tới địa điểm giao",
-                event.getOrder().getThumbnail());
+                event.getOrder().getOrderThumbnail());
+    }
+
+
+    @Async
+    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+    public void handleOrderPayment(OrderPayment event) {
+        notificationService.createNotification(
+                event.getClient().getId(),
+                NotificationType.ORDER,
+                event.getOrder().getId(),
+                "Thanh toán đơn hàng",
+                event.isSuccess() ? "Thanh toán đơn hàng: " + event.getOrder().getId() + " thành công " : "Thanh toán đơn hàng: " + event.getOrder().getId() + " thất bại ",
+                event.getOrder().getOrderThumbnail());
+        if (event.isSuccess()) {
+            notificationService.createNotification(
+                    event.getClient().getId(),
+                    NotificationType.ORDER,
+                    event.getOrder().getId(),
+                    "Thanh toán đơn hàng",
+                    event.getClient().getUsername() + " thanh toán đơn hàng: " + event.getOrder().getId() + " thành công ",
+                    event.getOrder().getOrderThumbnail());
+        }
     }
 
 }
