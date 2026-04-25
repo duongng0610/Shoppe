@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import java.math.BigDecimal;
+
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -53,10 +55,14 @@ public class SellerOrderStatListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderPaid(OrderPaid event) {
-
-        sellerStatRepository.completeOrder(event.getSellerId(), event.getOrder().getTotalPrice());
+    public void handleOrderPaid(OrderPayment event) {
+        if (!event.isSuccess()) {
+            return;
+        }
+        var order = event.getOrder();
+        sellerStatRepository.completeOrder(event.getSellerId(), order.getPriceEach().multiply(BigDecimal.valueOf(order.getQuantity())));
     }
+
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)

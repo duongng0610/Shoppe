@@ -1,7 +1,7 @@
 package com.e_cormerce.shoppe.event.listener.product;
 
 import com.e_cormerce.shoppe.event.order.OrderCreated;
-import com.e_cormerce.shoppe.event.order.OrderPaid;
+import com.e_cormerce.shoppe.event.order.OrderPayment;
 import com.e_cormerce.shoppe.event.product.ProductViewed;
 import com.e_cormerce.shoppe.repository.analytic.ProductDailyRepository;
 import com.e_cormerce.shoppe.repository.analytic.ProductVariantDailyRepository;
@@ -13,6 +13,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
+
+import java.math.BigDecimal;
 
 @Component
 @RequiredArgsConstructor
@@ -32,10 +34,14 @@ public class ProductDailyListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderPaid(OrderPaid event) {
+    public void handleOrderPaid(OrderPayment event) {
+        if (!event.isSuccess()) {
+            return;
+        }
+        var order = event.getOrder();
         var productId = variantRepository.getProductId(event.getVariantId());
-        productVariantDailyRepository.increaseRevenue(event.getVariantId(), productId, event.getOrder().getTotalPrice(), event.getPaymentDate().toLocalDate());
-        productDailyRepository.increaseRevenue(productId, event.getOrder().getTotalPrice(), event.getPaymentDate().toLocalDate());
+        productVariantDailyRepository.increaseRevenue(event.getVariantId(), productId, order.getPriceEach().multiply(BigDecimal.valueOf(order.getQuantity())), event.getPaymentDate().toLocalDate());
+        productDailyRepository.increaseRevenue(productId, order.getPriceEach().multiply(BigDecimal.valueOf(order.getQuantity())), event.getPaymentDate().toLocalDate());
 
     }
 

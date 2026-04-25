@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.entity.order;
 
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.enums.order.OrderPaymentStatus;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,10 +37,22 @@ public class Order {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    OrderStatus status;
+    OrderStatus status = OrderStatus.PENDING;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    OrderPaymentStatus paymentStatus = OrderPaymentStatus.PENDING;
 
     @Column(name = "total_price", precision = 15, scale = 2, nullable = false)
     BigDecimal totalPrice;
+
+
+    @Column(name = "ship_cost", precision = 15, scale = 2, nullable = false)
+    BigDecimal shipCost;
+
+
+    @Column(name = "price_each", precision = 15, scale = 2, nullable = false)
+    BigDecimal priceEach;
 
 
     @Column(nullable = false)
@@ -49,7 +62,7 @@ public class Order {
     @CreationTimestamp
     LocalDateTime createdAt;
 
-    
+
     @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
@@ -67,23 +80,24 @@ public class Order {
     @JoinColumn(name = "seller_id", nullable = false)
     User seller;
 
-    @Column(name = "shipping_province")
+    @Column(name = "shipping_province", nullable = false)
     String province;
 
-    @Column(name = "shipping_district")
+    @Column(name = "shipping_district", nullable = false)
     String district;
 
     @Column(name = "shipping_ward")
     String ward;
 
+    @Column(name = "order_name", nullable = false)
+    String orderName;
+
+
     @Column(name = "shipping_phone_number", nullable = false)
     String shippingPhoneNumber;
 
-    @Column(name = "product_name", nullable = false)
-    String productName;
-
-    @Column(name = "variant_thumbnail", nullable = false)
-    String variantThumbnail;
+    @Column(name = "order_thumbnail", nullable = false)
+    String orderThumbnail;
 
     @Column(name = "variant_attributes", columnDefinition = "json", nullable = true)
     String variantAttributes;

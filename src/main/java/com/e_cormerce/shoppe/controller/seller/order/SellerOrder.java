@@ -64,6 +64,7 @@ public class SellerOrder {
                 .body(ApiResponse.builder().message("ship order successfully").success(true).build());
     }
 
+
     @GetMapping("")
     @PreAuthorize("hasAuthority('PERMISSION_VIEW_SELLER_ORDERS')")
     public ResponseEntity<ApiResponse<GetOrderDetailResponse>> getSellerOrders() {

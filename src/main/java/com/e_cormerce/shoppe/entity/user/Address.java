@@ -1,55 +1,45 @@
-//package com.e_cormerce.shoppe.entity.user;
-//
-//import jakarta.persistence.*;
-//import lombok.*;
-//import lombok.experimental.FieldDefaults;
-//import org.hibernate.annotations.CreationTimestamp;
-//import org.hibernate.annotations.SQLDelete;
-//import org.hibernate.annotations.UpdateTimestamp;
-//import org.hibernate.annotations.Where;
-//
-//import java.time.LocalDateTime;
-//import java.util.Date;
-//
-//@Entity
-//@Table(
-//        name = "addresses",
-//        indexes = {
-//                @Index(name = "idx_province", columnList = "province"),
-//                @Index(name = "idx_province_district", columnList = "province, district"),
-//                @Index(name = "idx_province_district_ward", columnList = "province, district, ward")
-//        })
-//@Getter
-//@Setter
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE)
-//@SQLDelete(sql = "UPDATE addresses SET deleted=true where id=?")
-//@Where(clause = "deleted = false")
-//public class Address {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.UUID)
-//    String id;
-//
-//    @Column(columnDefinition = "boolean default false")
-//    boolean deleted;
-//
-//    @Column(nullable = false)
-//    String province;
-//
-//    @Column(nullable = false)
-//    String district;
-//
-//    @Column(nullable = false)
-//    String ward;
-//
-//    @CreationTimestamp
-//    @Column(name = "created_at", updatable = false)
-//    LocalDateTime createdAt;
-//
-//    @UpdateTimestamp
-//    @Column(name = "updated_at")
-//    Date updatedAt;
-//
-//}
+package com.e_cormerce.shoppe.entity.user;
+
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Entity
+@Table(
+        name = "address",
+        indexes = {
+                @Index(name = "idx_province", columnList = "province_id"),
+                @Index(name = "idx_district", columnList = "district_id"),
+                @Index(name = "idx_full_name", columnList = "province_name,district_name,ward_name")
+        }
+)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class Address {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    @Column(name = "province_name")
+    String provinceName;
+
+    @Column(name = "province_id")
+    Integer provinceId;
+
+    @Column(name = "district_name")
+    String districtName;
+
+    @Column(name = "district_id")
+    Integer districtId;
+
+    @Column(name = "ward_name")
+    String wardName;
+
+    @Column(name = "ward_id")
+    String wardId;
+}

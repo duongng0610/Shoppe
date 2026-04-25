@@ -64,14 +64,9 @@ public class User {
     @JoinColumn(name = "id")
     Account account;
 
-    @Column(name = "province")
-    String province;
-
-    @Column(name = "district")
-    String district;
-
-    @Column(name = "ward")
-    String ward;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    Address address;
 
 
 }

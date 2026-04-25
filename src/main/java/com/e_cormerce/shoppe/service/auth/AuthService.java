@@ -3,7 +3,9 @@ package com.e_cormerce.shoppe.service.auth;
 import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
 import com.e_cormerce.shoppe.dto.request.auth.register.AbstractRegisterRequest;
+import com.e_cormerce.shoppe.dto.request.auth.register.RegisterClientRequest;
 import com.e_cormerce.shoppe.dto.request.auth.register.RegisterSellerRequest;
+import com.e_cormerce.shoppe.dto.request.ghn.GhnCreateShopRequest;
 import com.e_cormerce.shoppe.entity.client.ClientStat;
 import com.e_cormerce.shoppe.entity.product.ShoppingCart;
 import com.e_cormerce.shoppe.entity.seller.SellerStat;
@@ -29,6 +31,8 @@ import com.e_cormerce.shoppe.repository.token.RefreshTokenRepository;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
 import com.e_cormerce.shoppe.repository.user.RoleRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
+import com.e_cormerce.shoppe.service.address.AddressService;
+import com.e_cormerce.shoppe.service.webclient.WebClientService;
 import com.e_cormerce.shoppe.util.HashUtil;
 import io.jsonwebtoken.Claims;
 import lombok.AccessLevel;
@@ -66,6 +70,8 @@ public class AuthService {
     JwtProperties jwtProperties;
     ClientStatRepository clientStatRepository;
     ApplicationEventPublisher eventPublisher;
+    WebClientService webClientService;
+    AddressService addressService;
 
     @Transactional()
     public String logIn(LogInRequest request) {
@@ -88,65 +94,104 @@ public class AuthService {
         return tokenService.generateAccessToken(account.getId(), account.getRole());
     }
 
-    @Transactional(timeout = 5)
-    public void registerUser(AbstractRegisterRequest request, RoleEnum roleEnum) {
+    private User buildBaseUser(AbstractRegisterRequest request, RoleEnum roleEnum) {
+
         if (accountRepository.existsByEmail(request.getEmail())) {
             throw new AppException(ErrorCode.EXISTED_ACCOUNT);
         }
 
-
-        Role role =
-                roleRepository
-                        .findByVal(roleEnum)
-                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
-
-        var account =
-                Account.builder()
-                        .email(request.getEmail())
-                        .password(bCryptPasswordEncoder.encode(request.getPassword()))
-                        .role(role)
-                        .status(AccountStatus.INACTIVE)
-                        .build();
-
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new AppException(ErrorCode.INVALID_USERNAME);
-
         }
 
-        var user =
-                User.builder()
-                        .account(account)
-                        .username(request.getUsername())
-                        .createdAt(LocalDateTime.now())
-                        .build();
+        Role role = roleRepository.findByVal(roleEnum)
+                .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
 
-        if (request.getClass() == RegisterSellerRequest.class
-        ) {
+        var account = Account.builder()
+                .email(request.getEmail())
+                .password(bCryptPasswordEncoder.encode(request.getPassword()))
+                .role(role)
+                .status(AccountStatus.INACTIVE)
+                .build();
 
-            var addressDto = ((RegisterSellerRequest) request).getAddress();
-            var phoneNumber = ((RegisterSellerRequest) request).getPhoneNumber();
+        return User.builder()
+                .account(account)
+                .username(request.getUsername())
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
 
-            user.setProvince(addressDto.getProvince());
-            user.setDistrict(addressDto.getDistrict());
-            user.setWard(addressDto.getWard());
-            user.setPhoneNumber(phoneNumber);
+    @Transactional(timeout = 5)
+    public void registerClient(RegisterClientRequest request) {
 
+        var user = buildBaseUser(request, RoleEnum.CLIENT);
 
-        }
         userRepository.save(user);
-        if (role.getVal().equals(RoleEnum.CLIENT)) {
-            ClientStat clientStat = ClientStat.builder().client(user).build();
-            clientStatRepository.save(clientStat);
-            ShoppingCart shoppingCart = ShoppingCart.builder().client(user).totalQuantity(0).name("Mặc định").build();
-            shoppingCartRepository.save(shoppingCart);
-            eventPublisher.publishEvent(ClientRegistered.builder().date(LocalDateTime.now()).client(userMapper.toDto(user)).build());
 
-        } else if (role.getVal().equals(RoleEnum.SELLER)) {
-            SellerStat sellerStat =
-                    SellerStat.builder().seller(user).build();
-            sellerStatRepository.save(sellerStat);
-            eventPublisher.publishEvent(SellerRegistered.builder().date(LocalDateTime.now()).seller(userMapper.toDto(user)).build());
-        }
+        ClientStat clientStat = ClientStat.builder()
+                .client(user)
+                .build();
+
+        clientStatRepository.save(clientStat);
+
+        ShoppingCart shoppingCart = ShoppingCart.builder()
+                .client(user)
+                .totalQuantity(0)
+                .name("Mặc định")
+                .build();
+
+        shoppingCartRepository.save(shoppingCart);
+
+        eventPublisher.publishEvent(
+                ClientRegistered.builder()
+                        .date(LocalDateTime.now())
+                        .client(userMapper.toDto(user))
+                        .build()
+        );
+    }
+
+
+    @Transactional(timeout = 5)
+    public void registerSeller(RegisterSellerRequest request) {
+
+        var user = buildBaseUser(request, RoleEnum.SELLER);
+
+        // set info seller
+        var addressDto = request.getAddress();
+        var phoneNumber = request.getPhoneNumber();
+
+        user.setPhoneNumber(phoneNumber);
+        // lấy addressId để gọi GHN
+        var address = addressService.getAddressByNames(addressDto);
+
+        user.setAddress(address);
+        userRepository.save(user);
+
+
+        var res = webClientService.createShopGhnApi(
+                GhnCreateShopRequest.builder()
+                        .name(user.getUsername())
+                        .address("...") // map lại cho đúng
+                        .districtId(address.getDistrictId())
+                        .wardCode(address.getWardId())
+                        .phone(phoneNumber)
+                        .build()
+        );
+
+
+        SellerStat sellerStat = SellerStat.builder()
+                .seller(user)
+                .shopId(res.getData().getShopId())
+                .build();
+
+        sellerStatRepository.save(sellerStat);
+
+        eventPublisher.publishEvent(
+                SellerRegistered.builder()
+                        .date(LocalDateTime.now())
+                        .seller(userMapper.toDto(user))
+                        .build()
+        );
     }
 
     @Transactional(timeout = 5)

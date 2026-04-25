@@ -42,6 +42,9 @@ public class SystemDaily {
     @Column(name = "total_transaction_amount", nullable = false, columnDefinition = "int default 0")
     int totalTransactionAmount;
 
+    @Column(name = "total_failed_transaction_amount", nullable = false, columnDefinition = "int default 0")
+    int totalFailedTransactionAmount;
+
 
     @Column(name = "total_new_products", nullable = false, columnDefinition = "int default 0")
     int totalNewProducts;

@@ -65,6 +65,9 @@ public class SellerStat {
     @Column(nullable = false, name = "shipping_orders", columnDefinition = "int default 0")
     int shippingOrders;
 
+    @Column(nullable = false, name = "arrived_orders", columnDefinition = "int default 0")
+    int arrivedOrders;
+
     @Column(nullable = false, name = "cancelled_orders_by_client", columnDefinition = "int default 0")
     int cancelledOrdersByClient;
 
@@ -102,4 +105,7 @@ public class SellerStat {
     @MapsId
     @JoinColumn(name = "id")
     User seller;
+
+    @Column(nullable = false)
+    String shopId;//cho api ben thu 3 biet.
 }

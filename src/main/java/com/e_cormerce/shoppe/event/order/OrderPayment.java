@@ -12,10 +12,11 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderPaid {
+public class OrderPayment {
     OrderDto order;
     UserDto client;
     String sellerId;
     String variantId;
+    boolean success;
     LocalDateTime paymentDate;
 }

@@ -12,8 +12,8 @@ import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import com.e_cormerce.shoppe.event.order.OrderApproved;
-import com.e_cormerce.shoppe.event.order.OrderArrived;
 import com.e_cormerce.shoppe.event.order.OrderCancelledByClient;
+import com.e_cormerce.shoppe.event.order.OrderShipping;
 import com.e_cormerce.shoppe.event.product.ProductHidden;
 import com.e_cormerce.shoppe.event.product.ProductUnhidden;
 import com.e_cormerce.shoppe.exception.AppException;
@@ -226,14 +226,15 @@ public class SellerService {
             throw new AppException(ErrorCode.UNABlE_SHIP_ORDER);
         }
 
-        Variant variant = order.getVariant();
         order.setStatus(OrderStatus.SHIPPING);
         orderRepository.save(order);
         eventPublisher.publishEvent(
-                OrderArrived.builder()
+                OrderShipping.builder()
                         .order(orderMapper.toOrderDto(order))
                         .client(userMapper.toDto(order.getClient()))
                         .seller(userMapper.toDto(order.getSeller()))
                         .build());
     }
+
+
 }

@@ -27,8 +27,8 @@ public class ClientStatListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleProductApproved(OrderApproved event) {
-        var seller = event.getSeller();
-        clientStatRepository.approveOrder(seller.getId());
+        var client = event.getClient();
+        clientStatRepository.approveOrder(client.getId());
     }
 
     @Async
@@ -48,7 +48,10 @@ public class ClientStatListener {
 
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleOrderPaid(OrderPaid event) {
+    public void handleOrderPaid(OrderPayment event) {
+        if (!event.isSuccess()) {
+            return;
+        }
         var client = event.getClient();
         clientStatRepository.completeOrder(client.getId(), event.getOrder().getTotalPrice());
     }

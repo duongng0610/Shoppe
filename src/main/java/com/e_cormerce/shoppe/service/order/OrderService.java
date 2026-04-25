@@ -1,6 +1,5 @@
 package com.e_cormerce.shoppe.service.order;
 
-import com.e_cormerce.shoppe.dto.common.address.AddressDto;
 import com.e_cormerce.shoppe.dto.common.order.OrderDetailDto;
 import com.e_cormerce.shoppe.dto.request.order.CreateOrderRequest;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
@@ -10,20 +9,21 @@ import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.enums.order.OrderPaymentStatus;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
-import com.e_cormerce.shoppe.enums.product.ProductStatus;
+import com.e_cormerce.shoppe.enums.order.ReservationStatus;
+import com.e_cormerce.shoppe.enums.transaction.TransactionStatus;
 import com.e_cormerce.shoppe.event.order.OrderCancelledByClient;
 import com.e_cormerce.shoppe.event.order.OrderCreated;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.order.OrderMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
+import com.e_cormerce.shoppe.repository.order.OrderReservationRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
-import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.order.helper.CreateOrderHelper;
 import com.e_cormerce.shoppe.service.vnpay.VnPayService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -32,9 +32,9 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,43 +48,24 @@ public class OrderService {
     ApplicationEventPublisher eventPublisher;
     VnPayService vnPayService;
     VariantRepository variantRepository;
-    ObjectMapper objectMapper;
     UserMapper userMapper;
-    AuthService authService;
+    OrderReservationRepository orderReservationRepository;
+
 
     @Transactional
-    public CreateOrderResponse create(@Valid CreateOrderRequest request) throws JsonProcessingException {
-        Variant variant = createOrderHelper.getVariant(request.getVariantId());
+    public CreateOrderResponse create(@Valid CreateOrderRequest request, HttpServletRequest httpServletRequest) throws JsonProcessingException {
+        Variant variant = variantRepository.getVariantWithProductAndSeller(request.getVariantId());
         Product product = variant.getProduct();
-        User seller = product.getSeller();
-        User client = authService.getUserThroughAuthentication();
-        AddressDto address = request.getAddress();
-        String phoneNumber = request.getShippingPhoneNumber();
+
         int orderedQuantity = request.getQuantity();
-        if (product.getStatus() != ProductStatus.ACTIVE) {
-            throw new AppException(ErrorCode.PRODUCT_NOT_ACTIVE);
-        }
-        Order order =
-                Order.builder()
-                        .quantity(request.getQuantity())
-                        .variant(variant)
-                        .status(OrderStatus.PENDING)
-                        .client(client)
-                        .seller(seller)
-                        .variantThumbnail(variant.getThumbnail())
-                        .province(address.getProvince())
-                        .district(address.getDistrict())
-                        .ward(address.getWard())
-                        .shippingPhoneNumber(phoneNumber)
-                        .totalPrice(createOrderHelper.getTotalPrice(variant, request.getQuantity()))
-                        .productName(product.getName())
-                        .variantAttributes(variant.isDefault() ? null : createOrderHelper.getAttributesVariant(variant))
-                        .createdAt(LocalDateTime.now())
-                        .build();
+        //step1
+        createOrderHelper.checkQuantityAndActiveProduct(variant, orderedQuantity);
 
+        var order = createOrderHelper.mainExecute(variant, request);
+        var client = order.getClient();
+        var seller = order.getSeller();
 
-        orderRepository.save(order);
-
+        //publish event
         eventPublisher.publishEvent(
                 OrderCreated.builder()
                         .order(orderMapper.toOrderDto(order))
@@ -96,10 +77,12 @@ public class OrderService {
 
         return CreateOrderResponse.builder()
                 .orderId(order.getId())
-                .clientId(client.getId())
                 .sellerId(seller.getId())
+                .clientId(client.getId())
+                .paymentUrl(getUrlPaymentByOrder(order.getId(), httpServletRequest))
                 .build();
     }
+
 
     @Transactional
     public void cancelOrder(String orderId) {
@@ -148,7 +131,6 @@ public class OrderService {
 
         order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
         variant.setQuantity(availableQuantity + orderQuantity);
-
         eventPublisher.publishEvent(
                 OrderCancelledByClient.builder()
                         .order(orderMapper.toOrderDto(order))
@@ -191,4 +173,33 @@ public class OrderService {
         String vnpayUrl = vnPayService.createUrlPayment(order.getTotalPrice().intValue(), order.getId(), userId, "Thanh toán đơn hàng " + id, baseUrl);
         return vnpayUrl;
     }
+
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void handleVnpayResult(Order order, User user, TransactionStatus status) {
+        var reservation = orderReservationRepository.findByOrderId(order.getId());
+        if (reservation.getStatus() != ReservationStatus.ACTIVE) {
+            throw new AppException(ErrorCode.RESERVATION_CONFLICT);
+        }
+        //set status = released
+        reservation.setStatus(ReservationStatus.RELEASED);
+
+        //update reserved of variant
+        var variant = reservation.getVariant();
+        variant.setReserved(variant.getReserved() - reservation.getQuantity());
+
+        if (status == com.e_cormerce.shoppe.enums.transaction.TransactionStatus.SUCCESS) {
+            order.setPaymentStatus(OrderPaymentStatus.SUCCESS);
+            variant.setQuantity(variant.getQuantity() - reservation.getQuantity());
+
+        } else {
+            order.setPaymentStatus(OrderPaymentStatus.FAILED);
+        }
+        variantRepository.save(variant);
+        orderReservationRepository.save(reservation);
+        orderRepository.save(order);
+
+    }
+
+
 }

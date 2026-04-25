@@ -56,10 +56,10 @@ public class OrderTrackingService {
 
         OrderStatus newStatus = OrderStatus.fromString(request.getOrderStatus());
 
-        if (newStatus == OrderStatus.ARRIVED) {
-            order.setStatus(OrderStatus.ARRIVED);
-            orderRepository.save(order);
-        }
+//        if (newStatus == OrderStatus.ARRIVED) {
+//            order.setStatus(OrderStatus.ARRIVED);
+//            orderRepository.save(order);
+//        }
 
         OrderTrackingLocation saved = orderTrackingLocationRepository.save(location);
 

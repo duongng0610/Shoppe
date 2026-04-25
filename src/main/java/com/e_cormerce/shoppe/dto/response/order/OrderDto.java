@@ -13,9 +13,11 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDto {
     String id;
-    String productName;
-    String thumbnail;
+    String orderName;
+    String orderThumbnail;
     BigDecimal totalPrice;
+    BigDecimal shipCost;
+    BigDecimal priceEach;
     int quantity;
     LocalDateTime createdAt;
 }
