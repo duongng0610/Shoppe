@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.dto.request.product;
 
 import com.e_cormerce.shoppe.dto.common.product.VariantAttributeDto;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -27,4 +28,7 @@ public class VariantRequest {
   @NotNull(message = "quantity of variant is required")
   @Positive(message = "quantity of variant must be greater than 0")
   int quantity;
+
+  @NotBlank(message = "thumbnail is required")
+  String thumbnailId;
 }

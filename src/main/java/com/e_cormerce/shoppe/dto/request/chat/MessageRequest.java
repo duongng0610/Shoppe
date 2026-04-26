@@ -21,5 +21,5 @@ public class MessageRequest {
 
   @NotBlank String conversationId;
 
-  List<String> imageUrls;
+  List<String> imageIds;
 }

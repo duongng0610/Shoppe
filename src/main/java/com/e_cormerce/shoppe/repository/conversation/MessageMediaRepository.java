@@ -13,7 +13,7 @@ public interface MessageMediaRepository extends JpaRepository<MessageMedia, Stri
   @Query(
       value =
           """
-        SELECT url
+        SELECT image_id
         FROM message_medias
         WHERE message_id = :messageId
           AND deleted = false

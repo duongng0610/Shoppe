@@ -11,9 +11,9 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCreated {
-    OrderDto order;
-    UserDto client;
-    UserDto seller;
-    String variantId;
-    String productId;
+  OrderDto order;
+  UserDto client;
+  UserDto seller;
+  String variantId;
+  String productId;
 }

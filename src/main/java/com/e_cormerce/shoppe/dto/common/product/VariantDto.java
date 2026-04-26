@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class VariantDto {
-    String id;
-    String productId;
-
+  String id;
+  String productId;
 }

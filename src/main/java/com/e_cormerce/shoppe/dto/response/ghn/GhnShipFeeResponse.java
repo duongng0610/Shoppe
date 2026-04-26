@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GhnShipFeeResponse {
-    Integer code;
-    String message;
-    GhnShipFeeDataResponse data;
+  Integer code;
+  String message;
+  GhnShipFeeDataResponse data;
 }

@@ -12,9 +12,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class ProductEventAbstract {
-    Product product;
-    User seller;
-    Category category;
-
-    
+  Product product;
+  User seller;
+  Category category;
 }

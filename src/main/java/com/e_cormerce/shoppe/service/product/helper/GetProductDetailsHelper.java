@@ -8,6 +8,7 @@ import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.mapper.product.VariantMapper;
 import com.e_cormerce.shoppe.repository.product.TypeValueRepository;
 import com.e_cormerce.shoppe.repository.product.VariantValueRepository;
+import com.e_cormerce.shoppe.service.media.CloudinaryService;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AccessLevel;
@@ -22,6 +23,7 @@ public class GetProductDetailsHelper {
   TypeValueRepository typeValueRepository;
   VariantValueRepository variantValueRepository;
   VariantMapper variantMapper;
+  CloudinaryService cloudinaryService;
 
   public List<TypeDto> createTypesResponse(List<Type> types) {
 

@@ -26,8 +26,7 @@ import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.repository.seller.SellerStatRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
-import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
-import com.e_cormerce.shoppe.service.seller.helper.UploadProductImagesHelper;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -35,206 +34,194 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SellerService {
-    UploadProductImagesHelper uploadProductImagesHelper;
-    ProductService productService;
-    SellerStatRepository sellerStatRepository;
-    OrderRepository orderRepository;
-    AuthService authService;
-    ApplicationEventPublisher eventPublisher;
-    ProductRepository productRepository;
-    ProductMapper productMapper;
-    OrderMapper orderMapper;
-    UserMapper userMapper;
-    VariantRepository variantRepository;
-    ProductRepository pRepository;
+  ProductService productService;
+  SellerStatRepository sellerStatRepository;
+  OrderRepository orderRepository;
+  AuthService authService;
+  ApplicationEventPublisher eventPublisher;
+  ProductRepository productRepository;
+  ProductMapper productMapper;
+  OrderMapper orderMapper;
+  UserMapper userMapper;
+  VariantRepository variantRepository;
+  ProductRepository pRepository;
 
+  public List<MyProductResponse> getMyProducts(int limit, int offset) {
+    String sellerId = authService.getUserId();
+    int page = offset / limit; // convert offset → page
 
-    public List<MyProductResponse> getMyProducts(int limit, int offset) {
-        String sellerId = authService.getUserId();
-        int page = offset / limit; // convert offset → page
+    var products = productRepository.findProductsOfSellerForSeller(sellerId, limit, offset);
+    return products.stream().map(p -> productMapper.toMyProductDTO(p)).toList();
+  }
 
-        var products = productRepository.findProductsOfSellerForSeller(sellerId, limit, offset);
-        return products.stream().map(p -> productMapper.toMyProductDTO(p)).toList();
+  @Transactional(propagation = Propagation.REQUIRED)
+  public void createProduct(CreateProductRequest request) {
+
+    if (request.getHasVariant()) {
+      if (request.getVariantRequests() != null && request.getTypes() == null) {
+        throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
+      }
+    } else {
+      if (request.getVariantRequests() != null && request.getVariantRequests().size() > 0) {
+        throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
+      }
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void createProduct(
-            CreateProductRequest request,
-            MultipartFile thumbnail,
-            List<MultipartFile> extraImages,
-            List<MultipartFile> variantImages) {
+    var product = productService.persistProduct(request);
+  }
 
-        if (request.getHasVariant()) {
-            if (variantImages == null
-                    || request.getVariantRequests() == null
-                    || (variantImages.size() != request.getVariantRequests().size()) // sai kích thước
-                    || (request.getVariantRequests() != null
-                    && request.getTypes() == null)) // có variant mà ko có type
-            {
-                throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
-            }
-        } else {
-            if (variantImages != null
-                    || (request.getVariantRequests() != null && request.getVariantRequests().size() > 0)) {
-                throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
-            }
-        }
+  @Transactional
+  public void hiddenProduct(String productId) {
+    Product product =
+        productRepository
+            .findById(productId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
-        ProductImagesUrl urls =
-                uploadProductImagesHelper.uploadImagesOfProduct(thumbnail, extraImages, variantImages);
+    User currentUser = authService.getUserThroughAuthentication();
 
-        var product = productService.persistProduct(request, urls);
-
+    // check seller
+    if (!product.getSeller().getId().equals(currentUser.getId())) {
+      throw new AppException(ErrorCode.UNAUTHORIZED);
     }
 
-    @Transactional
-    public void hiddenProduct(String productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
-
-        User currentUser = authService.getUserThroughAuthentication();
-
-        // check seller
-        if (!product.getSeller().getId().equals(currentUser.getId())) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
-        }
-
-        // check trạng thái
-        if (product.getStatus() != ProductStatus.ACTIVE) {
-            throw new AppException(ErrorCode.UNABLE_HIDDEN_PRODUCT);
-        }
-
-        productRepository.updateStatus(productId, ProductStatus.HIDDEN.getValue());
-
-        eventPublisher.publishEvent(ProductHidden.builder().product(productMapper.toProductCardDto(product)).seller(userMapper.toDto(product.getSeller())).build());
+    // check trạng thái
+    if (product.getStatus() != ProductStatus.ACTIVE) {
+      throw new AppException(ErrorCode.UNABLE_HIDDEN_PRODUCT);
     }
 
-    @Transactional
-    public void unhiddenProduct(String productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
+    productRepository.updateStatus(productId, ProductStatus.HIDDEN.getValue());
 
-        User currentUser = authService.getUserThroughAuthentication();
+    eventPublisher.publishEvent(
+        ProductHidden.builder()
+            .product(productMapper.toProductCardDto(product))
+            .seller(userMapper.toDto(product.getSeller()))
+            .build());
+  }
 
-        // check seller
-        if (!product.getSeller().getId().equals(currentUser.getId())) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
-        }
+  @Transactional
+  public void unhiddenProduct(String productId) {
+    Product product =
+        productRepository
+            .findById(productId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
-        // check trạng thái
-        if (product.getStatus() != ProductStatus.HIDDEN) {
-            throw new AppException(ErrorCode.UNABLE_UNHIDDEN_PRODUCT);
-        }
+    User currentUser = authService.getUserThroughAuthentication();
 
-        productRepository.updateStatus(productId, ProductStatus.ACTIVE.getValue());
-
-        eventPublisher.publishEvent(ProductUnhidden.builder().product(productMapper.toProductCardDto(product)).seller(userMapper.toDto(product.getSeller())).build());
+    // check seller
+    if (!product.getSeller().getId().equals(currentUser.getId())) {
+      throw new AppException(ErrorCode.UNAUTHORIZED);
     }
 
-    public SellerInfoResponse getSeller(String id) {
-        return sellerStatRepository
-                .findSellerInfoBySellerId(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SELLER));
+    // check trạng thái
+    if (product.getStatus() != ProductStatus.HIDDEN) {
+      throw new AppException(ErrorCode.UNABLE_UNHIDDEN_PRODUCT);
     }
 
-    public List<ProductCardResponse> getProductCardsBySeller(String id, int limit, int offset) {
-        return productService.getProductOfSeller(id, limit, offset);
+    productRepository.updateStatus(productId, ProductStatus.ACTIVE.getValue());
+
+    eventPublisher.publishEvent(
+        ProductUnhidden.builder()
+            .product(productMapper.toProductCardDto(product))
+            .seller(userMapper.toDto(product.getSeller()))
+            .build());
+  }
+
+  public SellerInfoResponse getSeller(String id) {
+    return sellerStatRepository
+        .findSellerInfoBySellerId(id)
+        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SELLER));
+  }
+
+  public List<ProductCardResponse> getProductCardsBySeller(String id, int limit, int offset) {
+    return productService.getProductOfSeller(id, limit, offset);
+  }
+
+  @Transactional
+  public void approveOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+    User currentUser = authService.getUserThroughAuthentication();
+    if (!order.getSeller().getId().equals(currentUser.getId())) {
+      throw new AppException(ErrorCode.UNAUTHORIZED);
     }
 
-    @Transactional
-    public void approveOrder(String orderId) {
-        Order order =
-                orderRepository
-                        .findById(orderId)
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
-        User currentUser = authService.getUserThroughAuthentication();
-        if (!order.getSeller().getId().equals(currentUser.getId())) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
-        }
-
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new AppException(ErrorCode.UNABLE_APPROVE_ORDER);
-        }
-
-        Variant variant = order.getVariant();
-        Product product = variant.getProduct();
-
-        if (variant.getQuantity() < order.getQuantity()) {
-            throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY_FOR_ORDER);
-        }
-
-        variant.setQuantity(variant.getQuantity() - order.getQuantity());
-        variant.setQuantitySold(variant.getQuantity() + order.getQuantity());//trigger
-        variantRepository.save(variant);
-
-
-        product.setTotalQuantity(product.getTotalQuantity() - order.getQuantity());//trigger
-        product.setTotalQuantitySold(product.getTotalQuantitySold() + order.getQuantity());//trigger
-        pRepository.save(product);
-
-
-        order.setStatus(OrderStatus.ACCEPTED);
-        orderRepository.save(order);
-        eventPublisher.publishEvent(
-                OrderApproved.builder()
-                        .order(orderMapper.toOrderDto(order))
-                        .client(userMapper.toDto(order.getClient()))
-                        .seller(userMapper.toDto(order.getSeller()))
-                        .build());
+    if (order.getStatus() != OrderStatus.PENDING) {
+      throw new AppException(ErrorCode.UNABLE_APPROVE_ORDER);
     }
 
-    @Transactional
-    public void cancelOrder(String orderId) {
-        Order order =
-                orderRepository
-                        .findById(orderId)
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+    Variant variant = order.getVariant();
+    Product product = variant.getProduct();
 
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new AppException(ErrorCode.UNABlE_CANCEL_ORDER);
-        }
-
-
-        order.setStatus(OrderStatus.CANCELLED_BY_SELLER);
-
-        orderRepository.save(order);
-
-        eventPublisher.publishEvent(
-                OrderCancelledByClient.builder()
-                        .order(orderMapper.toOrderDto(order))
-                        .client(userMapper.toDto(order.getClient()))
-                        .seller(userMapper.toDto(order.getSeller()))
-                        .build());
+    if (variant.getQuantity() < order.getQuantity()) {
+      throw new AppException(ErrorCode.NOT_ENOUGH_QUANTITY_FOR_ORDER);
     }
 
-    @Transactional
-    public void shipOrder(String orderId) {
-        Order order =
-                orderRepository
-                        .findById(orderId)
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+    variant.setQuantity(variant.getQuantity() - order.getQuantity());
+    variant.setQuantitySold(variant.getQuantity() + order.getQuantity()); // trigger
+    variantRepository.save(variant);
 
-        if (order.getStatus() != OrderStatus.ACCEPTED) {
-            throw new AppException(ErrorCode.UNABlE_SHIP_ORDER);
-        }
+    product.setTotalQuantity(product.getTotalQuantity() - order.getQuantity()); // trigger
+    product.setTotalQuantitySold(product.getTotalQuantitySold() + order.getQuantity()); // trigger
+    pRepository.save(product);
 
-        order.setStatus(OrderStatus.SHIPPING);
-        orderRepository.save(order);
-        eventPublisher.publishEvent(
-                OrderShipping.builder()
-                        .order(orderMapper.toOrderDto(order))
-                        .client(userMapper.toDto(order.getClient()))
-                        .seller(userMapper.toDto(order.getSeller()))
-                        .build());
+    order.setStatus(OrderStatus.ACCEPTED);
+    orderRepository.save(order);
+    eventPublisher.publishEvent(
+        OrderApproved.builder()
+            .order(orderMapper.toOrderDto(order))
+            .client(userMapper.toDto(order.getClient()))
+            .seller(userMapper.toDto(order.getSeller()))
+            .build());
+  }
+
+  @Transactional
+  public void cancelOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+
+    if (order.getStatus() != OrderStatus.PENDING) {
+      throw new AppException(ErrorCode.UNABlE_CANCEL_ORDER);
     }
 
+    order.setStatus(OrderStatus.CANCELLED_BY_SELLER);
 
+    orderRepository.save(order);
+
+    eventPublisher.publishEvent(
+        OrderCancelledByClient.builder()
+            .order(orderMapper.toOrderDto(order))
+            .client(userMapper.toDto(order.getClient()))
+            .seller(userMapper.toDto(order.getSeller()))
+            .build());
+  }
+
+  @Transactional
+  public void shipOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+
+    if (order.getStatus() != OrderStatus.ACCEPTED) {
+      throw new AppException(ErrorCode.UNABlE_SHIP_ORDER);
+    }
+
+    order.setStatus(OrderStatus.SHIPPING);
+    orderRepository.save(order);
+    eventPublisher.publishEvent(
+        OrderShipping.builder()
+            .order(orderMapper.toOrderDto(order))
+            .client(userMapper.toDto(order.getClient()))
+            .seller(userMapper.toDto(order.getSeller()))
+            .build());
+  }
 }

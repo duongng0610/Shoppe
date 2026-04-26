@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductCreated {
-    ProductCardResponse product;
-    UserDto seller;
-    CategoryDto category;
+  ProductCardResponse product;
+  UserDto seller;
+  CategoryDto category;
 }

@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Component
 public class GHNProperties {
-    String token;
-    String calculateShipFeeUrl;
-    String createShopUrl;
-    String createOrderShipUrl;
-    String getOrderShipUrl;
+  String token;
+  String calculateShipFeeUrl;
+  String createShopUrl;
+  String createOrderShipUrl;
+  String getOrderShipUrl;
 }
