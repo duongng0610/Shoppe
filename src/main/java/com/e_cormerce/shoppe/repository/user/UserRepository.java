@@ -26,12 +26,13 @@ public interface UserRepository extends JpaRepository<User, String> {
                     + "r.val AS role, "
                     + "u.phone_number, "
                     + "u.dob AS birthDate, "
-                    + "u.created_at, "
-                    + "u.province, "
-                    + "u.district, "
-                    + "u.ward "
+                    + "u.created_at as createdAt, "
+                    + "a.province_name as province, "
+                    + "a.district_name as district, "
+                    + "a.ward_name as ward "
                     + "FROM users u "
                     + "JOIN accounts ac ON u.id = ac.id "
+                    + "LEFT JOIN address a ON a.id = u.address_id "
                     + "JOIN role r ON ac.role_id = r.id "
                     + "WHERE u.id = :id;", nativeQuery = true)
     Optional<UserProfileResponse> getUserProfileById(String id);

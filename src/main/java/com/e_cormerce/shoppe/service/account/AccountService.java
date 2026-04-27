@@ -59,6 +59,7 @@ public class AccountService {
 
     public UserProfileResponse getUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getPrincipal());
         return userRepository
                 .getUserProfileById(authentication.getPrincipal().toString())
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
