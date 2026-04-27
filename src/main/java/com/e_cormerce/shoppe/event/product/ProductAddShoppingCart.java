@@ -11,8 +11,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductAddShoppingCart {
-    ProductCardResponse product;
-    UserDto user;
+  ProductCardResponse product;
+  UserDto user;
 }
-
-

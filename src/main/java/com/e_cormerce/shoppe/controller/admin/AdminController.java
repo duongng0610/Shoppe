@@ -23,7 +23,7 @@ public class AdminController {
     AdminService adminService;
 
     @PreAuthorize("hasAuthority('PERMISSION_ADD_CATEGORY')")
-    @PostMapping(path = "/categories", consumes = "multipart/form-data")
+    @PostMapping(path = "/categories")
     public ResponseEntity<ApiResponse> create(
             @Valid @RequestBody CreateCategoryRequest request) {
         categoryService.create(request);

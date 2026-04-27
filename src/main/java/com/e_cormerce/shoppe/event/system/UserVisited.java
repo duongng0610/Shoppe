@@ -1,9 +1,8 @@
 package com.e_cormerce.shoppe.event.system;
 
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
@@ -11,5 +10,5 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class UserVisited {
-    LocalDateTime date;
+  LocalDateTime date;
 }

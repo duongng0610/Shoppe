@@ -41,8 +41,7 @@ public class SellerProduct {
     }
 
     /**
-     * POST: /seller/products. -Tạo sản phẩm với request gửi lên phải có content-type:multipart/
-     * form-data.
+     * POST: /seller/products.
      *
      * @return
      */

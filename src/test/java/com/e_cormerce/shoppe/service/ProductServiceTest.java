@@ -37,11 +37,10 @@ public class ProductServiceTest {
   public void saveProduct() {
     var request = DataTestCreateProductRequestHelper.validNoVariantRequest();
 
-    var urls = new ProductImagesUrl("thumbnail", List.of(), List.of());
     when(authService.getUserThroughAuthentication()).thenReturn(User.builder().build());
     when(categoryRepository.findById(request.getCategoryId()))
         .thenReturn(Optional.of(new Category()));
 
-    productService.persistProduct(request, urls);
+    productService.persistProduct(request);
   }
 }

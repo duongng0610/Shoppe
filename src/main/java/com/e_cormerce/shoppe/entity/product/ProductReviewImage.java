@@ -1,6 +1,8 @@
 package com.e_cormerce.shoppe.entity.product;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
+import java.util.Date;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,15 +10,12 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-import java.util.Date;
-
 @Entity
 @Table(
-        name = "product_review_images",
-        indexes = {
-                @Index(name = "idx_product_review_images_product", columnList = "product_review_id")
-        })
+    name = "product_review_images",
+    indexes = {
+      @Index(name = "idx_product_review_images_product", columnList = "product_review_id")
+    })
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
@@ -25,26 +24,28 @@ import java.util.Date;
 @SQLDelete(sql = "UPDATE product_review_images SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class ProductReviewImage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(columnDefinition = "boolean default false")
-    boolean deleted;
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
-    @Column(nullable = false)
-    String url;
+  @Column(nullable = false)
+  String url;
 
     @ManyToOne
     @JoinColumn(name = "product_review_id", nullable = false)
     ProductReview productReview;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    LocalDateTime createdAt;
+  @CreationTimestamp
+  @Column(
+      name = "created_at",
+      updatable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    Date updatedAt;
+  @UpdateTimestamp
+  @Column(name = "updated_at")
+  Date updatedAt;
 }

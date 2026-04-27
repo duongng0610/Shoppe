@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GhnCreateShopResponse {
-    Integer code;
-    String message;
-    GhnCreateShopDataResponse data;
+  Integer code;
+  String message;
+  GhnCreateShopDataResponse data;
 }

@@ -15,6 +15,7 @@ import com.e_cormerce.shoppe.mapper.order.OrderTrackingLocationMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.repository.order.OrderTrackingLocationRepository;
 import com.e_cormerce.shoppe.service.order.helper.OrderTrackingHelper;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,63 +24,57 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Transactional
 @Slf4j
 public class OrderTrackingService {
-    OrderTrackingHelper orderTrackingHelper;
-    OrderRepository orderRepository;
-    ApplicationEventPublisher eventPublisher;
-    OrderTrackingLocationMapper orderTrackingLocationMapper;
-    OrderTrackingLocationRepository orderTrackingLocationRepository;
+  OrderTrackingHelper orderTrackingHelper;
+  OrderRepository orderRepository;
+  ApplicationEventPublisher eventPublisher;
+  OrderTrackingLocationMapper orderTrackingLocationMapper;
+  OrderTrackingLocationRepository orderTrackingLocationRepository;
 
-    public UpdateOrderTrackingLocationResponse updateTracking(
-            String orderId, UpdateOrderTrackingLocationRequest request) {
+  public UpdateOrderTrackingLocationResponse updateTracking(
+      String orderId, UpdateOrderTrackingLocationRequest request) {
 
-        Order order =
-                orderRepository
-                        .findById(orderId)
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
 
-        User client = orderTrackingHelper.getClient();
+    User client = orderTrackingHelper.getClient();
 
-        OrderTrackingLocation location =
-                orderTrackingHelper.createOrderTrackingLocation(request, order);
+    OrderTrackingLocation location =
+        orderTrackingHelper.createOrderTrackingLocation(request, order);
 
-        if (order.getStatus() != OrderStatus.SHIPPING) {
-            throw new AppException(ErrorCode.UNABLE_UPDATE_TRACKING);
-        }
-
-        OrderStatus newStatus = OrderStatus.fromString(request.getOrderStatus());
-
-//        if (newStatus == OrderStatus.ARRIVED) {
-//            order.setStatus(OrderStatus.ARRIVED);
-//            orderRepository.save(order);
-//        }
-
-        OrderTrackingLocation saved = orderTrackingLocationRepository.save(location);
-
-        eventPublisher.publishEvent(
-                OrderLocationUpdated.builder()
-
-                        .address(saved.getAddress())
-                        .build());
-
-        return UpdateOrderTrackingLocationResponse.builder()
-                .locationDTO(orderTrackingLocationMapper.toDTO(saved))
-                .build();
+    if (order.getStatus() != OrderStatus.SHIPPING) {
+      throw new AppException(ErrorCode.UNABLE_UPDATE_TRACKING);
     }
 
-    public GetCurrentTrackingResponse getCurrentTracking(String orderId) {
-        List<OrderTrackingLocation> locations =
-                orderTrackingLocationRepository.findAllByOrderId(orderId);
-        List<OrderTrackingLocationDTO> locationDTOS =
-                locations.stream().map(orderTrackingLocationMapper::toDTO).toList();
+    OrderStatus newStatus = OrderStatus.fromString(request.getOrderStatus());
 
-        return GetCurrentTrackingResponse.builder().locationDTOS(locationDTOS).build();
-    }
+    //        if (newStatus == OrderStatus.ARRIVED) {
+    //            order.setStatus(OrderStatus.ARRIVED);
+    //            orderRepository.save(order);
+    //        }
+
+    OrderTrackingLocation saved = orderTrackingLocationRepository.save(location);
+
+    eventPublisher.publishEvent(OrderLocationUpdated.builder().address(saved.getAddress()).build());
+
+    return UpdateOrderTrackingLocationResponse.builder()
+        .locationDTO(orderTrackingLocationMapper.toDTO(saved))
+        .build();
+  }
+
+  public GetCurrentTrackingResponse getCurrentTracking(String orderId) {
+    List<OrderTrackingLocation> locations =
+        orderTrackingLocationRepository.findAllByOrderId(orderId);
+    List<OrderTrackingLocationDTO> locationDTOS =
+        locations.stream().map(orderTrackingLocationMapper::toDTO).toList();
+
+    return GetCurrentTrackingResponse.builder().locationDTOS(locationDTOS).build();
+  }
 }

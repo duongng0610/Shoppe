@@ -1,22 +1,20 @@
 package com.e_cormerce.shoppe.entity.analytic.product.variant;
 
-
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-
 @Entity
 @Table(
-        name = "product_variant_daily",
-        indexes = {
-                @Index(name = "idx_product", columnList = "product_id,date"),
-                @Index(name = "idx_date", columnList = "date")
-        })
+    name = "product_variant_daily",
+    indexes = {
+      @Index(name = "idx_product", columnList = "product_id,date"),
+      @Index(name = "idx_date", columnList = "date")
+    })
 @Getter
 @Setter
 @Builder
@@ -26,43 +24,35 @@ import java.time.LocalDateTime;
 @IdClass(ProductVariantDailyId.class)
 public class ProductVariantDaily {
 
-    @Id
-    @Column(name = "date", nullable = false)
-    LocalDate date;
+  @Id
+  @Column(name = "date", nullable = false)
+  LocalDate date;
 
+  @Column(name = "total_orders", nullable = false, columnDefinition = "int default 0")
+  int totalOrders;
 
-    @Column(name = "total_orders", nullable = false, columnDefinition = "int default 0")
-    int totalOrders;
+  @Column(name = "total_units_orders", nullable = false, columnDefinition = "int default 0")
+  int totalUnitsOrder;
 
+  @Column(name = "total_revenue", precision = 15, scale = 2, columnDefinition = "decimal default 0")
+  BigDecimal totalRevenue;
 
-    @Column(name = "total_units_orders", nullable = false, columnDefinition = "int default 0")
-    int totalUnitsOrder;
+  @Column(
+      name = "created_at",
+      nullable = false,
+      updatable = false,
+      insertable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  LocalDateTime createdAt;
 
+  @UpdateTimestamp
+  @Column(name = "updated_at")
+  LocalDateTime updatedAt;
 
-    @Column(name = "total_revenue", precision = 15, scale = 2, columnDefinition = "decimal default 0")
-    BigDecimal totalRevenue;
+  @Id
+  @Column(name = "variant_id", nullable = false)
+  String variantId;
 
-
-    @Column(
-            name = "created_at",
-            nullable = false,
-            updatable = false,
-            insertable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"
-    )
-    LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    LocalDateTime updatedAt;
-
-    @Id
-    @Column(name = "variant_id", nullable = false)
-    String variantId;
-
-
-    @Column(name = "product_id", nullable = false)
-    String productId;
-
-
+  @Column(name = "product_id", nullable = false)
+  String productId;
 }

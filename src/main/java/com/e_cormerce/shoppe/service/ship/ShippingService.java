@@ -18,29 +18,31 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ShippingService {
-    GHNProperties ghnProperties;
-    AddressService addressService;
-    SellerStatRepository sellerInfoRepository;
-    WebClientService webClientService;
+  GHNProperties ghnProperties;
+  AddressService addressService;
+  SellerStatRepository sellerInfoRepository;
+  WebClientService webClientService;
 
-    public GhnShipFeeDataResponse getShipCost(ShipCostOrderRequest request) {
+  public GhnShipFeeDataResponse getShipCost(ShipCostOrderRequest request) {
 
-        var addressIds = addressService.getAddressByNames(request.getAddress());
-        var req = GhnCalculateShipFeeRequest.builder()
-                .serviceTypeId(2)
-                .toDistrictId(addressIds.getDistrictId())
-                .toWardCode(addressIds.getWardId())
-                .length(1)
-                .width(1)
-                .height(1)
-                .weight(1)
-                .insuranceValue(0)
-                .build();
-        var shopId = sellerInfoRepository.findShopIdBySellerId(request.getSellerId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SHOP));
-        var res = webClientService.calculateShipGhnApi(shopId, req);
-        //try-catch => custom loi...
-        return res.getData();
-
-    }
-
+    var addressIds = addressService.getAddressByNames(request.getAddress());
+    var req =
+        GhnCalculateShipFeeRequest.builder()
+            .serviceTypeId(2)
+            .toDistrictId(addressIds.getDistrictId())
+            .toWardCode(addressIds.getWardId())
+            .length(1)
+            .width(1)
+            .height(1)
+            .weight(1)
+            .insuranceValue(0)
+            .build();
+    var shopId =
+        sellerInfoRepository
+            .findShopIdBySellerId(request.getSellerId())
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SHOP));
+    var res = webClientService.calculateShipGhnApi(shopId, req);
+    // try-catch => custom loi...
+    return res.getData();
+  }
 }

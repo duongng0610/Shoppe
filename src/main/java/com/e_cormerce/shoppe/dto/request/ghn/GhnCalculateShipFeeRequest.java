@@ -13,12 +13,12 @@ import lombok.experimental.FieldDefaults;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GhnCalculateShipFeeRequest {
 
-    private Integer serviceTypeId;
-    private Integer toDistrictId;
-    private String toWardCode;
-    private Integer length;
-    private Integer width;
-    private Integer height;
-    private Integer weight;
-    private Integer insuranceValue;
+  private Integer serviceTypeId;
+  private Integer toDistrictId;
+  private String toWardCode;
+  private Integer length;
+  private Integer width;
+  private Integer height;
+  private Integer weight;
+  private Integer insuranceValue;
 }

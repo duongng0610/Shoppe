@@ -15,11 +15,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PaymentController {
-    PaymentService paymentService;
+  PaymentService paymentService;
 
-    @GetMapping("")
-    public String receivePaymentResult(HttpServletRequest request) throws AppException {
-        var id = paymentService.createTransaction(request);
-        return "redirect:http://localhost:5173/payments/" + id;
-    }
+  @GetMapping("")
+  public String receivePaymentResult(HttpServletRequest request) throws AppException {
+    var id = paymentService.createTransaction(request);
+    return "redirect:http://localhost:5173/payments/" + id;
+  }
 }

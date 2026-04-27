@@ -12,8 +12,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RegisterShipperRequest extends AbstractRegisterRequest {
-    @Valid
-    AddressDto address;
-    @NotBlank
-    String phoneNumber;
+  @Valid AddressDto address;
+  @NotBlank String phoneNumber;
 }
