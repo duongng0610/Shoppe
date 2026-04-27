@@ -40,12 +40,11 @@ public class AccountService {
         accountServiceHelper.updatePassword(request.getNewPassword(), account);
     }
 
-    public ChangeUserProfileResponse updateProfile(
-            ChangeUserProfileRequest request, MultipartFile avatar) {
+    public ChangeUserProfileResponse updateProfile(ChangeUserProfileRequest request) {
         User user = accountServiceHelper.getUser();
 
         accountServiceHelper.applyProfileChanges(user, request);
-        accountServiceHelper.applyAvatarChange(user, avatar);
+        accountServiceHelper.applyAvatarChange(user, request.getThumbnailUrl());
 
         userRepository.save(user);
 

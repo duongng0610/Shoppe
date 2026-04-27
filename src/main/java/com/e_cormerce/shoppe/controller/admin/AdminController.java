@@ -25,8 +25,8 @@ public class AdminController {
     @PreAuthorize("hasAuthority('PERMISSION_ADD_CATEGORY')")
     @PostMapping(path = "/categories", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse> create(
-            @Valid @RequestPart CreateCategoryRequest request, @RequestPart MultipartFile thumbnail) {
-        categoryService.create(request, thumbnail);
+            @Valid @RequestBody CreateCategoryRequest request) {
+        categoryService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.builder().success(true).message("create category successfully").build());
     }

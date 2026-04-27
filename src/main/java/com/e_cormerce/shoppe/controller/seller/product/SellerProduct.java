@@ -46,15 +46,11 @@ public class SellerProduct {
      *
      * @return
      */
-    @PostMapping(path = "", consumes = "multipart/form-data")
+    @PostMapping()
     @PreAuthorize("hasAuthority('PERMISSION_CREATE_PRODUCT')")
-    public ResponseEntity<ApiResponse> create(
-            @Valid @RequestPart CreateProductRequest request,
-            @RequestPart("thumbnail") MultipartFile thumbnail,
-            @RequestPart(value = "extraImages", required = false) List<MultipartFile> extraImages,
-            @RequestPart(value = "variantImages", required = false) List<MultipartFile> variantImages) {
+    public ResponseEntity<ApiResponse> create(@Valid @RequestBody CreateProductRequest request) {
 
-        sellerService.createProduct(request, thumbnail, extraImages, variantImages);
+        sellerService.createProduct(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.builder().success(true).message("create product successfully").build());
     }

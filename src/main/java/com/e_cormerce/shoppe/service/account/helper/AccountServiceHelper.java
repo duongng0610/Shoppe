@@ -10,13 +10,11 @@ import com.e_cormerce.shoppe.repository.user.AccountRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.address.AddressService;
 import com.e_cormerce.shoppe.service.auth.AuthService;
-import com.e_cormerce.shoppe.service.media.ImageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @RequiredArgsConstructor
@@ -26,7 +24,6 @@ public class AccountServiceHelper {
     UserRepository userRepository;
     AuthService authService;
     BCryptPasswordEncoder bCryptPasswordEncoder;
-    ImageService imageService;
     AddressService addressService;
 
     public Account getAccount(User user) {
@@ -70,11 +67,9 @@ public class AccountServiceHelper {
         }
     }
 
-    public void applyAvatarChange(User user, MultipartFile avatar) {
-        if (avatar == null || avatar.isEmpty()) return;
-
-        String newAvatar = imageService.uploadSingleImage(avatar);
-        user.setAvatar(newAvatar);
+    public void applyAvatarChange(User user, String avatarUrl) {
+        if (avatarUrl == null || avatarUrl.isBlank()) return;
+        user.setAvatar(avatarUrl);
     }
 
     public void updateAddress(AddressDto newAddress, User user) {

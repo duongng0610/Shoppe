@@ -14,7 +14,6 @@ import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
 import com.e_cormerce.shoppe.repository.catgory.SynonymsRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.service.category.helper.CategoryHelper;
-import com.e_cormerce.shoppe.service.media.ImageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,7 +21,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -32,7 +30,6 @@ import java.util.List;
 public class CategoryService {
 
     CategoryHelper categoryHelper;
-    ImageService imageService;
     CategoryRepository categoryRepository;
     SynonymsRepository synonymsRepository;
     ProductRepository productRepository;
@@ -41,14 +38,14 @@ public class CategoryService {
     CategoryMapper categoryMapper;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED)
-    public void create(CreateCategoryRequest request, MultipartFile thumbnail) {
+    public void create(CreateCategoryRequest request) {
         if (categoryRepository.existsByVal(request.getName())) {
             throw new AppException(ErrorCode.EXISTED_CATEGORY);
         }
         Category category =
                 Category.builder()
                         .val(request.getName().toLowerCase())
-                        .thumbnail(imageService.uploadSingleImage(thumbnail))
+                        .thumbnail(request.getThumbnailUrl())
                         .build();
 
         if (request.getParentId() != null) {

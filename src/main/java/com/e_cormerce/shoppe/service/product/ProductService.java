@@ -27,7 +27,6 @@ import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.helper.CreateProductHelper;
 import com.e_cormerce.shoppe.service.product.helper.GetProductDetailsHelper;
 import com.e_cormerce.shoppe.service.product.helper.ProductQueryDBHelper;
-import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +60,7 @@ public class ProductService {
     VariantRepository variantRepository;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
-    public Product persistProduct(@Valid CreateProductRequest request, ProductImagesUrl urls) {
+    public Product persistProduct(@Valid CreateProductRequest request) {
         var user = authService.getUserThroughAuthentication();
         Product product =
                 Product.builder()
@@ -71,16 +70,16 @@ public class ProductService {
                         .status(ProductStatus.PENDING)
                         .createdAt(LocalDateTime.now())
                         .hasVariant(request.getHasVariant())
-                        .thumbnail(urls.getThumbnailUrl())
+                        .thumbnail(request.getThumbnailUrl())
                         .discountPercentage(request.getDiscountPercentage())
                         .seller(user)
                         .totalQuantity(request.getTotalQuantity())
                         .originPrice(request.getOriginPrice())
                         .build();
 
-        if (!urls.getExtraImageUrls().isEmpty()) {
+        if (!request.getExtraImageUrls().isEmpty()) {
             product.setProductExtraImages(
-                    urls.getExtraImageUrls().stream()
+                    request.getExtraImageUrls().stream()
                             .map(url -> ProductExtraImage.builder().product(product).url(url).build())
                             .toList());
         }
@@ -89,10 +88,10 @@ public class ProductService {
             product.setTypes(createProductHelper.createType(request.getTypes(), product));
         }
         if (request.getHasVariant()) {
-            if (urls.getVariantImageUrls() != null && !urls.getVariantImageUrls().isEmpty()) {
+            if (request.getVariantRequests() != null && !request.getVariantRequests().isEmpty()) {
 
                 for (int i = 0; i < request.getVariantRequests().size(); i++) {
-                    product.addVariant(createProductHelper.createVariant(request.getVariantRequests().get(i), product, urls.getVariantImageUrls().get(i)));
+                    product.addVariant(createProductHelper.createVariant(request.getVariantRequests().get(i), product));
                 }
 
             }

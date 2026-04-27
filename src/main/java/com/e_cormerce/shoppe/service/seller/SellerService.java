@@ -26,8 +26,6 @@ import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.repository.seller.SellerStatRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
-import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
-import com.e_cormerce.shoppe.service.seller.helper.UploadProductImagesHelper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -43,7 +41,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SellerService {
-    UploadProductImagesHelper uploadProductImagesHelper;
     ProductService productService;
     SellerStatRepository sellerStatRepository;
     OrderRepository orderRepository;
@@ -66,32 +63,22 @@ public class SellerService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void createProduct(
-            CreateProductRequest request,
-            MultipartFile thumbnail,
-            List<MultipartFile> extraImages,
-            List<MultipartFile> variantImages) {
+    public void createProduct(CreateProductRequest request) {
 
         if (request.getHasVariant()) {
-            if (variantImages == null
-                    || request.getVariantRequests() == null
-                    || (variantImages.size() != request.getVariantRequests().size()) // sai kích thước
+            if (request.getVariantRequests() == null
                     || (request.getVariantRequests() != null
-                    && request.getTypes() == null)) // có variant mà ko có type
+                    && request.getTypes() == null))
             {
                 throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
             }
         } else {
-            if (variantImages != null
-                    || (request.getVariantRequests() != null && request.getVariantRequests().size() > 0)) {
+            if (request.getVariantRequests() != null && request.getVariantRequests().size() > 0) {
                 throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
             }
         }
 
-        ProductImagesUrl urls =
-                uploadProductImagesHelper.uploadImagesOfProduct(thumbnail, extraImages, variantImages);
-
-        var product = productService.persistProduct(request, urls);
+        var product = productService.persistProduct(request);
 
     }
 

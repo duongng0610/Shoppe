@@ -25,6 +25,9 @@ public class CreateProductRequest {
     @NotBlank(message = "description is required")
     String description;
 
+    @NotBlank(message = "thumbnail is required")
+    String thumbnailUrl;
+
     @NotNull(message = "originPrice is required")
     @Positive(message = "originPrice must be greater than 0")
     BigDecimal originPrice;
@@ -42,6 +45,8 @@ public class CreateProductRequest {
     @NotNull(message = "discount is required")
     @NumberFormat
     float discountPercentage;
+
+    List<@NotBlank String> extraImageUrls;
 
     /**
      * @Valid bật nested validation: nếu có trường types sẽ vào types lấy field và so khớp với
