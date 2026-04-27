@@ -9,7 +9,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProvinceDto {
-    int provinceId;
-    String provinceName;
+  int provinceId;
+  String provinceName;
 }
-

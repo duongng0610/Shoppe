@@ -9,9 +9,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public enum RoleEnum {
-    ADMIN,
-    CLIENT,
-    SELLER,
-    SHIPPER;
-
+  ADMIN,
+  CLIENT,
+  SELLER,
+  SHIPPER;
 }

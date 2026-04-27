@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 public enum AccountStatus {
-    BANNED,
-    ACTIVE,
-    INACTIVE
+  BANNED,
+  ACTIVE,
+  INACTIVE
 }

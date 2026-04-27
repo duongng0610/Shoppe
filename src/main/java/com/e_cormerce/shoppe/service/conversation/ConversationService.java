@@ -6,6 +6,7 @@ import com.e_cormerce.shoppe.dto.response.conversation.MessageDto;
 import com.e_cormerce.shoppe.dto.response.conversation.MessageMediaDto;
 import com.e_cormerce.shoppe.entity.conversation.Conversation;
 import com.e_cormerce.shoppe.entity.conversation.ConversationMember;
+import com.e_cormerce.shoppe.entity.conversation.ConversationMessage;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.projection.ConversationLineProjection;
@@ -16,6 +17,7 @@ import com.e_cormerce.shoppe.repository.conversation.MessageMediaRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.conversation.helper.ConversationHelper;
+import com.e_cormerce.shoppe.service.media.CloudinaryService;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -36,6 +38,7 @@ public class ConversationService {
   MessageMediaRepository messageMediaRepository;
   UserRepository userRepository;
   AuthService authService;
+  CloudinaryService cloudinaryService;
 
   public List<ConversationLineProjection> getConversationByUser() {
     String userId =
@@ -112,24 +115,30 @@ public class ConversationService {
             .findById(messageRequest.getUserId())
             .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
     if (messageRequest.getText() == null
-        && (messageRequest.getImageUrls() == null || messageRequest.getImageUrls().isEmpty())) {
+        && (messageRequest.getImageIds() == null || messageRequest.getImageIds().isEmpty())) {
       throw new AppException(ErrorCode.INVALID_CREATE_MESSAGE);
     }
+
     // member
     Conversation conversation =
         conversationRepository
             .findById(messageRequest.getConversationId())
             .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_CONVERSATION));
-    conversation.addMessage(conversationHelper.createConversationMessage(user, messageRequest));
+
+    ConversationMessage message =
+        conversationHelper.createConversationMessage(user, messageRequest);
+    conversation.addMessage(message);
+
     if (messageRequest.getText() != null) {
       conversation.setLastContent(user.getUsername() + ": " + messageRequest.getText());
     } else {
       conversation.setLastContent(user.getUsername() + ": Đã gửi ảnh");
     }
+
     conversation.setLastContentAt(LocalDateTime.now());
     conversation.setLastSenderId(user.getId());
     conversationRepository.save(conversation);
-    var message = conversation.getMessages().get(conversation.getMessages().size() - 1);
+
     return MessageDto.builder()
         .id(message.getId())
         .content(message.getContent())
@@ -137,10 +146,10 @@ public class ConversationService {
         .createdAt(message.getCreatedAt())
         .updatedAt(message.getUpdatedAt())
         .medias(
-            messageRequest.getImageUrls().stream()
+            message.getMedias().stream()
                 .map(
                     item -> {
-                      return MessageMediaDto.builder().url(item).build();
+                      return MessageMediaDto.builder().url(item.getUrl()).build();
                     })
                 .toList())
         .build();

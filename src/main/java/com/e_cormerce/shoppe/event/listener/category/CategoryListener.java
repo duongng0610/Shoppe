@@ -16,25 +16,22 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CategoryListener {
-    CategoryDailyRepository categoryDailyRepository;
-    SynonymsRepository synonymsRepository;
+  CategoryDailyRepository categoryDailyRepository;
+  SynonymsRepository synonymsRepository;
 
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleProductCreated(ProductCreated event) {
-        var product = event.getProduct();
-        var category = event.getCategory();
-        categoryDailyRepository.increaseNewProduct(category.getId(), product.getCreatedAt().toLocalDate());
+  @Async
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handleProductCreated(ProductCreated event) {
+    var product = event.getProduct();
+    var category = event.getCategory();
+    categoryDailyRepository.increaseNewProduct(
+        category.getId(), product.getCreatedAt().toLocalDate());
+  }
 
-    }
-
-    @Async
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void handleCategorySearched(CategorySearched event) {
-        var category = event.getCategory();
-        categoryDailyRepository.increaseSearch(category.getId(), event.getCreatedAt().toLocalDate());
-
-    }
-
-
+  @Async
+  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
+  public void handleCategorySearched(CategorySearched event) {
+    var category = event.getCategory();
+    categoryDailyRepository.increaseSearch(category.getId(), event.getCreatedAt().toLocalDate());
+  }
 }

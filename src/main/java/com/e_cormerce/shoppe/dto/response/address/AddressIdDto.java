@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AddressIdDto {
-    int provinceId;
-    int districtId;
-    String wardId;
+  int provinceId;
+  int districtId;
+  String wardId;
 }

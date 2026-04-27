@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-
 @Data
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 @Builder
@@ -13,9 +12,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GhnCreateShopRequest {
-    Integer districtId;
-    String wardCode;
-    String name;
-    String phone;
-    String address;
+  Integer districtId;
+  String wardCode;
+  String name;
+  String phone;
+  String address;
 }

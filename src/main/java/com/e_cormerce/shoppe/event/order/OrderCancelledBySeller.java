@@ -11,8 +11,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderCancelledBySeller {
-    OrderDto order;
-    UserDto client;
-    UserDto seller;
+  OrderDto order;
+  UserDto client;
+  UserDto seller;
 }
-

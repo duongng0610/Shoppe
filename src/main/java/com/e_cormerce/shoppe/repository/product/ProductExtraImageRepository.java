@@ -11,6 +11,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ProductExtraImageRepository extends JpaRepository<ProductExtraImage, String> {
 
+  boolean existsByImageId(String imageId);
+
   @Query(
       """
             SELECT DISTINCT pi

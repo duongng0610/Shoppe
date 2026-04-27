@@ -5,83 +5,92 @@ import com.e_cormerce.shoppe.dto.request.account.ChangeUserProfileRequest;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.event.media.ImagesConfirmedEvent;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.repository.user.AccountRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.address.AddressService;
 import com.e_cormerce.shoppe.service.auth.AuthService;
-import com.e_cormerce.shoppe.service.media.ImageService;
+import com.e_cormerce.shoppe.service.media.CloudinaryService;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountServiceHelper {
-    AccountRepository accountRepository;
-    UserRepository userRepository;
-    AuthService authService;
-    BCryptPasswordEncoder bCryptPasswordEncoder;
-    ImageService imageService;
-    AddressService addressService;
+  AccountRepository accountRepository;
+  UserRepository userRepository;
+  AuthService authService;
+  BCryptPasswordEncoder bCryptPasswordEncoder;
+  AddressService addressService;
+  CloudinaryService cloudinaryService;
+  ApplicationEventPublisher eventPublisher;
 
-    public Account getAccount(User user) {
-        return accountRepository.findAccountByUserId(user.getId());
+  public Account getAccount(User user) {
+    return accountRepository.findAccountByUserId(user.getId());
+  }
+
+  public User getUser() {
+    return authService.getUserThroughAuthentication();
+  }
+
+  public boolean isTrueOldPassword(String oldPassword, Account account) {
+    return bCryptPasswordEncoder.matches(oldPassword, account.getPassword());
+  }
+
+  public void updatePassword(String newPassword, Account account) {
+    account.setPassword(bCryptPasswordEncoder.encode(newPassword));
+    accountRepository.save(account);
+  }
+
+  public void applyProfileChanges(User user, ChangeUserProfileRequest request) {
+    System.out.println(request.getDob());
+    if (request == null) return;
+
+    if (request.getDob() != null) {
+      user.setDob(request.getDob());
+    }
+    if (request.getUsername() != null && !request.getUsername().isBlank()) {
+      if (userRepository.existsByUsername(request.getUsername())) {
+        throw new AppException(ErrorCode.EXISTED_USERNAME);
+      }
+      user.setUsername(request.getUsername());
     }
 
-    public User getUser() {
-        return authService.getUserThroughAuthentication();
+    if (request.getAddress() != null) {
+      AddressDto newAddress = request.getAddress();
+      this.updateAddress(newAddress, user);
     }
 
-    public boolean isTrueOldPassword(String oldPassword, Account account) {
-        return bCryptPasswordEncoder.matches(oldPassword, account.getPassword());
+    if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
+      this.updatePhoneNumber(request.getPhoneNumber(), user);
     }
+  }
 
-    public void updatePassword(String newPassword, Account account) {
-        account.setPassword(bCryptPasswordEncoder.encode(newPassword));
-        accountRepository.save(account);
-    }
+  public void applyAvatarChange(User user, String avatarId) {
+    if (avatarId == null || avatarId.isEmpty()) return;
 
-    public void applyProfileChanges(User user, ChangeUserProfileRequest request) {
-        System.out.println(request.getDob());
-        if (request == null) return;
+    user.setAvatarId(avatarId);
+    user.setAvatar(cloudinaryService.generateResizedUrl(avatarId, 300, 300));
 
-        if (request.getDob() != null) {
-            user.setDob(request.getDob());
-        }
-        if (request.getUsername() != null && !request.getUsername().isBlank()) {
-            if (userRepository.existsByUsername(request.getUsername())) {
-                throw new AppException(ErrorCode.EXISTED_USERNAME);
-            }
-            user.setUsername(request.getUsername());
-        }
+    Set<String> usedImageIds = new HashSet<>();
+    usedImageIds.add(avatarId);
 
-        if (request.getAddress() != null) {
-            AddressDto newAddress = request.getAddress();
-            this.updateAddress(newAddress, user);
-        }
+    eventPublisher.publishEvent(ImagesConfirmedEvent.builder().usedImageIds(usedImageIds).build());
+  }
 
-        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
-            this.updatePhoneNumber(request.getPhoneNumber(), user);
-        }
-    }
+  public void updateAddress(AddressDto newAddress, User user) {
+    user.setAddress(addressService.getAddressByNames(newAddress));
+  }
 
-    public void applyAvatarChange(User user, MultipartFile avatar) {
-        if (avatar == null || avatar.isEmpty()) return;
-
-        String newAvatar = imageService.uploadSingleImage(avatar);
-        user.setAvatar(newAvatar);
-    }
-
-    public void updateAddress(AddressDto newAddress, User user) {
-        user.setAddress(addressService.getAddressByNames(newAddress));
-    }
-
-    public void updatePhoneNumber(String phoneNumber, User user) {
-        user.setPhoneNumber(phoneNumber);
-    }
+  public void updatePhoneNumber(String phoneNumber, User user) {
+    user.setPhoneNumber(phoneNumber);
+  }
 }

@@ -16,6 +16,6 @@ public class CreateCategoryRequest {
   String name;
 
   String parentId;
-
   List<String> synonyms;
+  String thumbnailId;
 }

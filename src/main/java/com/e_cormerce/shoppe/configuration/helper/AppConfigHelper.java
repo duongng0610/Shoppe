@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,72 +32,76 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class AppConfigHelper {
 
-    BCryptPasswordEncoder passwordEncoder;
+  BCryptPasswordEncoder passwordEncoder;
 
-    RoleRepository roleRepository;
-    UserRepository userRepository;
-    AccountRepository accountRepository;
-    CategoryRepository categoryRepository;
-    SynonymsRepository synonymsRepository;
-    PermissionRepository permissionRepository;
+  RoleRepository roleRepository;
+  UserRepository userRepository;
+  AccountRepository accountRepository;
+  CategoryRepository categoryRepository;
+  SynonymsRepository synonymsRepository;
+  PermissionRepository permissionRepository;
 
+  ApplicationEventPublisher eventPublisher;
 
-    @Transactional
-    public void createRoles() {
-        RoleValue.ROLE_PERMISSIONS.forEach((roleVal, permissionVals) -> {
-            Role role = roleRepository.findByVal(roleVal).orElseGet(() -> Role.builder().val(roleVal).build());
-            permissionVals.forEach(permissionVal -> {
-                Permission permission = permissionRepository.findByVal(permissionVal).orElseGet(() -> Permission.builder().val(permissionVal).build());
-                if (role.getPermissions() == null || (role.getPermissions() != null && !role.getPermissions().contains(permission))) {
-                    role.addPermission(permission);
+  @Transactional
+  public void createRoles() {
+    RoleValue.ROLE_PERMISSIONS.forEach(
+        (roleVal, permissionVals) -> {
+          Role role =
+              roleRepository
+                  .findByVal(roleVal)
+                  .orElseGet(() -> Role.builder().val(roleVal).build());
+          permissionVals.forEach(
+              permissionVal -> {
+                Permission permission =
+                    permissionRepository
+                        .findByVal(permissionVal)
+                        .orElseGet(() -> Permission.builder().val(permissionVal).build());
+                if (role.getPermissions() == null
+                    || (role.getPermissions() != null
+                        && !role.getPermissions().contains(permission))) {
+                  role.addPermission(permission);
                 }
-            });
-            roleRepository.save(role);
+              });
+          roleRepository.save(role);
         });
+  }
 
+  public void createAdmin(String email, String password, String username) {
+    if (!accountRepository.existsByEmail(email)) {
+      Role adminRole =
+          roleRepository
+              .findByVal(RoleEnum.ADMIN)
+              .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
 
+      Account adminAccount =
+          Account.builder()
+              .email(email)
+              .password(passwordEncoder.encode(password))
+              .role(adminRole)
+              .build();
+
+      if (userRepository.existsByUsername(username)) {
+        log.error("Username for admin is invalid");
+        throw new AppException(ErrorCode.INVALID_USERNAME);
+      }
+
+      User admin = User.builder().account(adminAccount).username(username).build();
+
+      userRepository.save(admin);
     }
+  }
 
-    public void createAdmin(String email, String password, String username) {
-        if (!accountRepository.existsByEmail(email)) {
-            Role adminRole =
-                    roleRepository
-                            .findByVal(RoleEnum.ADMIN)
-                            .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
-
-            Account adminAccount =
-                    Account.builder()
-                            .email(email)
-                            .password(passwordEncoder.encode(password))
-                            .role(adminRole)
-                            .build();
-
-
-            if (userRepository.existsByUsername(username)) {
-                log.error("Username for admin is invalid");
-                throw new AppException(ErrorCode.INVALID_USERNAME);
-            }
-
-            User admin = User.builder().account(adminAccount).username(username).build();
-
-            userRepository.save(admin);
-        }
+  public void createDefaultCategories() {
+    var categories = DefaultCategory.DEFAULT_CATEGORIES;
+    for (int i = 0; i < categories.length; i++) {
+      String name = categories[i][0];
+      String thumbnail = categories[i][1];
+      if (!categoryRepository.existsByVal(name)) {
+        Category category = Category.builder().val(name).thumbnail(thumbnail).build();
+        categoryRepository.save(category);
+        synonymsRepository.save(CategorySynonyms.builder().val(name).category(category).build());
+      }
     }
-
-
-    public void createDefaultCategories() {
-        var categories = DefaultCategory.DEFAULT_CATEGORIES;
-        for (int i = 0; i < categories.length; i++) {
-            String name = categories[i][0];
-            String thumbnail = categories[i][1];
-            if (!categoryRepository.existsByVal(name)) {
-                Category category = Category.builder().val(name).thumbnail(thumbnail).build();
-                categoryRepository.save(category);
-                synonymsRepository.save(CategorySynonyms.builder().val(name).category(category).build());
-            }
-        }
-
-    }
-
-
+  }
 }

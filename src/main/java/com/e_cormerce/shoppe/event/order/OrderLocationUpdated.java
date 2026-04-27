@@ -11,8 +11,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderLocationUpdated {
-    OrderDto order;
-    UserDto client;
-    UserDto seller;
-    String address;
+  OrderDto order;
+  UserDto client;
+  UserDto seller;
+  String address;
 }

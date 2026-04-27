@@ -1,6 +1,5 @@
 package com.e_cormerce.shoppe.service.category.helper;
 
-import com.e_cormerce.shoppe.dto.response.category.CategoryDetailResponse;
 import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
