@@ -26,7 +26,7 @@ public class DataTestUpdateOrderTrackingHelper {
   /** Creates an UpdateOrderTrackingLocationRequest with "Out for Delivery" status */
   public static UpdateOrderTrackingLocationRequest outForDeliveryRequest() {
     return UpdateOrderTrackingLocationRequest.builder()
-        .orderStatus(OrderStatus.ARRIVED.name())
+       // .orderStatus(OrderStatus.ARRIVED.name())
         .address("Hà Nội, Cầu Giấy, Yên Hòa")
         .remainingDistance(100L)
         .build();
@@ -35,7 +35,7 @@ public class DataTestUpdateOrderTrackingHelper {
   /** Creates an UpdateOrderTrackingLocationRequest with "Delivered" status */
   public static UpdateOrderTrackingLocationRequest deliveredRequest() {
     return UpdateOrderTrackingLocationRequest.builder()
-        .orderStatus(OrderStatus.PAID.name())
+        //.orderStatus(OrderStatus.PAID.name())
         .address("Hà Nội, Đống Đa, Phương Liên")
         .remainingDistance(0L)
         .build();
