@@ -3,7 +3,6 @@ package com.e_cormerce.shoppe.service.seller;
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.response.product.MyProductResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
-import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.entity.product.Variant;
@@ -12,7 +11,7 @@ import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import com.e_cormerce.shoppe.event.order.OrderApproved;
-import com.e_cormerce.shoppe.event.order.OrderCancelledByClient;
+import com.e_cormerce.shoppe.event.order.OrderCancelledBySeller;
 import com.e_cormerce.shoppe.event.order.OrderShipping;
 import com.e_cormerce.shoppe.event.product.ProductHidden;
 import com.e_cormerce.shoppe.event.product.ProductUnhidden;
@@ -23,9 +22,10 @@ import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
-import com.e_cormerce.shoppe.repository.seller.SellerStatRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
+import com.e_cormerce.shoppe.service.ship.ShippingService;
+import com.e_cormerce.shoppe.service.webclient.WebClientService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -33,7 +33,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -42,7 +41,6 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SellerService {
     ProductService productService;
-    SellerStatRepository sellerStatRepository;
     OrderRepository orderRepository;
     AuthService authService;
     ApplicationEventPublisher eventPublisher;
@@ -52,6 +50,8 @@ public class SellerService {
     UserMapper userMapper;
     VariantRepository variantRepository;
     ProductRepository pRepository;
+    WebClientService webClientService;
+    private final ShippingService shippingService;
 
 
     public List<MyProductResponse> getMyProducts(int limit, int offset) {
@@ -68,8 +68,7 @@ public class SellerService {
         if (request.getHasVariant()) {
             if (request.getVariantRequests() == null
                     || (request.getVariantRequests() != null
-                    && request.getTypes() == null))
-            {
+                    && request.getTypes() == null)) {
                 throw new AppException(ErrorCode.CONFLICT_VARIANT_DATA);
             }
         } else {
@@ -126,11 +125,11 @@ public class SellerService {
         eventPublisher.publishEvent(ProductUnhidden.builder().product(productMapper.toProductCardDto(product)).seller(userMapper.toDto(product.getSeller())).build());
     }
 
-    public SellerInfoResponse getSeller(String id) {
-        return sellerStatRepository
-                .findSellerInfoBySellerId(id)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SELLER));
-    }
+//    public SellerInfoResponse getSeller(String id) {
+//        return sellerStatRepository
+//                .findSellerInfoBySellerId(id)
+//                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_SELLER));
+//    }
 
     public List<ProductCardResponse> getProductCardsBySeller(String id, int limit, int offset) {
         return productService.getProductOfSeller(id, limit, offset);
@@ -195,7 +194,7 @@ public class SellerService {
         orderRepository.save(order);
 
         eventPublisher.publishEvent(
-                OrderCancelledByClient.builder()
+                OrderCancelledBySeller.builder()
                         .order(orderMapper.toOrderDto(order))
                         .client(userMapper.toDto(order.getClient()))
                         .seller(userMapper.toDto(order.getSeller()))
@@ -208,11 +207,13 @@ public class SellerService {
                 orderRepository
                         .findById(orderId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
-
+        if (!order.getSeller().getId().equals(authService.getUserId())) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
         if (order.getStatus() != OrderStatus.ACCEPTED) {
             throw new AppException(ErrorCode.UNABlE_SHIP_ORDER);
         }
-
+        shippingService.createShipment(order);
         order.setStatus(OrderStatus.SHIPPING);
         orderRepository.save(order);
         eventPublisher.publishEvent(
