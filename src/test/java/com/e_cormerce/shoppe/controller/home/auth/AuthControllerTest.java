@@ -4,6 +4,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.e_cormerce.shoppe.controller.auth.AuthController;
 import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
 import com.e_cormerce.shoppe.properties.CookieTokenProperties;
 import com.e_cormerce.shoppe.service.auth.AuthService;

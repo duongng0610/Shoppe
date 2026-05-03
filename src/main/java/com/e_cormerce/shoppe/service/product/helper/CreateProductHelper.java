@@ -29,7 +29,7 @@ public class CreateProductHelper {
     public Variant createDefaultVariant(Product product) {
         return
                 Variant.builder()
-                        .isDefault(true)
+
                         .thumbnail(product.getThumbnail())
                         .quantity(product.getTotalQuantity())
                         .price(product.getOriginPrice())
@@ -70,13 +70,13 @@ public class CreateProductHelper {
 
 
     public Variant createVariant(
-            VariantRequest variantRequest, Product product, String variantImageUrl) {
+            VariantRequest variantRequest, Product product) {
         Variant variant =
                 Variant.builder()
                         .product(product)
                         .price(variantRequest.getPrice())
                         .quantity(variantRequest.getQuantity())
-                        .thumbnail(variantImageUrl)
+                        .thumbnail(variantRequest.getThumbnailUrl())
                         .build();
 
         List<VariantValue> variantValues = new ArrayList<>();

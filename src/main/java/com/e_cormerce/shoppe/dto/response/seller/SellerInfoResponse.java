@@ -10,12 +10,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SellerInfoResponse {
-
   String id;
   String avatar;
   String username;
   String phoneNumber;
-  Integer follower;
   Float rating;
   Integer productCount;
   Date createdAt;

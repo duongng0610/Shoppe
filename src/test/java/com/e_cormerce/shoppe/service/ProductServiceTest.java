@@ -9,7 +9,7 @@ import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
-import com.e_cormerce.shoppe.service.seller.helper.ProductImagesUrl;
+
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -37,11 +37,10 @@ public class ProductServiceTest {
   public void saveProduct() {
     var request = DataTestCreateProductRequestHelper.validNoVariantRequest();
 
-    var urls = new ProductImagesUrl("thumbnail", List.of(), List.of());
     when(authService.getUserThroughAuthentication()).thenReturn(User.builder().build());
     when(categoryRepository.findById(request.getCategoryId()))
         .thenReturn(Optional.of(new Category()));
 
-    productService.persistProduct(request, urls);
+    productService.persistProduct(request);
   }
 }

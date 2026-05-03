@@ -18,4 +18,7 @@ public class CreateCategoryRequest {
   String parentId;
 
   List<String> synonyms;
+
+  @NotBlank(message = "Thumbnail of category is required")
+  String thumbnailUrl;
 }

@@ -28,10 +28,8 @@ public class AccountController {
     }
 
     @PutMapping(value = "/profile", consumes = "multipart/form-data")
-    public ResponseEntity<ApiResponse> updateProfile(
-            @RequestPart(value = "request", required = false) ChangeUserProfileRequest request,
-            @RequestPart(value = "avatar", required = false) MultipartFile avatar) {
-        var res = accountService.updateProfile(request, avatar);
+    public ResponseEntity<ApiResponse> updateProfile(@RequestBody @Valid ChangeUserProfileRequest request) {
+        var res = accountService.updateProfile(request);
         return ResponseEntity.ok()
                 .body(
                         ApiResponse.builder()

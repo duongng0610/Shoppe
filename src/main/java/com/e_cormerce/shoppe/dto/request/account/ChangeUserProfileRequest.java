@@ -16,4 +16,5 @@ public class ChangeUserProfileRequest {
   String username;
   @Valid AddressDto address;
   String phoneNumber;
+  String thumbnailUrl;
 }

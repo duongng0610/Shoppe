@@ -26,6 +26,8 @@ import com.e_cormerce.shoppe.service.vnpay.VnPayService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -35,171 +37,175 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderService {
-    CreateOrderHelper createOrderHelper;
-    OrderRepository orderRepository;
-    OrderMapper orderMapper;
-    ApplicationEventPublisher eventPublisher;
-    VnPayService vnPayService;
-    VariantRepository variantRepository;
-    UserMapper userMapper;
-    OrderReservationRepository orderReservationRepository;
+  CreateOrderHelper createOrderHelper;
+  OrderRepository orderRepository;
+  OrderMapper orderMapper;
+  ApplicationEventPublisher eventPublisher;
+  VnPayService vnPayService;
+  VariantRepository variantRepository;
+  UserMapper userMapper;
+  OrderReservationRepository orderReservationRepository;
 
+  @Transactional
+  public CreateOrderResponse create(
+      @Valid CreateOrderRequest request, HttpServletRequest httpServletRequest)
+      throws JsonProcessingException {
+    Variant variant = variantRepository.getVariantWithProductAndSeller(request.getVariantId());
+    Product product = variant.getProduct();
 
-    @Transactional
-    public CreateOrderResponse create(@Valid CreateOrderRequest request, HttpServletRequest httpServletRequest) throws JsonProcessingException {
-        Variant variant = variantRepository.getVariantWithProductAndSeller(request.getVariantId());
-        Product product = variant.getProduct();
+    int orderedQuantity = request.getQuantity();
+    // step1
+    createOrderHelper.checkQuantityAndActiveProduct(variant, orderedQuantity);
 
-        int orderedQuantity = request.getQuantity();
-        //step1
-        createOrderHelper.checkQuantityAndActiveProduct(variant, orderedQuantity);
+    var order = createOrderHelper.mainExecute(variant, request);
+    var client = order.getClient();
+    var seller = order.getSeller();
 
-        var order = createOrderHelper.mainExecute(variant, request);
-        var client = order.getClient();
-        var seller = order.getSeller();
+    // publish event
+    eventPublisher.publishEvent(
+        OrderCreated.builder()
+            .order(orderMapper.toOrderDto(order))
+            .client(userMapper.toDto(client))
+            .seller(userMapper.toDto(seller))
+            .productId(product.getId())
+            .variantId(variant.getId())
+            .build());
 
-        //publish event
-        eventPublisher.publishEvent(
-                OrderCreated.builder()
-                        .order(orderMapper.toOrderDto(order))
-                        .client(userMapper.toDto(client))
-                        .seller(userMapper.toDto(seller))
-                        .productId(product.getId())
-                        .variantId(variant.getId())
-                        .build());
+    return CreateOrderResponse.builder()
+        .orderId(order.getId())
+        .sellerId(seller.getId())
+        .clientId(client.getId())
+        .paymentUrl(getUrlPaymentByOrder(order.getId(), httpServletRequest))
+        .build();
+  }
 
-        return CreateOrderResponse.builder()
-                .orderId(order.getId())
-                .sellerId(seller.getId())
-                .clientId(client.getId())
-                .paymentUrl(getUrlPaymentByOrder(order.getId(), httpServletRequest))
-                .build();
+  @Transactional
+  public void cancelOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+
+    if (order.getStatus() != OrderStatus.PENDING) {
+      throw new AppException(ErrorCode.UNABlE_CANCEL_ORDER);
     }
 
+    Variant variant = order.getVariant();
+    int availableQuantity = variant.getQuantity();
+    int orderQuantity = order.getQuantity();
 
-    @Transactional
-    public void cancelOrder(String orderId) {
-        Order order =
-                orderRepository
-                        .findById(orderId)
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+    variant.setQuantity(availableQuantity + orderQuantity);
 
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new AppException(ErrorCode.UNABlE_CANCEL_ORDER);
-        }
+    order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
+    variant.setQuantity(availableQuantity + orderQuantity);
 
-        Variant variant = order.getVariant();
-        int availableQuantity = variant.getQuantity();
-        int orderQuantity = order.getQuantity();
+    eventPublisher.publishEvent(
+        OrderCancelledByClient.builder()
+            .order(orderMapper.toOrderDto(order))
+            .client(userMapper.toDto(order.getClient()))
+            .seller(userMapper.toDto(order.getSeller()))
+            .build());
+  }
 
-        variant.setQuantity(availableQuantity + orderQuantity);
+  @Transactional
+  public void approveOrder(String orderId) {
+    Order order =
+        orderRepository
+            .findById(orderId)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
 
-        order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
-        variant.setQuantity(availableQuantity + orderQuantity);
-
-        eventPublisher.publishEvent(
-                OrderCancelledByClient.builder()
-                        .order(orderMapper.toOrderDto(order))
-                        .client(userMapper.toDto(order.getClient()))
-                        .seller(userMapper.toDto(order.getSeller()))
-                        .build());
+    if (order.getStatus() != OrderStatus.PENDING) {
+      throw new AppException(ErrorCode.UNABLE_HIDDEN_PRODUCT);
     }
 
-    @Transactional
-    public void approveOrder(String orderId) {
-        Order order =
-                orderRepository
-                        .findById(orderId)
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+    Variant variant = order.getVariant();
+    int availableQuantity = variant.getQuantity();
+    int orderQuantity = order.getQuantity();
 
-        if (order.getStatus() != OrderStatus.PENDING) {
-            throw new AppException(ErrorCode.UNABLE_HIDDEN_PRODUCT);
-        }
+    variant.setQuantity(availableQuantity + orderQuantity);
 
-        Variant variant = order.getVariant();
-        int availableQuantity = variant.getQuantity();
-        int orderQuantity = order.getQuantity();
+    order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
+    variant.setQuantity(availableQuantity + orderQuantity);
+    eventPublisher.publishEvent(
+        OrderCancelledByClient.builder()
+            .order(orderMapper.toOrderDto(order))
+            .client(userMapper.toDto(order.getClient()))
+            .seller(userMapper.toDto(order.getSeller()))
+            .build());
+  }
 
-        variant.setQuantity(availableQuantity + orderQuantity);
+  @Transactional(readOnly = true)
+  public GetOrderDetailResponse getOrdersByClient() {
+    String clientId = createOrderHelper.getUserId();
 
-        order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
-        variant.setQuantity(availableQuantity + orderQuantity);
-        eventPublisher.publishEvent(
-                OrderCancelledByClient.builder()
-                        .order(orderMapper.toOrderDto(order))
-                        .client(userMapper.toDto(order.getClient()))
-                        .seller(userMapper.toDto(order.getSeller()))
-                        .build());
+    List<OrderDetailDto> orderDetails =
+        orderRepository.findOrderOfClient(clientId).stream()
+            .map(orderMapper::toOrderDetailResponse)
+            .collect(Collectors.toList());
+
+    return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
+  }
+
+  @Transactional(readOnly = true)
+  public GetOrderDetailResponse getOrdersBySeller() {
+    String sellerId = createOrderHelper.getUserId();
+
+    List<OrderDetailDto> orderDetails =
+        orderRepository.findOrderOfSeller(sellerId).stream()
+            .map(orderMapper::toOrderDetailResponse)
+            .collect(Collectors.toList());
+
+    return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
+  }
+
+  public String getUrlPaymentByOrder(String id, HttpServletRequest request) {
+    String userId =
+        SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+    Order order =
+        orderRepository
+            .findById(id)
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+    if (!userId.equals(order.getClient().getId())) {
+      throw new AppException(ErrorCode.UNAUTHORIZED);
     }
+    String baseUrl =
+        request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
+    String vnpayUrl =
+        vnPayService.createUrlPayment(
+            order.getTotalPrice().intValue(),
+            order.getId(),
+            userId,
+            "Thanh toán đơn hàng " + id,
+            baseUrl);
+    return vnpayUrl;
+  }
 
-    @Transactional(readOnly = true)
-    public GetOrderDetailResponse getOrdersByClient() {
-        String clientId = createOrderHelper.getUserId();
-
-        List<OrderDetailDto> orderDetails =
-                orderRepository.findOrderOfClient(clientId).stream()
-                        .map(orderMapper::toOrderDetailResponse)
-                        .collect(Collectors.toList());
-
-        return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
+  @Transactional(propagation = Propagation.REQUIRED)
+  public void handleVnpayResult(Order order, User user, TransactionStatus status) {
+    var reservation = orderReservationRepository.findByOrderId(order.getId());
+    if (reservation.getStatus() != ReservationStatus.ACTIVE) {
+      throw new AppException(ErrorCode.RESERVATION_CONFLICT);
     }
+    // set status = released
+    reservation.setStatus(ReservationStatus.RELEASED);
 
-    @Transactional(readOnly = true)
-    public GetOrderDetailResponse getOrdersBySeller() {
-        String sellerId = createOrderHelper.getUserId();
+    // update reserved of variant
+    var variant = reservation.getVariant();
+    variant.setReserved(variant.getReserved() - reservation.getQuantity());
 
-        List<OrderDetailDto> orderDetails =
-                orderRepository.findOrderOfSeller(sellerId).stream()
-                        .map(orderMapper::toOrderDetailResponse)
-                        .collect(Collectors.toList());
+    if (status == com.e_cormerce.shoppe.enums.transaction.TransactionStatus.SUCCESS) {
+      order.setPaymentStatus(OrderPaymentStatus.SUCCESS);
+      variant.setQuantity(variant.getQuantity() - reservation.getQuantity());
 
-        return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
+    } else {
+      order.setPaymentStatus(OrderPaymentStatus.FAILED);
     }
-
-    public String getUrlPaymentByOrder(String id, HttpServletRequest request) {
-        String userId = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        Order order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
-        if (!userId.equals(order.getClient().getId())) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
-        }
-        String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        String vnpayUrl = vnPayService.createUrlPayment(order.getTotalPrice().intValue(), order.getId(), userId, "Thanh toán đơn hàng " + id, baseUrl);
-        return vnpayUrl;
-    }
-
-
-    @Transactional(propagation = Propagation.REQUIRED)
-    public void handleVnpayResult(Order order, User user, TransactionStatus status) {
-        var reservation = orderReservationRepository.findByOrderId(order.getId());
-        if (reservation.getStatus() != ReservationStatus.ACTIVE) {
-            throw new AppException(ErrorCode.RESERVATION_CONFLICT);
-        }
-        //set status = released
-        reservation.setStatus(ReservationStatus.RELEASED);
-
-        //update reserved of variant
-        var variant = reservation.getVariant();
-        variant.setReserved(variant.getReserved() - reservation.getQuantity());
-
-        if (status == com.e_cormerce.shoppe.enums.transaction.TransactionStatus.SUCCESS) {
-            order.setPaymentStatus(OrderPaymentStatus.SUCCESS);
-            variant.setQuantity(variant.getQuantity() - reservation.getQuantity());
-
-        } else {
-            order.setPaymentStatus(OrderPaymentStatus.FAILED);
-        }
-        variantRepository.save(variant);
-        orderReservationRepository.save(reservation);
-        orderRepository.save(order);
-
-    }
-
-
+    variantRepository.save(variant);
+    orderReservationRepository.save(reservation);
+    orderRepository.save(order);
+  }
 }

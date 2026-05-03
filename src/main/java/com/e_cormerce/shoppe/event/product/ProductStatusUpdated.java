@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductStatusUpdated {
-    ProductStatus oldStatus;
-    Product product;
-    User seller;
+  ProductStatus oldStatus;
+  Product product;
+  User seller;
 }

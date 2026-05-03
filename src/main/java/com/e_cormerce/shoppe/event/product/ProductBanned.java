@@ -11,7 +11,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductBanned {
-    ProductCardResponse product;
-    UserDto seller;
-
+  ProductCardResponse product;
+  UserDto seller;
 }

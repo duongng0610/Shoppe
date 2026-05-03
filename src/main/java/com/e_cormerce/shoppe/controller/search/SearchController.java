@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.controller.home.search;
+package com.e_cormerce.shoppe.controller.search;
 
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.service.search.SearchService;

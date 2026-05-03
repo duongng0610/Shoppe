@@ -46,15 +46,12 @@ public class Variant {
     @Column(name = "quantity_sold", columnDefinition = "int default 0")
     int quantitySold;
 
-
     @Column(name = "discount_percentage", columnDefinition = "float default 0")
     double discountPercentage;
 
     @Column(columnDefinition = "boolean default false")
     boolean deleted;
 
-    @Column(name = "is_default", columnDefinition = "boolean default false")
-    boolean isDefault;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
@@ -64,9 +61,10 @@ public class Variant {
     @OneToMany(mappedBy = "variant", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<VariantValue> variantValues;
 
-
     @CreationTimestamp
-    @Column(name = "created_at", updatable = false,
+    @Column(
+            name = "created_at",
+            updatable = false,
             columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     LocalDateTime createdAt;
 

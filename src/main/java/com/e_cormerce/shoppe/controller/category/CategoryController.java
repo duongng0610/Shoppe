@@ -1,7 +1,6 @@
-package com.e_cormerce.shoppe.controller.home.category;
+package com.e_cormerce.shoppe.controller.category;
 
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
-import com.e_cormerce.shoppe.dto.response.category.CategoryDetailResponse;
 import com.e_cormerce.shoppe.service.category.CategoryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(path = "/categories")
@@ -46,8 +43,7 @@ public class CategoryController {
   @GetMapping("/{id}/details")
   public ResponseEntity<ApiResponse> getDetails(@PathVariable String id) {
     var res = categoryService.getCategoryDetailResponse(id);
-    return ResponseEntity.ok(
-        ApiResponse.builder().success(true).data(res).build());
+    return ResponseEntity.ok(ApiResponse.builder().success(true).data(res).build());
   }
 
   @GetMapping("{id}/products")

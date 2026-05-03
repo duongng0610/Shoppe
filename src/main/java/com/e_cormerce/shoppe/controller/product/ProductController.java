@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.controller.home.product;
+package com.e_cormerce.shoppe.controller.product;
 
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.service.product.ProductService;
@@ -16,8 +16,7 @@ public class ProductController {
   ProductService productService;
 
   @GetMapping("")
-  public ResponseEntity<ApiResponse> getProductForHome(
-      @RequestParam("limit") int limit, @RequestParam("offset") int offset) {
+  public ResponseEntity<ApiResponse> getProductForHome(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
     var result = productService.getProductForHome(limit, offset);
 
     return ResponseEntity.ok(

@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.e_cormerce.shoppe.controller.search.SearchController;
 import com.e_cormerce.shoppe.dto.common.search.CategoryDto;
 import com.e_cormerce.shoppe.filter.AuthFilter;
 import com.e_cormerce.shoppe.service.search.SearchService;

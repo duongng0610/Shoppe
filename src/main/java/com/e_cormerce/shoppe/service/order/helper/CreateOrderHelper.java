@@ -63,7 +63,6 @@ public class CreateOrderHelper {
         return authService.getUserThroughAuthentication();
     }
 
-
     public BigDecimal getTotalPrice(Variant variant, int quantity, BigDecimal shipCost) {
         BigDecimal totalPrice = variant.getPrice().multiply(BigDecimal.valueOf(quantity));
         return totalPrice.add(shipCost);
@@ -72,28 +71,31 @@ public class CreateOrderHelper {
     public String getAttributesVariant(Variant variant) {
         try {
             return objectMapper.writeValueAsString(
-                    variant.getVariantValues().stream().map(variantValue ->
-                            VariantAttributeDto.builder().name(variantValue.getValue().getType().getVal()).value(variantValue.getValue().getVal()).build()));
+                    variant.getVariantValues().stream()
+                            .map(
+                                    variantValue ->
+                                            VariantAttributeDto.builder()
+                                                    .name(variantValue.getValue().getType().getVal())
+                                                    .value(variantValue.getValue().getVal())
+                                                    .build()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
     }
 
     public void checkTotalPrice(Variant variant, BigDecimal totalPrice) {
-
     }
-
 
     public String getUserId() {
         return authService.getUserId();
     }
 
     public void checkQuantityAndActiveProduct(Variant variant, int orderedQuantity) {
-        //step1: check active product
+        // step1: check active product
         if (variant.getProduct().getStatus() != ProductStatus.ACTIVE) {
             throw new AppException(ErrorCode.PRODUCT_NOT_ACTIVE);
         }
-        //step2: check quantity
+        // step2: check quantity
         if (variant.getQuantity() < orderedQuantity) {
             throw new AppException(ErrorCode.INSUFFICIENT_STOCK);
         }
@@ -104,7 +106,7 @@ public class CreateOrderHelper {
         Product product = variant.getProduct();
         User seller = product.getSeller();
         User client = authService.getUserThroughAuthentication();
-        AddressDto address = request.getAddress();
+        AddressDto address = request.getShippingAddress();
         String phoneNumber = request.getShippingPhoneNumber();
         int orderedQuantity = request.getQuantity();
         int affectedRows = variantRepository.reservedStock(variant.getId(), orderedQuantity);
@@ -113,8 +115,16 @@ public class CreateOrderHelper {
             throw new AppException(ErrorCode.NOT_RESERVE_AVAILABLE);
         }
 
-        var shipCost = BigDecimal.valueOf(shippingService.getShipCost(ShipCostOrderRequest.builder().address(address).sellerId(seller.getId()).build()).getTotal());
-
+        var shipCost =
+                BigDecimal.valueOf(
+                        shippingService
+                                .getShipCost(
+                                        ShipCostOrderRequest.builder()
+                                                .address(address)
+                                                .variantId(variant.getId())
+                                                .sellerId(seller.getId())
+                                                .build())
+                                .getTotal());
 
         var order =
                 Order.builder()
@@ -133,24 +143,23 @@ public class CreateOrderHelper {
                         .priceEach(variant.getPrice())
                         .shipCost(shipCost)
                         .totalPrice(getTotalPrice(variant, orderedQuantity, shipCost))
-                        .variantAttributes(variant.isDefault() ? null : getAttributesVariant(variant))
+                        .variantAttributes(!product.isHasVariant() ? null : getAttributesVariant(variant))
                         .createdAt(LocalDateTime.now())
                         .build();
 
         orderRepository.save(order);
 
-        var newReservation = OrderReservation.builder()
-                .order(order)
-                .status(ReservationStatus.ACTIVE)
-                .variant(variant)
-                .quantity(orderedQuantity)
-                .expireAt(LocalDateTime.now().plusMinutes(15))
-                .build();
+        var newReservation =
+                OrderReservation.builder()
+                        .order(order)
+                        .status(ReservationStatus.ACTIVE)
+                        .variant(variant)
+                        .quantity(orderedQuantity)
+                        .expireAt(LocalDateTime.now().plusMinutes(15))
+                        .build();
 
         orderReservationRepository.save(newReservation);
 
         return order;
     }
-
-
 }
