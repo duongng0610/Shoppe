@@ -28,7 +28,6 @@ import org.hibernate.annotations.Where;
 @Where(clause = "deleted = false")
 public class Account {
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
   String id;
 
   @Column(unique = true, nullable = false)
@@ -66,6 +65,6 @@ public class Account {
   Role role;
 
   // inverse side
-  @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+  @OneToOne(mappedBy = "account")
   User user;
 }

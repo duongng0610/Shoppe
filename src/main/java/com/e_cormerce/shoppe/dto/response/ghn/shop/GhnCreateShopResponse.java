@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.dto.response.ghn;
+package com.e_cormerce.shoppe.dto.response.ghn.shop;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -8,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class GhnShipFeeResponse {
+public class GhnCreateShopResponse {
   Integer code;
   String message;
-  GhnShipFeeDataResponse data;
+  GhnCreateShopDataResponse data;
 }

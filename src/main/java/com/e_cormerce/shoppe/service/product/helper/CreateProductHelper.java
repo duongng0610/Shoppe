@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.service.product.helper;
 
 import com.e_cormerce.shoppe.dto.common.product.TypeDto;
 import com.e_cormerce.shoppe.dto.common.product.VariantAttributeDto;
+import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.request.product.VariantRequest;
 import com.e_cormerce.shoppe.entity.product.*;
 import lombok.AccessLevel;
@@ -26,15 +27,14 @@ public class CreateProductHelper {
         variant.setProduct(product);
     }
 
-    public Variant createDefaultVariant(Product product) {
+    public Variant createDefaultVariant(Product product, CreateProductRequest request ) {
         return
                 Variant.builder()
-                        .isDefault(true)
-                        .thumbnail(product.getThumbnail())
-                        .quantity(product.getTotalQuantity())
-                        .price(product.getOriginPrice())
+                        .thumbnail(request.getThumbnailUrl())
+                        .quantity(request.getTotalQuantity())
+                        .price(request.getOriginPrice())
                         .product(product)
-                        .discountPercentage(product.getDiscountPercentage())
+                        .discountPercentage(request.getDiscountPercentage())
                         .build();
 
 

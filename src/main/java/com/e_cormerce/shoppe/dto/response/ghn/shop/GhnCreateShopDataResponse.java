@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.dto.response.ghn;
+package com.e_cormerce.shoppe.dto.response.ghn.shop;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -11,6 +11,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GhnShipFeeDataResponse {
-  float total;
+public class GhnCreateShopDataResponse {
+  String shopId;
 }

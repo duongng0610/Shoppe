@@ -1,0 +1,112 @@
+socket-server:
+  port: 8086
+server:
+  port: 3000
+spring:
+  master:
+    datasource:
+      jdbcUrl: jdbc:mysql://mysql-master:3306/ecommerce
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      driverClassName: com.mysql.cj.jdbc.Driver
+  slave:
+    datasource:
+      jdbcUrl: jdbc:mysql://mysql-slave:3306/ecommerce
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      driverClassName: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope: email, profile
+jwt:
+  access-token-secret: ${JWT_ACCESS_SECRET}
+  access-token-expiration-time: 3600000
+  refresh-token-secret: ${JWT_REFRESH_SECRET}
+  refresh-token-expiration-time: 86400000
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  secret-key: ${CLOUDINARY_SECRET_KEY}
+  image-width: 500
+  image-height: 500
+  crop: fit
+app:
+  security:
+    endpoints:
+      public-urls:
+        - /auth/login
+        - /auth/register/*
+        - /categories/default
+        - /categories/*/children
+        - /categories
+        - /products
+        - /products/*/details
+        - /search
+        - /categories/{id}/products
+        - /seller/{id}/info
+        - /seller/{id}/products
+        - /chat/**
+        - /app/message
+        - /app/topic/messages
+        - /payment
+        - /address/**
+      public-urls-regex:
+        - /auth/login
+        - /auth/register/.*
+        - /categories/default
+        - /categories/.*/children
+        - /categories
+        - /products
+        - /products/.*/details
+        - /address/.*
+    cors:
+      allowed-origins:
+        - ${CORS_ALLOWED_ORIGIN}
+      allowed-headers:
+        - Authorization
+        - Content-Type
+      allowed-methods:
+        - GET
+        - POST
+        - PUT
+        - DELETE
+      credentials: true
+  cookie:
+    access-token:
+      expiration-time: 7200
+      same-site: none
+      secure: true
+      http-only: true
+      path: /
+  admin:
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
+    username: ${ADMIN_USERNAME}
+  snapshot:
+    delay: 30000
+    file-path: ./data/snapshot.dat
+vn-pay:
+  tmn-code: ${VNPAY_TMN_CODE}
+  hash-secret: ${VNPAY_HASH_SECRET}
+  url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: /payment
+ghn:
+  token: ${GHN_TOKEN}
+  calculate-ship-fee-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee
+  create-shop-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/register
+  create-order-ship: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create
+  get-order-ship: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail
+  create-shipment: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create

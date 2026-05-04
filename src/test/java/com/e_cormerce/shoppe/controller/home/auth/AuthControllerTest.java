@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
 import com.e_cormerce.shoppe.properties.CookieTokenProperties;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 //import com.e_cormerce.shoppe.util.ConvertObject;
@@ -19,12 +18,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@ActiveProfiles("test")
 public class AuthControllerTest {
     @Autowired MockMvc mockMvc;
 

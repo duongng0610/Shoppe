@@ -9,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateOrderResponse {
-  String orderId;
+  OrderDto order;
   String sellerId;
   String clientId;
   String paymentUrl;

@@ -46,7 +46,7 @@ public class CreateProductRequest {
     @NumberFormat
     float discountPercentage;
 
-    List<@NotBlank String> extraImageUrls;
+    List< String> extraImageUrls;
 
     /**
      * @Valid bật nested validation: nếu có trường types sẽ vào types lấy field và so khớp với
