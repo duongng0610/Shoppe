@@ -12,12 +12,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShipCostOrderRequest {
+
+
     @NotNull(message = "variant_id  is required")
     String variantId;
-
-  // để lấy địa chỉ + sdt from.
-  @NotNull(message = "seller_id  is required")
-  String sellerId;
 
   @Valid AddressDto address;
 }

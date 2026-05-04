@@ -26,6 +26,7 @@ public class AddressController {
   @GetMapping("/provinces")
   public ResponseEntity<ApiResponse> getProvinces() {
     List<ProvinceDto> data = addressService.getProvinces();
+
     return ResponseEntity.ok(ApiResponse.builder().success(true).data(data).build());
   }
 

@@ -66,18 +66,15 @@ public class ProductService {
                 Product.builder()
                         .name(request.getName())
                         .description(request.getDescription())
-                        .originPrice(request.getOriginPrice())
                         .status(ProductStatus.PENDING)
                         .createdAt(LocalDateTime.now())
                         .hasVariant(request.getHasVariant())
                         .thumbnail(request.getThumbnailUrl())
-                        .discountPercentage(request.getDiscountPercentage())
-                        .seller(user)
-                        .totalQuantity(request.getTotalQuantity())
                         .originPrice(request.getOriginPrice())
+                        .seller(user)
                         .build();
 
-        if (!request.getExtraImageUrls().isEmpty()) {
+        if (request.getExtraImageUrls()!= null && !request.getExtraImageUrls().isEmpty()) {
             product.setProductExtraImages(
                     request.getExtraImageUrls().stream()
                             .map(url -> ProductExtraImage.builder().product(product).url(url).build())
@@ -96,7 +93,7 @@ public class ProductService {
 
             }
         } else {
-            product.addVariant(createProductHelper.createDefaultVariant(product));
+            product.addVariant(createProductHelper.createDefaultVariant(product,request));
         }
 
         product.setCategory(

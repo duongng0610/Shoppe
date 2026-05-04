@@ -9,27 +9,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @RequiredArgsConstructor
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Profile("!test")
 public class AppConfig {
 
-  AppConfigHelper appConfigHelper;
-  AdminProperties appConfigProperties;
+    AppConfigHelper appConfigHelper;
+    AdminProperties appConfigProperties;
 
-  @Bean
-  CommandLineRunner initData() {
-    return args -> {
-      appConfigHelper.createRoles();
-
-      appConfigHelper.createAdmin(
-          appConfigProperties.getEmail(),
-          appConfigProperties.getPassword(),
-          appConfigProperties.getUsername());
-      appConfigHelper.createDefaultCategories();
-//      appConfigHelper.initAddressData();
-    };
-  }
+    @Bean
+    CommandLineRunner initData() {
+        return args -> {
+            appConfigHelper.createRoles();
+            appConfigHelper.createAdmin(
+                    appConfigProperties.getEmail(),
+                    appConfigProperties.getPassword(),
+                    appConfigProperties.getUsername());
+            appConfigHelper.createDefaultCategories();
+        };
+    }
 }

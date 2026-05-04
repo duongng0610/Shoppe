@@ -106,12 +106,12 @@ public class CreateOrderHelper {
         Product product = variant.getProduct();
         User seller = product.getSeller();
         User client = authService.getUserThroughAuthentication();
-        AddressDto address = request.getShippingAddress();
+        AddressDto address = request.getAddress();
         String phoneNumber = request.getShippingPhoneNumber();
         int orderedQuantity = request.getQuantity();
-        int affectedRows = variantRepository.reservedStock(variant.getId(), orderedQuantity);
 
-        if (affectedRows == 0) {
+
+        if (variant.getReserved()+orderedQuantity > variant.getQuantity()) {
             throw new AppException(ErrorCode.NOT_RESERVE_AVAILABLE);
         }
 
@@ -122,7 +122,6 @@ public class CreateOrderHelper {
                                         ShipCostOrderRequest.builder()
                                                 .address(address)
                                                 .variantId(variant.getId())
-                                                .sellerId(seller.getId())
                                                 .build())
                                 .getTotal());
 
@@ -140,25 +139,17 @@ public class CreateOrderHelper {
                         .district(address.getDistrict())
                         .ward(address.getWard())
                         .shippingPhoneNumber(phoneNumber)
+                        .addressDetail(request.getAddressDetail())
                         .priceEach(variant.getPrice())
                         .shipCost(shipCost)
                         .totalPrice(getTotalPrice(variant, orderedQuantity, shipCost))
-                        .variantAttributes(!product.isHasVariant() ? null : getAttributesVariant(variant))
+                        .variantAttributes(variant.isDefault() ? null : getAttributesVariant(variant))
                         .createdAt(LocalDateTime.now())
                         .build();
 
         orderRepository.save(order);
 
-        var newReservation =
-                OrderReservation.builder()
-                        .order(order)
-                        .status(ReservationStatus.ACTIVE)
-                        .variant(variant)
-                        .quantity(orderedQuantity)
-                        .expireAt(LocalDateTime.now().plusMinutes(15))
-                        .build();
 
-        orderReservationRepository.save(newReservation);
 
         return order;
     }

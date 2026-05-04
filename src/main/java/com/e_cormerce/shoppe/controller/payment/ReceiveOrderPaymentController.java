@@ -20,6 +20,6 @@ public class ReceiveOrderPaymentController {
   @GetMapping("")
   public String receivePaymentResult(HttpServletRequest request) throws AppException {
     var id = paymentService.createTransaction(request);
-    return "redirect:http://localhost:5173/users/transactions/" + id;
+    return "redirect:http://localhost:5173/payments/" + id;
   }
 }
