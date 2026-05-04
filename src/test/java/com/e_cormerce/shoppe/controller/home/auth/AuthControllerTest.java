@@ -6,6 +6,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.e_cormerce.shoppe.dto.request.auth.login.LogInRequest;
+import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.properties.CookieTokenProperties;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 //import com.e_cormerce.shoppe.util.ConvertObject;
@@ -23,7 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AuthControllerTest {
     @Autowired MockMvc mockMvc;
@@ -47,5 +49,136 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.message").exists());
 
         Mockito.verify(authService, Mockito.never()).logIn(Mockito.any());
+    }
+
+    @Test
+    void registerClient_validRequest_returns201() throws Exception {
+        String json = """
+        {
+          "email": "test@gmail.com",
+          "password": "123456",
+          "username": "testuser"
+        }
+        """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("register successfully"));
+
+        Mockito.verify(authService).registerClient(Mockito.any());
+    }
+
+    // 2. Blank email
+    @Test
+    void registerClient_blankEmail_returns400() throws Exception {
+        String json = """
+        {
+          "email": "",
+          "password": "123456",
+          "username": "testuser"
+        }
+        """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
+    }
+
+    // 3. Blank password
+    @Test
+    void registerClient_blankPassword_returns400() throws Exception {
+        String json = """
+        {
+          "email": "test@gmail.com",
+          "password": "",
+          "username": "testuser"
+        }
+        """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
+    }
+
+    // 4. Blank username
+    @Test
+    void registerClient_blankUsername_returns400() throws Exception {
+        String json = """
+        {
+          "email": "test@gmail.com",
+          "password": "123456",
+          "username": ""
+        }
+        """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
+    }
+
+    // 5. Email existed
+    @Test
+    void registerClient_emailExists_returnsError() throws Exception {
+        String json = """
+        {
+          "email": "test@gmail.com",
+          "password": "123456",
+          "username": "testuser"
+        }
+        """;
+
+        Mockito.doThrow(new AppException(ErrorCode.EXISTED_ACCOUNT))
+                .when(authService).registerClient(Mockito.any());
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService).registerClient(Mockito.any());
+    }
+
+    // 6. Username invalid
+    @Test
+    void registerClient_invalidUsername_returnsError() throws Exception {
+        String json = """
+        {
+          "email": "test@gmail.com",
+          "password": "123456",
+          "username": "testuser"
+        }
+        """;
+
+        Mockito.doThrow(new AppException(ErrorCode.INVALID_USERNAME))
+                .when(authService).registerClient(Mockito.any());
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService).registerClient(Mockito.any());
+    }
+
+    // 7. Missing body
+    @Test
+    void registerClient_missingBody_returns400() throws Exception {
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
     }
 }
