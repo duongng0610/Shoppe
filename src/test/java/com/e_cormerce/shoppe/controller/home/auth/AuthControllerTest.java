@@ -51,6 +51,9 @@ public class AuthControllerTest {
         Mockito.verify(authService, Mockito.never()).logIn(Mockito.any());
     }
 
+    // =========================
+    // 15
+    // =========================
     @Test
     void registerClient_validRequest_returns201() throws Exception {
         String json = """
@@ -71,7 +74,9 @@ public class AuthControllerTest {
         Mockito.verify(authService).registerClient(Mockito.any());
     }
 
-    // 2. Blank email
+    // =========================
+    // 16. Blank email
+    // =========================
     @Test
     void registerClient_blankEmail_returns400() throws Exception {
         String json = """
@@ -90,7 +95,9 @@ public class AuthControllerTest {
         Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
     }
 
-    // 3. Blank password
+    // =========================
+    // 17. Blank password
+    // =========================
     @Test
     void registerClient_blankPassword_returns400() throws Exception {
         String json = """
@@ -109,7 +116,9 @@ public class AuthControllerTest {
         Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
     }
 
-    // 4. Blank username
+    // =========================
+    // 18. Blank username
+    // =========================
     @Test
     void registerClient_blankUsername_returns400() throws Exception {
         String json = """
@@ -128,7 +137,9 @@ public class AuthControllerTest {
         Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
     }
 
-    // 5. Email existed
+    // =========================
+    // 19. Email existed
+    // =========================
     @Test
     void registerClient_emailExists_returnsError() throws Exception {
         String json = """
@@ -150,7 +161,9 @@ public class AuthControllerTest {
         Mockito.verify(authService).registerClient(Mockito.any());
     }
 
-    // 6. Username invalid
+    // =========================
+    // 20. Username invalid
+    // =========================
     @Test
     void registerClient_invalidUsername_returnsError() throws Exception {
         String json = """
@@ -172,7 +185,9 @@ public class AuthControllerTest {
         Mockito.verify(authService).registerClient(Mockito.any());
     }
 
-    // 7. Missing body
+    // =========================
+    // 21. Missing body
+    // =========================
     @Test
     void registerClient_missingBody_returns400() throws Exception {
         mockMvc.perform(post("/auth/register/client")
