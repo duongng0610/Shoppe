@@ -34,11 +34,11 @@ public class AuthControllerTest {
     @Test
     void login_blankFields_returns400() throws Exception {
         String json = """
-        {
-          "email": "",
-          "password": ""
-        }
-        """;
+                {
+                  "email": "",
+                  "password": ""
+                }
+                """;
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
