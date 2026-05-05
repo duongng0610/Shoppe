@@ -1,0 +1,64 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      mysql-master:
+        condition: service_healthy   # ← chờ master healthy
+      mysql-slave:
+        condition: service_healthy   # ← chờ slave healthy
+    env_file:
+      - .env
+    volumes:
+      - ./data:/data
+
+  mysql-master:
+    image: mysql:8.0
+    container_name: mysql-master
+    command: --server-id=1 --log-bin=mysql-bin --binlog-format=row
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: ecommerce
+      MYSQL_USER: replication_user
+      MYSQL_PASSWORD: 123456
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_master_data:/var/lib/mysql
+      - ./init/master:/docker-entrypoint-initdb.d
+      - ./data:/data
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s   # ← chờ 30s trước khi bắt đầu check
+
+  mysql-slave:
+    image: mysql:8.0
+    container_name: mysql-slave
+    command: --server-id=2 --log-bin=mysql-bin --binlog-format=row
+    depends_on:
+      mysql-master:
+        condition: service_healthy   # ← slave chờ master healthy mới start
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_DATABASE: ecommerce
+    ports:
+      - "3308:3306"
+    volumes:
+      - mysql_slave_data:/var/lib/mysql
+      - ./init/slave:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  mysql_master_data:
+  mysql_slave_data:

@@ -76,7 +76,7 @@ public class OrderService {
             .build());
 
     return CreateOrderResponse.builder()
-        .orderId(order.getId())
+        .order(orderMapper.toOrderDto(order))
         .sellerId(seller.getId())
         .clientId(client.getId())
         .paymentUrl(getUrlPaymentByOrder(order.getId(), httpServletRequest))
@@ -111,32 +111,6 @@ public class OrderService {
             .build());
   }
 
-  @Transactional
-  public void approveOrder(String orderId) {
-    Order order =
-        orderRepository
-            .findById(orderId)
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
-
-    if (order.getStatus() != OrderStatus.PENDING) {
-      throw new AppException(ErrorCode.UNABLE_HIDDEN_PRODUCT);
-    }
-
-    Variant variant = order.getVariant();
-    int availableQuantity = variant.getQuantity();
-    int orderQuantity = order.getQuantity();
-
-    variant.setQuantity(availableQuantity + orderQuantity);
-
-    order.setStatus(OrderStatus.CANCELLED_BY_CLIENT);
-    variant.setQuantity(availableQuantity + orderQuantity);
-    eventPublisher.publishEvent(
-        OrderCancelledByClient.builder()
-            .order(orderMapper.toOrderDto(order))
-            .client(userMapper.toDto(order.getClient()))
-            .seller(userMapper.toDto(order.getSeller()))
-            .build());
-  }
 
   @Transactional(readOnly = true)
   public GetOrderDetailResponse getOrdersByClient() {
@@ -186,26 +160,12 @@ public class OrderService {
 
   @Transactional(propagation = Propagation.REQUIRED)
   public void handleVnpayResult(Order order, User user, TransactionStatus status) {
-    var reservation = orderReservationRepository.findByOrderId(order.getId());
-    if (reservation.getStatus() != ReservationStatus.ACTIVE) {
-      throw new AppException(ErrorCode.RESERVATION_CONFLICT);
-    }
-    // set status = released
-    reservation.setStatus(ReservationStatus.RELEASED);
-
-    // update reserved of variant
-    var variant = reservation.getVariant();
-    variant.setReserved(variant.getReserved() - reservation.getQuantity());
 
     if (status == com.e_cormerce.shoppe.enums.transaction.TransactionStatus.SUCCESS) {
       order.setPaymentStatus(OrderPaymentStatus.SUCCESS);
-      variant.setQuantity(variant.getQuantity() - reservation.getQuantity());
-
     } else {
-      order.setPaymentStatus(OrderPaymentStatus.FAILED);
+      order.setPaymentStatus(OrderPaymentStatus.FAIL);
     }
-    variantRepository.save(variant);
-    orderReservationRepository.save(reservation);
     orderRepository.save(order);
   }
 }

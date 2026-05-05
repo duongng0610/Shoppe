@@ -37,6 +37,8 @@ public interface VariantRepository extends JpaRepository<Variant, String> {
       nativeQuery = true)
   String getProductName(@Param("variant_id") String variant_id);
 
+
+
   @Query(value = "SELECT product_id from variants v WHERE v.id = :variant_id", nativeQuery = true)
   String getProductId(@Param("variant_id") String variant_id);
 
@@ -48,6 +50,14 @@ public interface VariantRepository extends JpaRepository<Variant, String> {
               + "WHERE v.id = :variant_id",
       nativeQuery = true)
   List<String> getVariantValues(@Param("variant_id") String variant_id);
+
+    @Query(
+            value =
+                    "SELECT p.seller_id  FROM variants v "
+                            + "INNER JOIN products p on v.product_id =p.id "
+                            + "WHERE v.id = :variant_id",
+            nativeQuery = true)
+    Optional<String> getSellerId(@Param("variant_id") String variant_id);
 
   @Transactional
   @Modifying

@@ -46,7 +46,7 @@ public class Variant {
   int quantitySold;
 
   @Column(name = "discount_percentage", columnDefinition = "float default 0")
-  double discountPercentage;
+  Float discountPercentage;
 
   @Column(columnDefinition = "boolean default false")
   boolean deleted;

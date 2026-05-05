@@ -41,7 +41,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
       nativeQuery = true)
   CompletableFuture<User> findSellerOfProduct(@Param("product_id") String productId);
 
-    @Query(value = "SELECT * FROM products WHERE  p.status = 'ACTIVE' and category_id = :category_id", nativeQuery = true)
+    @Query(value = "SELECT * FROM products p WHERE  p.status = 'ACTIVE' and category_id = :category_id", nativeQuery = true)
     List<Product> findProductsInCategory(@Param("category_id") String category_id);
 
   @Query(

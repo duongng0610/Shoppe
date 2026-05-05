@@ -21,12 +21,14 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@ActiveProfiles("test")
 public class AuthControllerTest {
     @Autowired MockMvc mockMvc;
 
@@ -36,11 +38,11 @@ public class AuthControllerTest {
     @Test
     void login_blankFields_returns400() throws Exception {
         String json = """
-        {
-          "email": "",
-          "password": ""
-        }
-        """;
+                {
+                  "email": "",
+                  "password": ""
+                }
+                """;
 
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
