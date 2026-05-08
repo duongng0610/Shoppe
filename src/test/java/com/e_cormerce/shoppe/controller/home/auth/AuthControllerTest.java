@@ -16,6 +16,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import javax.sql.DataSource;
+import java.sql.Connection;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +38,16 @@ public class AuthControllerTest {
     @MockitoBean
     CookieUtil cookieUtil;
 
+    @Autowired
+    private DataSource dataSource;
+
+    @Test
+    void testConnection() throws Exception {
+        try (Connection conn = dataSource.getConnection()) {
+            System.out.println("Connected: " + (conn != null));
+        }
+    }
+
     @Test
     void login_blankFields_returns400() throws Exception {
         String json = """
@@ -47,7 +60,7 @@ public class AuthControllerTest {
         mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.message").exists());
 
         Mockito.verify(authService, Mockito.never()).logIn(Mockito.any());

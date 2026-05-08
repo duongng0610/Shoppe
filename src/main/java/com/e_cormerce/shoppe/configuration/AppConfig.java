@@ -30,6 +30,7 @@ public class AppConfig {
                     appConfigProperties.getPassword(),
                     appConfigProperties.getUsername());
             appConfigHelper.createDefaultCategories();
+            appConfigHelper.createDefaultAddress();
         };
     }
 }
