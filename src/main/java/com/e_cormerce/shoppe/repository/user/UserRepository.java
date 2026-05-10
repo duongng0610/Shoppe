@@ -61,12 +61,8 @@ public interface UserRepository extends JpaRepository<User, String> {
   @Query(value = "CALL sp_get_client_detail_info(:clientId)", nativeQuery = true)
   UserDetailManageInfoProjection getClientDetailInfo(@Param("clientId") String clientId);
 
-  @Query(value = "CALL sp_get_registered_seller_info(:limit, :offset)", nativeQuery = true)
-  List<UserManageInfoProjection> getRegisteredSellerInfo(
-      @Param("limit") int limit, @Param("offset") int offset);
-
-  @Query(value = "CALL sp_get_unregistered_seller_info(:limit, :offset)", nativeQuery = true)
-  List<UserManageInfoProjection> getUnregisteredSellerInfo(
+  @Query(value = "CALL sp_get_seller_info(:limit, :offset)", nativeQuery = true)
+  List<UserManageInfoProjection> getSellerInfo(
       @Param("limit") int limit, @Param("offset") int offset);
 
   @Query(value = "CALL sp_get_client_info(:limit, :offset)", nativeQuery = true)

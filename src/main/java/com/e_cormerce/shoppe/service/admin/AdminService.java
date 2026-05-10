@@ -130,36 +130,8 @@ public class AdminService {
     return userRepository.getRegisteredSellerDetailInfo(sellerId);
   }
 
-  public List<UserManageInfoProjection> getRegisteredSellerInfo(int limit, int offset) {
-    return userRepository.getRegisteredSellerInfo(limit, offset);
-  }
-
-  public List<UserManageInfoProjection> getUnregisteredSellerInfo(int limit, int offset) {
-    return userRepository.getUnregisteredSellerInfo(limit, offset);
-  }
-
-  @Transactional
-  public void approveSellerRegister(String sellerId) {
-    Account account =
-        accountRepository
-            .findById(sellerId)
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-    if (account.getStatus() != AccountStatus.PENDING) {
-      throw new AppException(ErrorCode.UNABLE_APPROVE_SELLER_REGISTER);
-    }
-    accountRepository.setStatus(sellerId, AccountStatus.INACTIVE);
-  }
-
-  @Transactional
-  public void rejectSellerRegister(String sellerId) {
-    Account account =
-        accountRepository
-            .findById(sellerId)
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-    if (account.getStatus() != AccountStatus.PENDING) {
-      throw new AppException(ErrorCode.UNABLE_REJECT_SELLER_REGISTER);
-    }
-    accountRepository.setStatus(sellerId, AccountStatus.REJECTED);
+  public List<UserManageInfoProjection> getSellerInfo(int limit, int offset) {
+    return userRepository.getSellerInfo(limit, offset);
   }
 
   @Transactional

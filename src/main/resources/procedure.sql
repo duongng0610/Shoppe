@@ -41,8 +41,8 @@ BEGIN
 END $$
 
 
-DROP PROCEDURE IF EXISTS sp_get_registered_seller_info $$
-CREATE PROCEDURE sp_get_registered_seller_info (
+DROP PROCEDURE IF EXISTS sp_get_seller_info $$
+CREATE PROCEDURE sp_get_seller_info (
     IN p_limit INT,
     IN p_offset INT
 )
@@ -56,30 +56,9 @@ BEGIN
     INNER JOIN accounts a ON u.id = a.id
     INNER JOIN role r ON r.id = a.role_id
     WHERE r.val = 'SELLER'
-        AND a.status != 'PENDING'
     LIMIT p_limit OFFSET p_offset;
 END $$
 
-
-DROP PROCEDURE IF EXISTS sp_get_unregistered_seller_info $$
-CREATE PROCEDURE sp_get_unregistered_seller_info (
-    IN p_limit INT,
-    IN p_offset INT
-)
-BEGIN
-    SELECT
-        u.id,
-        u.username,
-        a.status,
-        u.created_at
-    FROM users u
-    INNER JOIN accounts a ON u.id = a.id
-    INNER JOIN role r ON r.id = a.role_id
-    WHERE r.val = 'SELLER'
-        AND a.status = 'PENDING'
-    ORDER BY u.created_at
-    LIMIT p_limit OFFSET p_offset;
-END $$
 
 
 DROP PROCEDURE IF EXISTS sp_get_seller_detail_info $$

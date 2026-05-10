@@ -61,7 +61,7 @@ public class AdminController {
         ApiResponse.builder().success(true).message("unlock products successfully").build());
   }
 
-  // Client Management Endpoints
+
   @PreAuthorize("hasAuthority('PERMISSION_GET_USERS_MANAGEMENT')")
   @GetMapping(path = "/clients")
   public ResponseEntity<ApiResponse> getClientInfo(
@@ -87,29 +87,15 @@ public class AdminController {
             .build());
   }
 
-  // Seller Management Endpoints
   @PreAuthorize("hasAuthority('PERMISSION_GET_USERS_MANAGEMENT')")
-  @GetMapping(path = "/sellers/registered")
+  @GetMapping(path = "/sellers")
   public ResponseEntity<ApiResponse> getRegisteredSellerInfo(
       @RequestParam int limit, @RequestParam int offset) {
-    var sellers = adminService.getRegisteredSellerInfo(limit, offset);
+    var sellers = adminService.getSellerInfo(limit, offset);
     return ResponseEntity.ok(
         ApiResponse.builder()
             .success(true)
             .message("get registered seller info successfully")
-            .data(sellers)
-            .build());
-  }
-
-  @PreAuthorize("hasAuthority('PERMISSION_GET_USERS_MANAGEMENT')")
-  @GetMapping(path = "/sellers/unregistered")
-  public ResponseEntity<ApiResponse> getUnregisteredSellerInfo(
-      @RequestParam int limit, @RequestParam int offset) {
-    var sellers = adminService.getUnregisteredSellerInfo(limit, offset);
-    return ResponseEntity.ok(
-        ApiResponse.builder()
-            .success(true)
-            .message("get unregistered seller info successfully")
             .data(sellers)
             .build());
   }
@@ -124,25 +110,6 @@ public class AdminController {
             .message("get seller detail info successfully")
             .data(seller)
             .build());
-  }
-
-  @PreAuthorize("hasAuthority('PERMISSION_APPROVE_SELLER_REGISTER')")
-  @PatchMapping(path = "/sellers/{sellerId}/approve")
-  public ResponseEntity<ApiResponse> approveSellerRegister(@PathVariable String sellerId) {
-    adminService.approveSellerRegister(sellerId);
-    return ResponseEntity.ok(
-        ApiResponse.builder()
-            .success(true)
-            .message("approve seller register successfully")
-            .build());
-  }
-
-  @PreAuthorize("hasAuthority('PERMISSION_REJECT_SELLER_REGISTER')")
-  @PatchMapping(path = "/sellers/{sellerId}/reject")
-  public ResponseEntity<ApiResponse> rejectSellerRegister(@PathVariable String sellerId) {
-    adminService.rejectSellerRegister(sellerId);
-    return ResponseEntity.ok(
-        ApiResponse.builder().success(true).message("reject seller register successfully").build());
   }
 
   // User Ban/Unban Endpoints

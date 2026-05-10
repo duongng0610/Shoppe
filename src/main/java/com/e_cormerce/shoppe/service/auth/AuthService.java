@@ -115,7 +115,7 @@ public class AuthService {
             .email(request.getEmail())
             .password(bCryptPasswordEncoder.encode(request.getPassword()))
             .role(role)
-            .status(roleEnum == roleEnum.SELLER ? AccountStatus.PENDING : AccountStatus.INACTIVE)
+            .status(AccountStatus.INACTIVE)
             .build();
 
     entityManager.persist(account);

@@ -57,7 +57,5 @@ public class PermissionValue {
           GET_TRANSACTION_DETAILS,
           BAN_PRODUCTS,
           UNLOCK_PRODUCTS,
-          REJECT_PRODUCTS,
-          APPROVE_SELLER_REGISTER,
-          REJECT_SELLER_REGISTER);
+          REJECT_PRODUCTS);
 }
