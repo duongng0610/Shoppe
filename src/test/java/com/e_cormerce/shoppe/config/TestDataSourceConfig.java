@@ -1,13 +1,13 @@
-//package com.e_cormerce.shoppe.config;
+// package com.e_cormerce.shoppe.config;
 //
-//import org.springframework.boot.jdbc.DataSourceBuilder;
-//import org.springframework.boot.test.context.TestConfiguration;
-//import org.springframework.context.annotation.Bean;
+// import org.springframework.boot.jdbc.DataSourceBuilder;
+// import org.springframework.boot.test.context.TestConfiguration;
+// import org.springframework.context.annotation.Bean;
 //
-//import javax.sql.DataSource;
+// import javax.sql.DataSource;
 //
-//@TestConfiguration
-//public class TestDataSourceConfig {
+// @TestConfiguration
+// public class TestDataSourceConfig {
 //
 //    @Bean
 //    public DataSource dataSource() {
@@ -18,4 +18,4 @@
 //                .password("")
 //                .build();
 //    }
-//}
+// }

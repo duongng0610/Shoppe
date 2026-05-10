@@ -1,19 +1,19 @@
-//package com.e_cormerce.shoppe.event.listener.seller_stat;
+// package com.e_cormerce.shoppe.event.listener.seller_stat;
 //
-//import com.e_cormerce.shoppe.event.product.*;
-//import com.e_cormerce.shoppe.repository.seller.SellerStatRepository;
-//import lombok.AccessLevel;
-//import lombok.RequiredArgsConstructor;
-//import lombok.experimental.FieldDefaults;
-//import org.springframework.scheduling.annotation.Async;
-//import org.springframework.stereotype.Component;
-//import org.springframework.transaction.event.TransactionPhase;
-//import org.springframework.transaction.event.TransactionalEventListener;
+// import com.e_cormerce.shoppe.event.product.*;
+// import com.e_cormerce.shoppe.repository.seller.SellerStatRepository;
+// import lombok.AccessLevel;
+// import lombok.RequiredArgsConstructor;
+// import lombok.experimental.FieldDefaults;
+// import org.springframework.scheduling.annotation.Async;
+// import org.springframework.stereotype.Component;
+// import org.springframework.transaction.event.TransactionPhase;
+// import org.springframework.transaction.event.TransactionalEventListener;
 //
-//@Component
-//@RequiredArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-//public class SellerProductStatListener {
+// @Component
+// @RequiredArgsConstructor
+// @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+// public class SellerProductStatListener {
 //  SellerStatRepository sellerStatRepository;
 //
 //  @Async
@@ -72,4 +72,4 @@
 //    var seller = event.getSeller();
 //    sellerStatRepository.deleteProduct(seller.getId());
 //  }
-//}
+// }

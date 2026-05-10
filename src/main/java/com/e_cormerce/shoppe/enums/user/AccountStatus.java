@@ -11,5 +11,7 @@ import lombok.experimental.FieldDefaults;
 public enum AccountStatus {
   BANNED,
   ACTIVE,
-  INACTIVE
+  INACTIVE,
+  PENDING,
+  REJECTED
 }

@@ -1,15 +1,15 @@
-//package com.e_cormerce.shoppe.repository.client;
+// package com.e_cormerce.shoppe.repository.client;
 //
-//import com.e_cormerce.shoppe.entity.client.ClientStat;
-//import java.math.BigDecimal;
-//import org.springframework.data.jpa.repository.JpaRepository;
-//import org.springframework.data.jpa.repository.Modifying;
-//import org.springframework.data.jpa.repository.Query;
-//import org.springframework.stereotype.Repository;
-//import org.springframework.transaction.annotation.Transactional;
+// import com.e_cormerce.shoppe.entity.client.ClientStat;
+// import java.math.BigDecimal;
+// import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.Modifying;
+// import org.springframework.data.jpa.repository.Query;
+// import org.springframework.stereotype.Repository;
+// import org.springframework.transaction.annotation.Transactional;
 //
-//@Repository
-//public interface ClientStatRepository extends JpaRepository<ClientStat, Integer> {
+// @Repository
+// public interface ClientStatRepository extends JpaRepository<ClientStat, Integer> {
 //  @Modifying
 //  @Transactional
 //  @Query(
@@ -97,4 +97,4 @@
 //                WHERE c.client.id = :clientId
 //            """)
 //  void failDelivery(String clientId);
-//}
+// }

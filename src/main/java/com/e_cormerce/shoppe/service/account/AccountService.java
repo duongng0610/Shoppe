@@ -18,49 +18,47 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
 @Log4j2
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountService {
-    UserRepository userRepository;
-    BCryptPasswordEncoder bCryptPasswordEncoder;
-    AccountServiceHelper accountServiceHelper;
+  UserRepository userRepository;
+  BCryptPasswordEncoder bCryptPasswordEncoder;
+  AccountServiceHelper accountServiceHelper;
 
-    public void changePassword(ChangePasswordRequest request) {
-        User user = accountServiceHelper.getUser();
-        Account account = accountServiceHelper.getAccount(user);
+  public void changePassword(ChangePasswordRequest request) {
+    User user = accountServiceHelper.getUser();
+    Account account = accountServiceHelper.getAccount(user);
 
-        if (!accountServiceHelper.isTrueOldPassword(request.getOldPassword(), account)) {
-            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
-        }
-
-        accountServiceHelper.updatePassword(request.getNewPassword(), account);
+    if (!accountServiceHelper.isTrueOldPassword(request.getOldPassword(), account)) {
+      throw new AppException(ErrorCode.INCORRECT_PASSWORD);
     }
 
-    public ChangeUserProfileResponse updateProfile(ChangeUserProfileRequest request) {
-        User user = accountServiceHelper.getUser();
+    accountServiceHelper.updatePassword(request.getNewPassword(), account);
+  }
 
-        accountServiceHelper.applyProfileChanges(user, request);
-        accountServiceHelper.applyAvatarChange(user, request.getThumbnailUrl());
+  public ChangeUserProfileResponse updateProfile(ChangeUserProfileRequest request) {
+    User user = accountServiceHelper.getUser();
 
-        userRepository.save(user);
+    accountServiceHelper.applyProfileChanges(user, request);
+    accountServiceHelper.applyAvatarChange(user, request.getThumbnailUrl());
 
-        return ChangeUserProfileResponse.builder()
-                .dob(user.getDob())
-                .avatar(user.getAvatar())
-                .username(user.getUsername())
-                .build();
-    }
+    userRepository.save(user);
 
+    return ChangeUserProfileResponse.builder()
+        .dob(user.getDob())
+        .avatar(user.getAvatar())
+        .username(user.getUsername())
+        .build();
+  }
 
-    public UserProfileResponse getUserProfile() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println(authentication.getPrincipal());
-        return userRepository
-                .getUserProfileById(authentication.getPrincipal().toString())
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-    }
+  public UserProfileResponse getUserProfile() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    System.out.println(authentication.getPrincipal());
+    return userRepository
+        .getUserProfileById(authentication.getPrincipal().toString())
+        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+  }
 }

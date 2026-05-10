@@ -27,8 +27,7 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE users SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class User {
-  @Id
-  String id;
+  @Id String id;
 
   @Column(columnDefinition = "boolean default false")
   boolean deleted;

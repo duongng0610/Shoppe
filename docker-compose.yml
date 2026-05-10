@@ -33,8 +33,8 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456" ]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 20s   # ← chờ 30s trước khi bắt đầu check
+      retries: 10
+      start_period: 15s   # ← chờ 30s trước khi bắt đầu check
 
   mysql-slave:
     image: mysql:8.0
@@ -56,8 +56,8 @@ services:
       test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456" ]
       interval: 10s
       timeout: 5s
-      retries: 5
-      start_period: 20s
+      retries: 10
+      start_period: 15s
 
 volumes:
   mysql_master_data:

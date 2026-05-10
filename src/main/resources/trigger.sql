@@ -1,6 +1,3 @@
-
-DELIMITER $$
-
 -- ─────────────────────────────────────────────────────────────
 -- 1. AFTER INSERT variant
 --    KHÔNG dùng CONTINUE HANDLER vì đây là dữ liệu cốt lõi
@@ -297,12 +294,3 @@ BEGIN
 
     END IF;
 END$$
-
-DELIMITER ;
-
-LOAD DATA INFILE '/data/address.csv'
-INTO TABLE address
-FIELDS TERMINATED BY ','
-ENCLOSED BY '"'
-LINES TERMINATED BY '\n'
-IGNORE 1 ROWS;

@@ -20,80 +20,74 @@ import org.springframework.test.web.servlet.MockMvc;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class GetAllShoppingCartTest {
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockitoBean
-    ShoppingCartService shoppingCartService;
+  @MockitoBean ShoppingCartService shoppingCartService;
 
-    // 1. SUCCESS
-    @Test
-    void getAll_success() throws Exception {
-        Mockito.when(shoppingCartService.getShoppingCartItems()).thenReturn(null);
+  // 1. SUCCESS
+  @Test
+  void getAll_success() throws Exception {
+    Mockito.when(shoppingCartService.getShoppingCartItems()).thenReturn(null);
 
-        mockMvc.perform(get("/client/shopping-cart"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true));
+    mockMvc
+        .perform(get("/client/shopping-cart"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.success").value(true));
 
-        Mockito.verify(shoppingCartService).getShoppingCartItems();
-    }
+    Mockito.verify(shoppingCartService).getShoppingCartItems();
+  }
 
-    // 2. SERVICE THROW
-    @Test
-    void getAll_serviceThrow() throws Exception {
-        Mockito.when(shoppingCartService.getShoppingCartItems())
-                .thenThrow(new RuntimeException());
+  // 2. SERVICE THROW
+  @Test
+  void getAll_serviceThrow() throws Exception {
+    Mockito.when(shoppingCartService.getShoppingCartItems()).thenThrow(new RuntimeException());
 
-        mockMvc.perform(get("/client/shopping-cart"))
-                .andExpect(status().isInternalServerError());
+    mockMvc.perform(get("/client/shopping-cart")).andExpect(status().isInternalServerError());
 
-        Mockito.verify(shoppingCartService).getShoppingCartItems();
-    }
+    Mockito.verify(shoppingCartService).getShoppingCartItems();
+  }
 
-    // 3. MULTIPLE CALL
-    @Test
-    void getAll_calledTwice() throws Exception {
-        mockMvc.perform(get("/client/shopping-cart")).andExpect(status().isOk());
-        mockMvc.perform(get("/client/shopping-cart")).andExpect(status().isOk());
+  // 3. MULTIPLE CALL
+  @Test
+  void getAll_calledTwice() throws Exception {
+    mockMvc.perform(get("/client/shopping-cart")).andExpect(status().isOk());
+    mockMvc.perform(get("/client/shopping-cart")).andExpect(status().isOk());
 
-        Mockito.verify(shoppingCartService, Mockito.times(2))
-                .getShoppingCartItems();
-    }
+    Mockito.verify(shoppingCartService, Mockito.times(2)).getShoppingCartItems();
+  }
 
-    // 4. WRONG METHOD
-    @Test
-    void getAll_wrongMethod() throws Exception {
-        mockMvc.perform(post("/client/shopping-cart"))
-                .andExpect(status().isInternalServerError()); // do PreAuthorize ở POST
-    }
+  // 4. WRONG METHOD
+  @Test
+  void getAll_wrongMethod() throws Exception {
+    mockMvc
+        .perform(post("/client/shopping-cart"))
+        .andExpect(status().isInternalServerError()); // do PreAuthorize ở POST
+  }
 
-    // 5. NULL RESPONSE
-    @Test
-    void getAll_nullData() throws Exception {
-        Mockito.when(shoppingCartService.getShoppingCartItems()).thenReturn(null);
+  // 5. NULL RESPONSE
+  @Test
+  void getAll_nullData() throws Exception {
+    Mockito.when(shoppingCartService.getShoppingCartItems()).thenReturn(null);
 
-        mockMvc.perform(get("/client/shopping-cart"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").doesNotExist());
-    }
+    mockMvc
+        .perform(get("/client/shopping-cart"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data").doesNotExist());
+  }
 
-    // 6. NO SERVICE CALL (INVALID URL)
-    @Test
-    void getAll_invalidUrl() throws Exception {
-        mockMvc.perform(get("/client/shopping-cart/abc"))
-                .andExpect(status().isNotFound());
+  // 6. NO SERVICE CALL (INVALID URL)
+  @Test
+  void getAll_invalidUrl() throws Exception {
+    mockMvc.perform(get("/client/shopping-cart/abc")).andExpect(status().isNotFound());
 
-        Mockito.verify(shoppingCartService, Mockito.never())
-                .getShoppingCartItems();
-    }
+    Mockito.verify(shoppingCartService, Mockito.never()).getShoppingCartItems();
+  }
 
-    // 7. HEADER TEST
-    @Test
-    void getAll_withHeader() throws Exception {
-        mockMvc.perform(get("/client/shopping-cart")
-                        .header("test", "123"))
-                .andExpect(status().isOk());
+  // 7. HEADER TEST
+  @Test
+  void getAll_withHeader() throws Exception {
+    mockMvc.perform(get("/client/shopping-cart").header("test", "123")).andExpect(status().isOk());
 
-        Mockito.verify(shoppingCartService).getShoppingCartItems();
-    }
+    Mockito.verify(shoppingCartService).getShoppingCartItems();
+  }
 }

@@ -34,9 +34,9 @@ public class ProductReviewImage {
   @Column(nullable = false)
   String url;
 
-    @ManyToOne
-    @JoinColumn(name = "product_review_id", nullable = false)
-    ProductReview productReview;
+  @ManyToOne
+  @JoinColumn(name = "product_review_id", nullable = false)
+  ProductReview productReview;
 
   @CreationTimestamp
   @Column(
