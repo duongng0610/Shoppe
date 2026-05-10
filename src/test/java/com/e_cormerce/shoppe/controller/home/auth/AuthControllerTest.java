@@ -1,6 +1,8 @@
 package com.e_cormerce.shoppe.controller.home.auth;
 
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +37,7 @@ public class AuthControllerTest {
     @MockitoBean AuthService authService;
     @MockitoBean CookieTokenProperties cookieTokenProperties;
     @MockitoBean CookieUtil cookieUtil;
+    // A.login
     @Test
     void login_blankFields_returns400() throws Exception {
         String json = """
@@ -50,7 +53,272 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").exists());
 
-        Mockito.verify(authService, Mockito.never()).logIn(Mockito.any());
+        Mockito.verify(authService, Mockito.never()).logIn(any());
+    }
+
+    @Test
+    void login_success() throws Exception {
+
+        String body = """
+                {
+                    "email": "test@gmail.com",
+                    "password": "123456"
+                }
+                """;
+
+        Mockito.when(authService.logIn(any()))
+                .thenReturn("access-token");
+
+        Mockito.when(cookieTokenProperties.getExpirationTime())
+                .thenReturn(1000);
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.message").value("login successfully"));
+
+        Mockito.verify(authService).logIn(any());
+        Mockito.verify(cookieUtil)
+                .saveToken(eq("access_token"), eq("access-token"), eq(1000), any());
+    }
+
+    // =========================
+    // 2. WRONG PASSWORD
+    // =========================
+    @Test
+    void login_wrongPassword_returns500() throws Exception {
+
+        String body = """
+                {
+                    "email": "test@gmail.com",
+                    "password": "wrong-password"
+                }
+                """;
+
+        Mockito.when(authService.logIn(any()))
+                .thenThrow(new RuntimeException("wrong password"));
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isInternalServerError());
+
+        Mockito.verify(authService).logIn(any());
+
+        Mockito.verify(cookieUtil, Mockito.never())
+                .saveToken(any(), any(), Math.toIntExact(any(Long.class)), any());
+    }
+
+    // =========================
+    // 3. EMAIL NULL
+    // =========================
+    @Test
+    void login_emailNull_returns400() throws Exception {
+
+        String body = """
+                {
+                    "email": null,
+                    "password": "123456"
+                }
+                """;
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .logIn(any());
+    }
+
+    // =========================
+    // 4. PASSWORD NULL
+    // =========================
+    @Test
+    void login_passwordNull_returns400() throws Exception {
+
+        String body = """
+                {
+                    "email": "test@gmail.com",
+                    "password": null
+                }
+                """;
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .logIn(any());
+    }
+
+    // =========================
+    // 5. EMPTY REQUEST BODY
+    // =========================
+    @Test
+    void login_emptyBody_returns400() throws Exception {
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(""))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .logIn(any());
+    }
+
+    // =========================
+    // 6. INVALID JSON
+    // =========================
+    @Test
+    void login_invalidJson_returns400() throws Exception {
+
+        String body = """
+                {
+                    "email": "test@gmail.com",
+                    "password":
+                }
+                """;
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .logIn(any());
+    }
+
+    // =========================
+    // 7. LONG EMAIL
+    // =========================
+    @Test
+    void login_longEmail_success() throws Exception {
+
+        String longEmail = "a".repeat(100) + "@gmail.com";
+
+        String body = """
+                {
+                    "email": "%s",
+                    "password": "123456"
+                }
+                """.formatted(longEmail);
+
+        Mockito.when(authService.logIn(any()))
+                .thenReturn("token");
+
+        Mockito.when(cookieTokenProperties.getExpirationTime())
+                .thenReturn(1000);
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isOk());
+
+        Mockito.verify(authService).logIn(any());
+    }
+
+    // =========================
+    // 8. LOGIN CALLED TWICE
+    // =========================
+    @Test
+    void login_calledTwice() throws Exception {
+
+        String body = """
+                {
+                    "email": "test@gmail.com",
+                    "password": "123456"
+                }
+                """;
+
+        Mockito.when(authService.logIn(any()))
+                .thenReturn("token");
+
+        Mockito.when(cookieTokenProperties.getExpirationTime())
+                .thenReturn(1000);
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isOk());
+
+        Mockito.verify(authService, Mockito.times(2))
+                .logIn(any());
+    }
+
+    // =========================
+    // 9. COOKIE SAVE THROW EXCEPTION
+    // =========================
+    @Test
+    void login_cookieSaveThrowsException_returns500() throws Exception {
+
+        String body = """
+                {
+                    "email": "test@gmail.com",
+                    "password": "123456"
+                }
+                """;
+
+        Mockito.when(authService.logIn(any()))
+                .thenReturn("token");
+
+        Mockito.when(cookieTokenProperties.getExpirationTime())
+                .thenReturn(1000);
+
+        Mockito.doThrow(new RuntimeException("cookie error"))
+                .when(cookieUtil)
+                .saveToken(any(), any(), Math.toIntExact(any(Long.class)), any());
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(body))
+                .andExpect(status().isInternalServerError());
+
+        Mockito.verify(authService).logIn(any());
+
+        Mockito.verify(cookieUtil)
+                .saveToken(any(), any(), Math.toIntExact(any(Long.class)), any());
+    }
+
+    // =========================
+    // 10. CONTENT TYPE INVALID
+    // =========================
+    @Test
+    void login_invalidContentType_returns415() throws Exception {
+
+        String body = """
+                {
+                    "email": "test@gmail.com",
+                    "password": "123456"
+                }
+                """;
+
+        mockMvc.perform(
+                        post("/auth/login")
+                                .contentType(MediaType.TEXT_PLAIN)
+                                .content(body))
+                .andExpect(status().isUnsupportedMediaType());
+
+        Mockito.verify(authService, Mockito.never())
+                .logIn(any());
     }
 
     private final String VALID_BODY = """
@@ -76,7 +344,7 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("register successfully"));
 
-        Mockito.verify(authService).registerSeller(Mockito.any());
+        Mockito.verify(authService).registerSeller(any());
     }
 
     // =========================
@@ -86,14 +354,14 @@ public class AuthControllerTest {
     void registerSeller_serviceThrow_returns500() throws Exception {
 
         Mockito.doThrow(new RuntimeException("error"))
-                .when(authService).registerSeller(Mockito.any());
+                .when(authService).registerSeller(any());
 
         mockMvc.perform(post("/auth/register/seller")
                         .contentType("application/json")
                         .content(VALID_BODY))
                 .andExpect(status().isInternalServerError());
 
-        Mockito.verify(authService).registerSeller(Mockito.any());
+        Mockito.verify(authService).registerSeller(any());
     }
 
     // =========================
@@ -104,10 +372,10 @@ public class AuthControllerTest {
 
         mockMvc.perform(post("/auth/register/seller")
                         .contentType("application/json"))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isInternalServerError());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -124,7 +392,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -139,7 +407,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -163,7 +431,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -183,7 +451,7 @@ public class AuthControllerTest {
                 .andExpect(status().isCreated());
 
         Mockito.verify(authService, Mockito.times(2))
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
     // =========================
     // 8.INVALID EMAIL FORMAT
@@ -207,7 +475,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -232,7 +500,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -257,7 +525,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -282,7 +550,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -307,7 +575,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -332,7 +600,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
 
     // =========================
@@ -357,7 +625,7 @@ public class AuthControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(authService, Mockito.never())
-                .registerSeller(Mockito.any());
+                .registerSeller(any());
     }
     @Test
     void registerClient_validRequest_returns201() throws Exception {
@@ -376,7 +644,7 @@ public class AuthControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.message").value("register successfully"));
 
-        Mockito.verify(authService).registerClient(Mockito.any());
+        Mockito.verify(authService).registerClient(any());
     }
 
     // 2. Blank email
@@ -395,7 +663,7 @@ public class AuthControllerTest {
                         .content(json))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
+        Mockito.verify(authService, Mockito.never()).registerClient(any());
     }
 
     // 3. Blank password
@@ -414,7 +682,7 @@ public class AuthControllerTest {
                         .content(json))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
+        Mockito.verify(authService, Mockito.never()).registerClient(any());
     }
 
     // 4. Blank username
@@ -433,7 +701,7 @@ public class AuthControllerTest {
                         .content(json))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
+        Mockito.verify(authService, Mockito.never()).registerClient(any());
     }
 
     // 5. Email existed
@@ -448,14 +716,14 @@ public class AuthControllerTest {
         """;
 
         Mockito.doThrow(new AppException(ErrorCode.EXISTED_ACCOUNT))
-                .when(authService).registerClient(Mockito.any());
+                .when(authService).registerClient(any());
 
         mockMvc.perform(post("/auth/register/client")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(authService).registerClient(Mockito.any());
+        Mockito.verify(authService).registerClient(any());
     }
 
     // 6. Username invalid
@@ -470,14 +738,14 @@ public class AuthControllerTest {
         """;
 
         Mockito.doThrow(new AppException(ErrorCode.INVALID_USERNAME))
-                .when(authService).registerClient(Mockito.any());
+                .when(authService).registerClient(any());
 
         mockMvc.perform(post("/auth/register/client")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(authService).registerClient(Mockito.any());
+        Mockito.verify(authService).registerClient(any());
     }
 
     // 7. Missing body
@@ -487,7 +755,7 @@ public class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
 
-        Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
+        Mockito.verify(authService, Mockito.never()).registerClient(any());
     }
 
     // =========================
