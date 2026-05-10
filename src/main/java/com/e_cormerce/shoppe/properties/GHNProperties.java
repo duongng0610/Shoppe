@@ -18,4 +18,5 @@ public class GHNProperties {
   String createShopUrl;
   String createOrderShipUrl;
   String getOrderShipUrl;
+  String createShipment;
 }

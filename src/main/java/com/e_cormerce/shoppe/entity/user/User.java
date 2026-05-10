@@ -28,7 +28,6 @@ import org.hibernate.annotations.Where;
 @Where(clause = "deleted = false")
 public class User {
   @Id
-  @GeneratedValue(strategy = GenerationType.UUID)
   String id;
 
   @Column(columnDefinition = "boolean default false")
