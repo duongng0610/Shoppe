@@ -489,4 +489,249 @@ public class AuthControllerTest {
 
         Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
     }
+
+    // =========================
+// 8. INVALID EMAIL FORMAT
+// =========================
+    @Test
+    void registerClient_invalidEmail_returns400() throws Exception {
+
+        String json = """
+    {
+      "email": "invalid-email",
+      "password": "123456",
+      "username": "testuser"
+    }
+    """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 9. PASSWORD TOO SHORT
+// =========================
+    @Test
+    void registerClient_shortPassword_returns400() throws Exception {
+
+        String json = """
+    {
+      "email": "test@gmail.com",
+      "password": "123",
+      "username": "testuser"
+    }
+    """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 10. USERNAME TOO SHORT
+// =========================
+    @Test
+    void registerClient_shortUsername_returns400() throws Exception {
+
+        String json = """
+    {
+      "email": "test@gmail.com",
+      "password": "123456",
+      "username": "a"
+    }
+    """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 11. EMPTY BODY
+// =========================
+    @Test
+    void registerClient_emptyBody_returns400() throws Exception {
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(""))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 12. INVALID JSON
+// =========================
+    @Test
+    void registerClient_invalidJson_returns400() throws Exception {
+
+        String invalidJson = "{ invalid json }";
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidJson))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 13. MULTIPLE INVALID FIELDS
+// =========================
+    @Test
+    void registerClient_multipleInvalidFields_returns400() throws Exception {
+
+        String json = """
+    {
+      "email": "invalid",
+      "password": "1",
+      "username": ""
+    }
+    """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 14. REGISTER CLIENT SUCCESS CALLED TWICE
+// =========================
+    @Test
+    void registerClient_calledTwice() throws Exception {
+
+        String json = """
+    {
+      "email": "test@gmail.com",
+      "password": "123456",
+      "username": "testuser"
+    }
+    """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated());
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isCreated());
+
+        Mockito.verify(authService, Mockito.times(2))
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 15. SERVICE THROW RUNTIME EXCEPTION
+// =========================
+    @Test
+    void registerClient_serviceThrow_returns500() throws Exception {
+
+        String json = """
+    {
+      "email": "test@gmail.com",
+      "password": "123456",
+      "username": "testuser"
+    }
+    """;
+
+        Mockito.doThrow(new RuntimeException("server error"))
+                .when(authService)
+                .registerClient(Mockito.any());
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isInternalServerError());
+
+        Mockito.verify(authService)
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 16. EMAIL FIELD MISSING
+// =========================
+    @Test
+    void registerClient_missingEmail_returns400() throws Exception {
+
+        String json = """
+    {
+      "password": "123456",
+      "username": "testuser"
+    }
+    """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 17. PASSWORD FIELD MISSING
+// =========================
+    @Test
+    void registerClient_missingPassword_returns400() throws Exception {
+
+        String json = """
+    {
+      "email": "test@gmail.com",
+      "username": "testuser"
+    }
+    """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
+
+    // =========================
+// 18. USERNAME FIELD MISSING
+// =========================
+    @Test
+    void registerClient_missingUsername_returns400() throws Exception {
+
+        String json = """
+    {
+      "email": "test@gmail.com",
+      "password": "123456"
+    }
+    """;
+
+        mockMvc.perform(post("/auth/register/client")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(authService, Mockito.never())
+                .registerClient(Mockito.any());
+    }
 }
