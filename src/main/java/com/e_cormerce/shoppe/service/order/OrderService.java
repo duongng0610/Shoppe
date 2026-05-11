@@ -11,7 +11,6 @@ import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.order.OrderPaymentStatus;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
-import com.e_cormerce.shoppe.enums.order.ReservationStatus;
 import com.e_cormerce.shoppe.enums.transaction.TransactionStatus;
 import com.e_cormerce.shoppe.event.order.OrderCancelledByClient;
 import com.e_cormerce.shoppe.event.order.OrderCreated;
@@ -110,7 +109,6 @@ public class OrderService {
             .seller(userMapper.toDto(order.getSeller()))
             .build());
   }
-
 
   @Transactional(readOnly = true)
   public GetOrderDetailResponse getOrdersByClient() {

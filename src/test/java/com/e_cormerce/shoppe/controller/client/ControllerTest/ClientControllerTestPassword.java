@@ -24,195 +24,198 @@ import org.springframework.test.web.servlet.MockMvc;
 @ActiveProfiles("test")
 class ClientControllerTestPassword {
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockitoBean
-    AccountService accountService;
+  @MockitoBean AccountService accountService;
 
-    private final String VALID_BODY = """
+  private final String VALID_BODY =
+      """
             {
               "oldPassword": "123456",
               "newPassword": "654321"
             }
             """;
 
-    // =========================
-    // 1. SUCCESS
-    // =========================
-    @Test
-    void changePassword_success() throws Exception {
+  // =========================
+  // 1. SUCCESS
+  // =========================
+  @Test
+  void changePassword_success() throws Exception {
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(VALID_BODY))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("change password successfully"));
+    mockMvc
+        .perform(
+            patch("/user/account/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_BODY))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("change password successfully"));
 
-        Mockito.verify(accountService).changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 2. SERVICE THROW (wrong old password)
-    // =========================
-    @Test
-    void changePassword_wrongOldPassword_returns400() throws Exception {
+  // =========================
+  // 2. SERVICE THROW (wrong old password)
+  // =========================
+  @Test
+  void changePassword_wrongOldPassword_returns400() throws Exception {
 
-        Mockito.doThrow(new AppException(ErrorCode.INCORRECT_PASSWORD))
-                .when(accountService).changePassword(Mockito.any());
+    Mockito.doThrow(new AppException(ErrorCode.INCORRECT_PASSWORD))
+        .when(accountService)
+        .changePassword(Mockito.any());
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(VALID_BODY))
-                .andExpect(status().isBadRequest());
+    mockMvc
+        .perform(
+            patch("/user/account/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_BODY))
+        .andExpect(status().isBadRequest());
 
-        Mockito.verify(accountService).changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 3. MISSING BODY
-    // =========================
-    @Test
-    void changePassword_missingBody_returns400() throws Exception {
+  // =========================
+  // 3. MISSING BODY
+  // =========================
+  @Test
+  void changePassword_missingBody_returns400() throws Exception {
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
+    mockMvc
+        .perform(patch("/user/account/password").contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isBadRequest());
 
-        Mockito.verify(accountService, Mockito.never())
-                .changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService, Mockito.never()).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 4. INVALID JSON
-    // =========================
-    @Test
-    void changePassword_invalidJson_returns400() throws Exception {
+  // =========================
+  // 4. INVALID JSON
+  // =========================
+  @Test
+  void changePassword_invalidJson_returns400() throws Exception {
 
-        String invalid = "{ invalid json }";
+    String invalid = "{ invalid json }";
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(invalid))
-                .andExpect(status().isBadRequest());
+    mockMvc
+        .perform(
+            patch("/user/account/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(invalid))
+        .andExpect(status().isBadRequest());
 
-        Mockito.verify(accountService, Mockito.never())
-                .changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService, Mockito.never()).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 5. BLANK FIELDS
-    // =========================
-    @Test
-    void changePassword_blankFields_returns400() throws Exception {
+  // =========================
+  // 5. BLANK FIELDS
+  // =========================
+  @Test
+  void changePassword_blankFields_returns400() throws Exception {
 
-        String body = """
+    String body =
+        """
                 {
                   "oldPassword": "",
                   "newPassword": ""
                 }
                 """;
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isBadRequest());
+    mockMvc
+        .perform(
+            patch("/user/account/password").contentType(MediaType.APPLICATION_JSON).content(body))
+        .andExpect(status().isBadRequest());
 
-        Mockito.verify(accountService, Mockito.never())
-                .changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService, Mockito.never()).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 6. NEW PASSWORD TOO SHORT
-    // =========================
-    @Test
-    void changePassword_shortNewPassword_returns400() throws Exception {
+  // =========================
+  // 6. NEW PASSWORD TOO SHORT
+  // =========================
+  @Test
+  void changePassword_shortNewPassword_returns400() throws Exception {
 
-        String body = """
+    String body =
+        """
                 {
                   "oldPassword": "123456",
                   "newPassword": "1"
                 }
                 """;
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isBadRequest());
+    mockMvc
+        .perform(
+            patch("/user/account/password").contentType(MediaType.APPLICATION_JSON).content(body))
+        .andExpect(status().isBadRequest());
 
-        Mockito.verify(accountService, Mockito.never())
-                .changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService, Mockito.never()).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 7. EMPTY BODY
-    // =========================
-    @Test
-    void changePassword_emptyBody_returns400() throws Exception {
+  // =========================
+  // 7. EMPTY BODY
+  // =========================
+  @Test
+  void changePassword_emptyBody_returns400() throws Exception {
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(""))
-                .andExpect(status().isBadRequest());
+    mockMvc
+        .perform(
+            patch("/user/account/password").contentType(MediaType.APPLICATION_JSON).content(""))
+        .andExpect(status().isBadRequest());
 
-        Mockito.verify(accountService, Mockito.never())
-                .changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService, Mockito.never()).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 8. NULL PASSWORD FIELDS
-    // =========================
-    @Test
-    void changePassword_nullFields_returns400() throws Exception {
+  // =========================
+  // 8. NULL PASSWORD FIELDS
+  // =========================
+  @Test
+  void changePassword_nullFields_returns400() throws Exception {
 
-        String body = """
+    String body =
+        """
                 {
                   "oldPassword": null,
                   "newPassword": null
                 }
                 """;
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(body))
-                .andExpect(status().isBadRequest());
+    mockMvc
+        .perform(
+            patch("/user/account/password").contentType(MediaType.APPLICATION_JSON).content(body))
+        .andExpect(status().isBadRequest());
 
-        Mockito.verify(accountService, Mockito.never())
-                .changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService, Mockito.never()).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 9. SERVICE THROW RUNTIME EXCEPTION
-    // =========================
-    @Test
-    void changePassword_serviceThrowRuntime_returns500() throws Exception {
+  // =========================
+  // 9. SERVICE THROW RUNTIME EXCEPTION
+  // =========================
+  @Test
+  void changePassword_serviceThrowRuntime_returns500() throws Exception {
 
-        Mockito.doThrow(new RuntimeException("server error"))
-                .when(accountService)
-                .changePassword(Mockito.any());
+    Mockito.doThrow(new RuntimeException("server error"))
+        .when(accountService)
+        .changePassword(Mockito.any());
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(VALID_BODY))
-                .andExpect(status().isInternalServerError());
+    mockMvc
+        .perform(
+            patch("/user/account/password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(VALID_BODY))
+        .andExpect(status().isInternalServerError());
 
-        Mockito.verify(accountService)
-                .changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService).changePassword(Mockito.any());
+  }
 
-    // =========================
-    // 10. INVALID CONTENT TYPE
-    // =========================
-    @Test
-    void changePassword_invalidContentType_returns415() throws Exception {
+  // =========================
+  // 10. INVALID CONTENT TYPE
+  // =========================
+  @Test
+  void changePassword_invalidContentType_returns415() throws Exception {
 
-        mockMvc.perform(patch("/user/account/password")
-                        .contentType(MediaType.TEXT_PLAIN)
-                        .content(VALID_BODY))
-                .andExpect(status().isUnsupportedMediaType());
+    mockMvc
+        .perform(
+            patch("/user/account/password").contentType(MediaType.TEXT_PLAIN).content(VALID_BODY))
+        .andExpect(status().isUnsupportedMediaType());
 
-        Mockito.verify(accountService, Mockito.never())
-                .changePassword(Mockito.any());
-    }
+    Mockito.verify(accountService, Mockito.never()).changePassword(Mockito.any());
+  }
 }

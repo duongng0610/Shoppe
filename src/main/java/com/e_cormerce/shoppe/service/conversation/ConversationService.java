@@ -6,7 +6,6 @@ import com.e_cormerce.shoppe.dto.response.conversation.MessageDto;
 import com.e_cormerce.shoppe.dto.response.conversation.MessageMediaDto;
 import com.e_cormerce.shoppe.entity.conversation.Conversation;
 import com.e_cormerce.shoppe.entity.conversation.ConversationMember;
-import com.e_cormerce.shoppe.entity.conversation.ConversationMessage;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.projection.ConversationLineProjection;

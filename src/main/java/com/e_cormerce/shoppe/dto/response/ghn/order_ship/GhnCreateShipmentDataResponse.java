@@ -12,11 +12,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GhnCreateShipmentDataResponse {
-    String orderCode;
-    String sortCode;
-    String transType;
-    String wardEncode;
-    String districtEncode;
-    String totalFee;
-    String expectedDeliveryTime;
+  String orderCode;
+  String sortCode;
+  String transType;
+  String wardEncode;
+  String districtEncode;
+  String totalFee;
+  String expectedDeliveryTime;
 }

@@ -1,27 +1,27 @@
-//package com.e_cormerce.shoppe.entity.order;
+// package com.e_cormerce.shoppe.entity.order;
 //
-//import jakarta.persistence.*;
-//import java.time.LocalDateTime;
-//import lombok.*;
-//import lombok.experimental.FieldDefaults;
-//import org.hibernate.annotations.CreationTimestamp;
-//import org.hibernate.annotations.SQLDelete;
-//import org.hibernate.annotations.UpdateTimestamp;
-//import org.hibernate.annotations.Where;
+// import jakarta.persistence.*;
+// import java.time.LocalDateTime;
+// import lombok.*;
+// import lombok.experimental.FieldDefaults;
+// import org.hibernate.annotations.CreationTimestamp;
+// import org.hibernate.annotations.SQLDelete;
+// import org.hibernate.annotations.UpdateTimestamp;
+// import org.hibernate.annotations.Where;
 //
-//@Entity
-//@Table(
+// @Entity
+// @Table(
 //    name = "order_tracking_locations",
 //    indexes = {@Index(name = "idx_order_id", columnList = "order_id")})
-//@Getter
-//@Setter
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE)
-//@SQLDelete(sql = "UPDATE order_tracking_locations SET deleted=true where id=?")
-//@Where(clause = "deleted = false")
-//public class OrderTrackingLocation {
+// @Getter
+// @Setter
+// @Builder
+// @NoArgsConstructor
+// @AllArgsConstructor
+// @FieldDefaults(level = AccessLevel.PRIVATE)
+// @SQLDelete(sql = "UPDATE order_tracking_locations SET deleted=true where id=?")
+// @Where(clause = "deleted = false")
+// public class OrderTrackingLocation {
 //  @Id
 //  @GeneratedValue(strategy = GenerationType.UUID)
 //  String id;
@@ -52,4 +52,4 @@
 //  @ManyToOne(fetch = FetchType.LAZY)
 //  @JoinColumn(name = "order_id", nullable = false)
 //  Order order;
-//}
+// }

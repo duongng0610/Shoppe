@@ -1,13 +1,12 @@
 package com.e_cormerce.shoppe.entity.token;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -20,28 +19,26 @@ import java.time.LocalDateTime;
 @SQLDelete(sql = "UPDATE refresh_tokens SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class RefreshToken {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(columnDefinition = "boolean default false")
-    boolean deleted;
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
-    @Column(nullable = false, unique = true)
-    String val;
+  @Column(nullable = false, unique = true)
+  String val;
 
-    @CreationTimestamp
-    @Column(
-            name = "created_at",
-            updatable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    LocalDateTime createdAt;
+  @CreationTimestamp
+  @Column(
+      name = "created_at",
+      updatable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  LocalDateTime createdAt;
 
-    @Column(name = "expired_at", nullable = false)
-    LocalDateTime expiredAt;
+  @Column(name = "expired_at", nullable = false)
+  LocalDateTime expiredAt;
 
-    @Column(name = "is_revoked", columnDefinition = "boolean default false")
-    boolean isRevoked;
-
-
+  @Column(name = "is_revoked", columnDefinition = "boolean default false")
+  boolean isRevoked;
 }

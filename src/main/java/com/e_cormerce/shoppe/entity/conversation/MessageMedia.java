@@ -31,18 +31,21 @@ public class MessageMedia {
   @Column(name = "url", nullable = false)
   String url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "message_id", nullable = false)
-    @JsonIgnore
-    ConversationMessage message;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "message_id", nullable = false)
+  @JsonIgnore
+  ConversationMessage message;
 
   @Column(columnDefinition = "boolean default false", nullable = false)
   boolean deleted;
 
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false, nullable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    LocalDateTime createdAt;
+  @CreationTimestamp
+  @Column(
+      name = "created_at",
+      updatable = false,
+      nullable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  LocalDateTime createdAt;
 
   @UpdateTimestamp
   @Column(name = "updated_at")

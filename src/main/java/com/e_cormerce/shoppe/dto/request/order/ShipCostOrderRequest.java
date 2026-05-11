@@ -13,9 +13,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ShipCostOrderRequest {
 
-
-    @NotNull(message = "variant_id  is required")
-    String variantId;
+  @NotNull(message = "variant_id  is required")
+  String variantId;
 
   @Valid AddressDto address;
 }

@@ -1,17 +1,17 @@
-//package com.e_cormerce.shoppe.repository.seller;
+// package com.e_cormerce.shoppe.repository.seller;
 //
-//import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
-//import com.e_cormerce.shoppe.entity.seller.SellerStat;
-//import java.math.BigDecimal;
-//import java.util.Optional;
-//import org.springframework.data.jpa.repository.JpaRepository;
-//import org.springframework.data.jpa.repository.Modifying;
-//import org.springframework.data.jpa.repository.Query;
-//import org.springframework.stereotype.Repository;
-//import org.springframework.transaction.annotation.Transactional;
+// import com.e_cormerce.shoppe.dto.response.seller.SellerInfoResponse;
+// import com.e_cormerce.shoppe.entity.seller.SellerStat;
+// import java.math.BigDecimal;
+// import java.util.Optional;
+// import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.Modifying;
+// import org.springframework.data.jpa.repository.Query;
+// import org.springframework.stereotype.Repository;
+// import org.springframework.transaction.annotation.Transactional;
 //
-//@Repository
-//public interface SellerStatRepository extends JpaRepository<SellerStat, String> {
+// @Repository
+// public interface SellerStatRepository extends JpaRepository<SellerStat, String> {
 //
 //  Optional<SellerStat> findById(String sellerId);
 //
@@ -223,4 +223,4 @@
 //                WHERE s.seller.id = :sellerId
 //            """)
 //  void failDelivery(String sellerId);
-//}
+// }
