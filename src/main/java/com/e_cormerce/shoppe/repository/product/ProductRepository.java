@@ -28,6 +28,13 @@ public interface ProductRepository extends JpaRepository<Product, String> {
       nativeQuery = true)
   CompletableFuture<Category> findCategoryOfProduct(@Param("product_id") String productId);
 
+    @Query(value = "SELECT p.* FROM orders o " +
+            "INNER JOIN variants v ON o.variant_id = v.id " +
+            "INNER JOIN products p ON v.product_id = p.id " +
+            "WHERE o.id = :order_id",
+            nativeQuery = true)
+    Product findProductOfOrder(@Param("order_id") String orderId);
+
   @Query(value = "UPDATE products p SET p.status = :status WHERE p.id = :id", nativeQuery = true)
   @Transactional
   @Modifying

@@ -3,6 +3,7 @@
 --    KHÔNG dùng CONTINUE HANDLER vì đây là dữ liệu cốt lõi
 --    → lỗi thì rollback toàn bộ, không để data không nhất quán
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_variant_after_insert$$
 CREATE TRIGGER trg_variant_after_insert
 AFTER INSERT ON variants
 FOR EACH ROW
@@ -19,6 +20,7 @@ END$$
 -- 2. AFTER UPDATE variant
 --    KHÔNG dùng CONTINUE HANDLER — quantity là dữ liệu cốt lõi
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_variant_after_update$$
 CREATE TRIGGER trg_variant_after_update
 AFTER UPDATE ON variants
 FOR EACH ROW
@@ -65,6 +67,7 @@ END$$
 -- 3. AFTER DELETE variant
 --    KHÔNG dùng CONTINUE HANDLER — dữ liệu cốt lõi
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_variant_after_delete$$
 CREATE TRIGGER trg_variant_after_delete
 AFTER DELETE ON variants
 FOR EACH ROW
@@ -81,6 +84,7 @@ END$$
 -- 4. AFTER UPDATE product — cascade soft delete xuống variants
 --    KHÔNG dùng CONTINUE HANDLER — cascade là nghiệp vụ cốt lõi
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_product_after_update$$
 CREATE TRIGGER trg_product_after_update
 AFTER UPDATE ON products
 FOR EACH ROW
@@ -102,6 +106,7 @@ END$$
 -- 5. AFTER INSERT variant — cập nhật origin_price
 --    Dùng CONTINUE HANDLER vì chỉ là cache giá, không cốt lõi
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_variant_price_after_insert$$
 CREATE TRIGGER trg_variant_price_after_insert
 AFTER INSERT ON variants
 FOR EACH ROW
@@ -126,6 +131,7 @@ END$$
 -- 6. AFTER UPDATE variant — cập nhật origin_price
 --    Dùng CONTINUE HANDLER vì chỉ là cache giá, không cốt lõi
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_variant_price_after_update$$
 CREATE TRIGGER trg_variant_price_after_update
 AFTER UPDATE ON variants
 FOR EACH ROW
@@ -170,6 +176,7 @@ END$$
 --    KHÔNG dùng CONTINUE HANDLER — phải SIGNAL để rollback
 --    nếu không đủ hàng, không thể để order được tạo
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_order_before_insert$$
 CREATE TRIGGER trg_order_before_insert
 BEFORE INSERT ON orders
 FOR EACH ROW
@@ -204,6 +211,7 @@ END$$
 --    Dùng CONTINUE HANDLER vì reservation là bước phụ,
 --    không nên rollback cả order chỉ vì reservation lỗi
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_order_after_insert$$
 CREATE TRIGGER trg_order_after_insert
 AFTER INSERT ON orders
 FOR EACH ROW
@@ -235,6 +243,7 @@ END$$
 --    Dùng CONTINUE HANDLER vì không nên rollback việc cập nhật
 --    payment_status chỉ vì bước release reservation lỗi
 -- ─────────────────────────────────────────────────────────────
+DROP TRIGGER IF EXISTS trg_order_after_update$$
 CREATE TRIGGER trg_order_after_update
 AFTER UPDATE ON orders
 FOR EACH ROW

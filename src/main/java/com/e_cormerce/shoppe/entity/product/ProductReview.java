@@ -4,6 +4,8 @@ import com.e_cormerce.shoppe.entity.user.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -58,4 +60,8 @@ public class ProductReview {
   @ManyToOne
   @JoinColumn(name = "product_id", nullable = false)
   Product product;
+
+  @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "productReview")
+  List<ProductReviewImage> images;
+
 }
