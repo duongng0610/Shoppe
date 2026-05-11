@@ -18,18 +18,19 @@ import org.springframework.context.annotation.Profile;
 @Profile("!test")
 public class AppConfig {
 
-    AppConfigHelper appConfigHelper;
-    AdminProperties appConfigProperties;
+  AppConfigHelper appConfigHelper;
+  AdminProperties appConfigProperties;
 
-    @Bean
-    CommandLineRunner initData() {
-        return args -> {
-            appConfigHelper.createRoles();
-            appConfigHelper.createAdmin(
-                    appConfigProperties.getEmail(),
-                    appConfigProperties.getPassword(),
-                    appConfigProperties.getUsername());
-            appConfigHelper.createDefaultCategories();
-        };
-    }
+  @Bean
+  CommandLineRunner initData() {
+    return args -> {
+      appConfigHelper.createRoles();
+      appConfigHelper.createAdmin(
+          appConfigProperties.getEmail(),
+          appConfigProperties.getPassword(),
+          appConfigProperties.getUsername());
+      appConfigHelper.createDefaultCategories();
+      appConfigHelper.createDefaultAddress();
+    };
+  }
 }

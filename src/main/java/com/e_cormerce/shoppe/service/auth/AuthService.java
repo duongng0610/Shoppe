@@ -32,6 +32,9 @@ import com.e_cormerce.shoppe.service.webclient.WebClientService;
 import com.e_cormerce.shoppe.util.HashUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -44,196 +47,188 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 @Service
 @RequiredArgsConstructor
 @EnableConfigurationProperties({JwtProperties.class})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class AuthService {
-    private final ShoppingCartRepository shoppingCartRepository;
-    UserRepository userRepository;
-    AccountRepository accountRepository;
-    RoleRepository roleRepository;
-    RefreshTokenRepository refreshTokenRepository;
-    InvalidTokenRepository invalidTokenRepository;
-    BCryptPasswordEncoder bCryptPasswordEncoder;
-    JwtService jwtService;
-    TokenService tokenService;
-    UserMapper userMapper;
-    JwtProperties jwtProperties;
-    ApplicationEventPublisher eventPublisher;
-    WebClientService webClientService;
-    AddressService addressService;
-    EntityManager entityManager;
+  private final ShoppingCartRepository shoppingCartRepository;
+  UserRepository userRepository;
+  AccountRepository accountRepository;
+  RoleRepository roleRepository;
+  RefreshTokenRepository refreshTokenRepository;
+  InvalidTokenRepository invalidTokenRepository;
+  BCryptPasswordEncoder bCryptPasswordEncoder;
+  JwtService jwtService;
+  TokenService tokenService;
+  UserMapper userMapper;
+  JwtProperties jwtProperties;
+  ApplicationEventPublisher eventPublisher;
+  WebClientService webClientService;
+  AddressService addressService;
+  EntityManager entityManager;
 
-    @Transactional()
-    public String logIn(LogInRequest request) {
-        Account account =
-                accountRepository
-                        .findByEmail(request.getEmail())
-                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_ACCOUNT));
+  @Transactional()
+  public String logIn(LogInRequest request) {
+    Account account =
+        accountRepository
+            .findByEmail(request.getEmail())
+            .orElseThrow(() -> new AppException(ErrorCode.INVALID_ACCOUNT));
 
-        boolean authenticated =
-                bCryptPasswordEncoder.matches(request.getPassword(), account.getPassword());
+    boolean authenticated =
+        bCryptPasswordEncoder.matches(request.getPassword(), account.getPassword());
 
-        if (!authenticated) {
-            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
-        }
-
-        account.setStatus(AccountStatus.ACTIVE);
-        accountRepository.save(account);
-        eventPublisher.publishEvent(
-                UserLoggedIn.builder()
-                        .date(LocalDateTime.now())
-                        .user(userMapper.toDto(account.getUser()))
-                        .build());
-
-        return tokenService.generateAccessToken(account.getId(), account.getRole());
+    if (!authenticated) {
+      throw new AppException(ErrorCode.INCORRECT_PASSWORD);
     }
 
-    private User buildBaseUser(AbstractRegisterRequest request, RoleEnum roleEnum, String userId) {
+    account.setStatus(AccountStatus.ACTIVE);
+    accountRepository.save(account);
+    eventPublisher.publishEvent(
+        UserLoggedIn.builder()
+            .date(LocalDateTime.now())
+            .user(userMapper.toDto(account.getUser()))
+            .build());
 
-        if (accountRepository.existsByEmail(request.getEmail())) {
-            throw new AppException(ErrorCode.EXISTED_ACCOUNT);
-        }
+    return tokenService.generateAccessToken(account.getId(), account.getRole());
+  }
 
-        if (userRepository.existsByUsername(request.getUsername())) {
-            throw new AppException(ErrorCode.INVALID_USERNAME);
-        }
+  private User buildBaseUser(AbstractRegisterRequest request, RoleEnum roleEnum, String userId) {
 
-        Role role =
-                roleRepository
-                        .findByVal(roleEnum)
-                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
-
-        var account =
-                Account.builder()
-                        .id(userId != null ? userId : UUID.randomUUID().toString())
-                        .email(request.getEmail())
-                        .password(bCryptPasswordEncoder.encode(request.getPassword()))
-                        .role(role)
-                        .status(AccountStatus.INACTIVE)
-                        .build();
-
-        entityManager.persist(account);
-        return User.builder()
-                .account(account)
-                .username(request.getUsername())
-                .createdAt(LocalDateTime.now())
-                .build();
+    if (accountRepository.existsByEmail(request.getEmail())) {
+      throw new AppException(ErrorCode.EXISTED_ACCOUNT);
     }
 
-    @Transactional(timeout = 5)
-    public void registerClient(RegisterClientRequest request) {
-
-        var user = buildBaseUser(request, RoleEnum.CLIENT, null);
-
-        entityManager.persist(user);
-//
-//    ClientStat clientStat = ClientStat.builder().client(user).build();
-//
-//    clientStatRepository.save(clientStat);
-
-        ShoppingCart shoppingCart =
-                ShoppingCart.builder().client(user).totalQuantity(0).name("Mặc định").build();
-
-        shoppingCartRepository.save(shoppingCart);
-
-        eventPublisher.publishEvent(
-                ClientRegistered.builder()
-                        .date(LocalDateTime.now())
-                        .client(userMapper.toDto(user))
-                        .build());
+    if (userRepository.existsByUsername(request.getUsername())) {
+      throw new AppException(ErrorCode.INVALID_USERNAME);
     }
 
-    @Transactional(timeout = 5)
-    public void registerSeller(RegisterSellerRequest request) {
-        // set info seller
-        var addressDto = request.getAddress();
-        var phoneNumber = request.getPhoneNumber();
-        // lấy addressId để gọi GHN
-        var address = addressService.getAddressByNames(addressDto);
-        var res =
-                webClientService.createShopGhnApi(
-                        GhnCreateShopRequest.builder()
-                                .name(request.getUsername())
-                                .address("...") // map lại cho đúng
-                                .districtId(address.getDistrictId())
-                                .wardCode(address.getWardId())
-                                .phone(phoneNumber)
-                                .build());
+    Role role =
+        roleRepository
+            .findByVal(roleEnum)
+            .orElseThrow(() -> new AppException(ErrorCode.INVALID_ROLE));
 
+    var account =
+        Account.builder()
+            .id(userId != null ? userId : UUID.randomUUID().toString())
+            .email(request.getEmail())
+            .password(bCryptPasswordEncoder.encode(request.getPassword()))
+            .role(role)
+            .status(AccountStatus.INACTIVE)
+            .build();
 
-        var user = buildBaseUser(request, RoleEnum.SELLER, res.getData().getShopId());
+    entityManager.persist(account);
+    return User.builder()
+        .account(account)
+        .username(request.getUsername())
+        .createdAt(LocalDateTime.now())
+        .build();
+  }
 
+  @Transactional(timeout = 5)
+  public void registerClient(RegisterClientRequest request) {
 
-        user.setPhoneNumber(phoneNumber);
+    var user = buildBaseUser(request, RoleEnum.CLIENT, null);
 
+    entityManager.persist(user);
+    //
+    //    ClientStat clientStat = ClientStat.builder().client(user).build();
+    //
+    //    clientStatRepository.save(clientStat);
 
-        user.setAddress(address);
+    ShoppingCart shoppingCart =
+        ShoppingCart.builder().client(user).totalQuantity(0).name("Mặc định").build();
 
-        entityManager.persist(user);
+    shoppingCartRepository.save(shoppingCart);
 
+    eventPublisher.publishEvent(
+        ClientRegistered.builder()
+            .date(LocalDateTime.now())
+            .client(userMapper.toDto(user))
+            .build());
+  }
 
-        eventPublisher.publishEvent(
-                SellerRegistered.builder()
-                        .date(LocalDateTime.now())
-                        .seller(userMapper.toDto(user))
-                        .build());
-    }
+  @Transactional(timeout = 5)
+  public void registerSeller(RegisterSellerRequest request) {
+    // set info seller
+    var addressDto = request.getAddress();
+    var phoneNumber = request.getPhoneNumber();
+    // lấy addressId để gọi GHN
+    var address = addressService.getAddressByNames(addressDto);
+    var res =
+        webClientService.createShopGhnApi(
+            GhnCreateShopRequest.builder()
+                .name(request.getUsername())
+                .address("...") // map lại cho đúng
+                .districtId(address.getDistrictId())
+                .wardCode(address.getWardId())
+                .phone(phoneNumber)
+                .build());
 
-    @Transactional(timeout = 5)
-    public void logOut(String accessToken) {
-        revokeToken(accessToken);
-        accountRepository.setStatus(getUserId(), AccountStatus.INACTIVE);
-    }
+    var user = buildBaseUser(request, RoleEnum.SELLER, res.getData().getShopId());
 
-    public UserDto verify() {
-        UserDto res =
-                userRepository
-                        .getUserDto(this.getUserId())
-                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-        return res;
-    }
+    user.setPhoneNumber(phoneNumber);
 
-    public User getUserThroughAuthentication() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = (String) authentication.getPrincipal();
+    user.setAddress(address);
 
-        return userRepository
-                .findById(userId)
-                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-    }
+    entityManager.persist(user);
 
-    public String getUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (String) authentication.getPrincipal();
-    }
+    eventPublisher.publishEvent(
+        SellerRegistered.builder()
+            .date(LocalDateTime.now())
+            .seller(userMapper.toDto(user))
+            .build());
+  }
 
-    private void revokeToken(String accessToken) {
-        Claims accessTokenClaims =
-                jwtService.extractClaims(accessToken, jwtProperties.getAccessTokenSecret());
+  @Transactional(timeout = 5)
+  public void logOut(String accessToken) {
+    revokeToken(accessToken);
+    accountRepository.setStatus(getUserId(), AccountStatus.INACTIVE);
+  }
 
-        String refreshTokenId = (String) accessTokenClaims.get("refreshTokenId");
+  public UserDto verify() {
+    UserDto res =
+        userRepository
+            .getUserDto(this.getUserId())
+            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+    return res;
+  }
 
-        InvalidToken invalidToken =
-                InvalidToken.builder()
-                        .val(HashUtil.sha256(accessToken))
-                        .invalidDate(LocalDate.now())
-                        .build();
+  public User getUserThroughAuthentication() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String userId = (String) authentication.getPrincipal();
 
-        invalidTokenRepository.save(invalidToken);
+    return userRepository
+        .findById(userId)
+        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+  }
 
-        RefreshToken refreshToken =
-                refreshTokenRepository
-                        .findById(refreshTokenId)
-                        .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
+  public String getUserId() {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    return (String) authentication.getPrincipal();
+  }
 
-        refreshToken.setRevoked(true);
-        refreshTokenRepository.save(refreshToken);
-    }
+  private void revokeToken(String accessToken) {
+    Claims accessTokenClaims =
+        jwtService.extractClaims(accessToken, jwtProperties.getAccessTokenSecret());
+
+    String refreshTokenId = (String) accessTokenClaims.get("refreshTokenId");
+
+    InvalidToken invalidToken =
+        InvalidToken.builder()
+            .val(HashUtil.sha256(accessToken))
+            .invalidDate(LocalDate.now())
+            .build();
+
+    invalidTokenRepository.save(invalidToken);
+
+    RefreshToken refreshToken =
+        refreshTokenRepository
+            .findById(refreshTokenId)
+            .orElseThrow(() -> new AppException(ErrorCode.INVALID_REFRESH_TOKEN));
+
+    refreshToken.setRevoked(true);
+    refreshTokenRepository.save(refreshToken);
+  }
 }

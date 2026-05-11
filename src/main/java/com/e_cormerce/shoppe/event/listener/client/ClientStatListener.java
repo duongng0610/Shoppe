@@ -1,19 +1,19 @@
-//package com.e_cormerce.shoppe.event.listener.client;
+// package com.e_cormerce.shoppe.event.listener.client;
 //
-//import com.e_cormerce.shoppe.event.order.*;
-//import com.e_cormerce.shoppe.repository.client.ClientStatRepository;
-//import lombok.AccessLevel;
-//import lombok.RequiredArgsConstructor;
-//import lombok.experimental.FieldDefaults;
-//import org.springframework.scheduling.annotation.Async;
-//import org.springframework.stereotype.Component;
-//import org.springframework.transaction.event.TransactionPhase;
-//import org.springframework.transaction.event.TransactionalEventListener;
+// import com.e_cormerce.shoppe.event.order.*;
+// import com.e_cormerce.shoppe.repository.client.ClientStatRepository;
+// import lombok.AccessLevel;
+// import lombok.RequiredArgsConstructor;
+// import lombok.experimental.FieldDefaults;
+// import org.springframework.scheduling.annotation.Async;
+// import org.springframework.stereotype.Component;
+// import org.springframework.transaction.event.TransactionPhase;
+// import org.springframework.transaction.event.TransactionalEventListener;
 //
-//@Component
-//@RequiredArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-//public class ClientStatListener {
+// @Component
+// @RequiredArgsConstructor
+// @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+// public class ClientStatListener {
 //
 //  @Async
 //  @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
@@ -73,4 +73,4 @@
 //    var client = event.getClient();
 //    clientStatRepository.refundOrder(client.getId());
 //  }
-//}
+// }

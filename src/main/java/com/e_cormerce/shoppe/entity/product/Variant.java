@@ -36,8 +36,8 @@ public class Variant {
   @Column(nullable = false)
   String thumbnail;
 
-    @Column(nullable = false, columnDefinition = "int default 0")
-    int quantity;
+  @Column(nullable = false, columnDefinition = "int default 0")
+  int quantity;
 
   @Column(nullable = false, columnDefinition = "int default 0")
   int reserved;

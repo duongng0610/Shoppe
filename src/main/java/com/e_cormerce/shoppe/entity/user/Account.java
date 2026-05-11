@@ -27,8 +27,7 @@ import org.hibernate.annotations.Where;
 @SQLDelete(sql = "UPDATE accounts SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class Account {
-  @Id
-  String id;
+  @Id String id;
 
   @Column(unique = true, nullable = false)
   String email;

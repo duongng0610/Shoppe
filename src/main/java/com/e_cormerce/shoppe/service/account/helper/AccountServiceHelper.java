@@ -20,63 +20,63 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountServiceHelper {
-    AccountRepository accountRepository;
-    UserRepository userRepository;
-    AuthService authService;
-    BCryptPasswordEncoder bCryptPasswordEncoder;
-    AddressService addressService;
+  AccountRepository accountRepository;
+  UserRepository userRepository;
+  AuthService authService;
+  BCryptPasswordEncoder bCryptPasswordEncoder;
+  AddressService addressService;
 
-    public Account getAccount(User user) {
-        return accountRepository.findAccountByUserId(user.getId());
+  public Account getAccount(User user) {
+    return accountRepository.findAccountByUserId(user.getId());
+  }
+
+  public User getUser() {
+    return authService.getUserThroughAuthentication();
+  }
+
+  public boolean isTrueOldPassword(String oldPassword, Account account) {
+    return bCryptPasswordEncoder.matches(oldPassword, account.getPassword());
+  }
+
+  public void updatePassword(String newPassword, Account account) {
+    account.setPassword(bCryptPasswordEncoder.encode(newPassword));
+    accountRepository.save(account);
+  }
+
+  public void applyProfileChanges(User user, ChangeUserProfileRequest request) {
+    System.out.println(request.getDob());
+    if (request == null) return;
+
+    if (request.getDob() != null) {
+      user.setDob(request.getDob());
+    }
+    if (request.getUsername() != null && !request.getUsername().isBlank()) {
+      if (userRepository.existsByUsername(request.getUsername())) {
+        throw new AppException(ErrorCode.EXISTED_USERNAME);
+      }
+      user.setUsername(request.getUsername());
     }
 
-    public User getUser() {
-        return authService.getUserThroughAuthentication();
+    if (request.getAddress() != null) {
+      AddressDto newAddress = request.getAddress();
+      this.updateAddress(newAddress, user);
     }
 
-    public boolean isTrueOldPassword(String oldPassword, Account account) {
-        return bCryptPasswordEncoder.matches(oldPassword, account.getPassword());
+    if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
+      this.updatePhoneNumber(request.getPhoneNumber(), user);
     }
+  }
 
-    public void updatePassword(String newPassword, Account account) {
-        account.setPassword(bCryptPasswordEncoder.encode(newPassword));
-        accountRepository.save(account);
-    }
+  public void applyAvatarChange(User user, String avatarUrl) {
+    if (avatarUrl == null || avatarUrl.isBlank()) return;
+    user.setAvatar(avatarUrl);
+  }
 
-    public void applyProfileChanges(User user, ChangeUserProfileRequest request) {
-        System.out.println(request.getDob());
-        if (request == null) return;
+  public void updateAddress(AddressDto newAddress, User user) {
+    user.setAddress(addressService.getAddressByNames(newAddress));
+  }
 
-        if (request.getDob() != null) {
-            user.setDob(request.getDob());
-        }
-        if (request.getUsername() != null && !request.getUsername().isBlank()) {
-            if (userRepository.existsByUsername(request.getUsername())) {
-                throw new AppException(ErrorCode.EXISTED_USERNAME);
-            }
-            user.setUsername(request.getUsername());
-        }
-
-        if (request.getAddress() != null) {
-            AddressDto newAddress = request.getAddress();
-            this.updateAddress(newAddress, user);
-        }
-
-        if (request.getPhoneNumber() != null && !request.getPhoneNumber().isBlank()) {
-            this.updatePhoneNumber(request.getPhoneNumber(), user);
-        }
-    }
-
-    public void applyAvatarChange(User user, String avatarUrl) {
-        if (avatarUrl == null || avatarUrl.isBlank()) return;
-        user.setAvatar(avatarUrl);
-    }
-
-    public void updateAddress(AddressDto newAddress, User user) {
-        user.setAddress(addressService.getAddressByNames(newAddress));
-    }
-
-    public void updatePhoneNumber(String phoneNumber, User user) {
-        user.setPhoneNumber(phoneNumber);
-    }
+  public void updatePhoneNumber(String phoneNumber, User user) {
+    user.setPhoneNumber(phoneNumber);
+  }
 }

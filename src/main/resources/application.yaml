@@ -5,16 +5,21 @@ server:
 spring:
   master:
     datasource:
-      jdbcUrl: jdbc:mysql://mysql-master:3306/ecommerce
-      username: ${DB_USERNAME}
-      password: ${DB_PASSWORD}
+      jdbcUrl: jdbc:mysql://localhost:3307/ecommerce
+      username: root
+      password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
   slave:
     datasource:
-      jdbcUrl: jdbc:mysql://mysql-slave:3306/ecommerce
-      username: ${DB_USERNAME}
-      password: ${DB_PASSWORD}
+      jdbcUrl: jdbc:mysql://localhost:3308/ecommerce
+      username: root
+      password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:procedure.sql, classpath:trigger.sql
+      separator: "$$"
   jpa:
     properties:
       hibernate:
@@ -22,24 +27,24 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-
+    defer-datasource-initialization: true
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: ${GOOGLE_CLIENT_ID}
-            client-secret: ${GOOGLE_CLIENT_SECRET}
+            client-id: 77525743447-o1civ812em7pqos90ss5a52a60sv1edc.apps.googleusercontent.com
+            client-secret: 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
             scope: email, profile
 jwt:
-  access-token-secret: ${JWT_ACCESS_SECRET}
+  access-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
   access-token-expiration-time: 3600000
-  refresh-token-secret: ${JWT_REFRESH_SECRET}
+  refresh-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
   refresh-token-expiration-time: 86400000
 cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_API_KEY}
-  secret-key: ${CLOUDINARY_SECRET_KEY}
+  cloud-name: dhwxpgxzl
+  api-key: 683161372337227
+  secret-key: eKL1dtmtWHG6NwYiw52-Ubnt4-U
   image-width: 500
   image-height: 500
   crop: fit
@@ -62,7 +67,7 @@ app:
         - /app/message
         - /app/topic/messages
         - /payment
-        - /address/**
+        - products/*/reviews
       public-urls-regex:
         - /auth/login
         - /auth/register/.*
@@ -71,10 +76,9 @@ app:
         - /categories
         - /products
         - /products/.*/details
-        - /address/.*
     cors:
       allowed-origins:
-        - ${CORS_ALLOWED_ORIGIN}
+        - http://localhost:5173
       allowed-headers:
         - Authorization
         - Content-Type
@@ -92,21 +96,21 @@ app:
       http-only: true
       path: /
   admin:
-    email: ${ADMIN_EMAIL}
-    password: ${ADMIN_PASSWORD}
-    username: ${ADMIN_USERNAME}
+    email: admin@gmail.com
+    password: admin123
+    username: admin123
   snapshot:
     delay: 30000
     file-path: ./data/snapshot.dat
 vn-pay:
-  tmn-code: ${VNPAY_TMN_CODE}
-  hash-secret: ${VNPAY_HASH_SECRET}
+  tmn-code: QGXVIH4M
+  hash-secret: F31BKXHO8RNJ8M0ZLEEGANWVIVHXKJ2O
   url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
   return-url: /payment
 ghn:
-  token: ${GHN_TOKEN}
+  token: f29f99c6-3d9a-11f1-a973-aee5264794df
   calculate-ship-fee-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee
   create-shop-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/register
-  create-order-ship: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create
-  get-order-ship: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail
+  create-order-ship-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create
+  get-order-ship-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail
   create-shipment: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create

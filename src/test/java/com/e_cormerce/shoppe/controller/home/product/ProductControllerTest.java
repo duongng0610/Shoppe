@@ -5,7 +5,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.e_cormerce.shoppe.service.product.ProductService;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import org.junit.jupiter.api.Test;
@@ -21,24 +20,21 @@ import org.springframework.test.web.servlet.MockMvc;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockitoBean
-    ProductService productService;
+  @MockitoBean ProductService productService;
 
+  @Test
+  void getDetailOfProduct_invalidId_returns200() throws Exception {
+    String productId = "not-found";
 
-    @Test
-    void getDetailOfProduct_invalidId_returns200() throws Exception {
-        String productId = "not-found";
+    Mockito.when(productService.getProductDetail(productId)).thenReturn(null);
 
-        Mockito.when(productService.getProductDetail(productId))
-                .thenReturn(null);
+    mockMvc
+        .perform(get("/products/" + productId + "/details"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.data").doesNotExist());
 
-        mockMvc.perform(get("/products/" + productId + "/details"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").doesNotExist());
-
-        Mockito.verify(productService).getProductDetail(productId);
-    }
+    Mockito.verify(productService).getProductDetail(productId);
+  }
 }

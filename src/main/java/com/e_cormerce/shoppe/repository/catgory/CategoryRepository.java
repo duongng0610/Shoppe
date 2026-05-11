@@ -17,8 +17,8 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
 
   boolean existsByVal(String val);
 
-    @Query(value = "SELECT * FROM categories WHERE path_to_parent IS NULL", nativeQuery = true)
-    List<Category> findDefault();
+  @Query(value = "SELECT * FROM categories WHERE path_to_parent IS NULL", nativeQuery = true)
+  List<Category> findDefault();
 
   @Query(
       value = "SELECT * FROM categories WHERE SUBSTRING_INDEX(path_to_parent, '/', -1) = :id",

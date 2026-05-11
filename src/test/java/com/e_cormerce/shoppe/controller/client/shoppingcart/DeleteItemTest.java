@@ -21,83 +21,73 @@ import org.springframework.test.web.servlet.MockMvc;
 
 class DeleteItemTest {
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockitoBean
-    ShoppingCartService shoppingCartService;
+  @MockitoBean ShoppingCartService shoppingCartService;
 
-    String body = """
+  String body = """
             {
               "itemIds":["1","2"]
             }
             """;
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
-    void delete_success() throws Exception {
-        mockMvc.perform(delete("/client/shopping-cart")
-                        .contentType("application/json")
-                        .content(body))
-                .andExpect(status().isOk());
+  @Test
+  @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
+  void delete_success() throws Exception {
+    mockMvc
+        .perform(delete("/client/shopping-cart").contentType("application/json").content(body))
+        .andExpect(status().isOk());
 
-        Mockito.verify(shoppingCartService).deleteItems(Mockito.any());
-    }
+    Mockito.verify(shoppingCartService).deleteItems(Mockito.any());
+  }
 
-    @Test
-    @WithMockUser
-    void delete_noPermission() throws Exception {
-        mockMvc.perform(delete("/client/shopping-cart")
-                        .contentType("application/json")
-                        .content(body))
-                .andExpect(status().isForbidden());
-    }
+  @Test
+  @WithMockUser
+  void delete_noPermission() throws Exception {
+    mockMvc
+        .perform(delete("/client/shopping-cart").contentType("application/json").content(body))
+        .andExpect(status().isForbidden());
+  }
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
-    void delete_invalidJson() throws Exception {
-        mockMvc.perform(delete("/client/shopping-cart")
-                        .contentType("application/json")
-                        .content("{"))
-                .andExpect(status().isBadRequest());
-    }
+  @Test
+  @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
+  void delete_invalidJson() throws Exception {
+    mockMvc
+        .perform(delete("/client/shopping-cart").contentType("application/json").content("{"))
+        .andExpect(status().isBadRequest());
+  }
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
-    void delete_serviceThrow() throws Exception {
-        Mockito.doThrow(new RuntimeException())
-                .when(shoppingCartService).deleteItems(Mockito.any());
+  @Test
+  @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
+  void delete_serviceThrow() throws Exception {
+    Mockito.doThrow(new RuntimeException()).when(shoppingCartService).deleteItems(Mockito.any());
 
-        mockMvc.perform(delete("/client/shopping-cart")
-                        .contentType("application/json")
-                        .content(body))
-                .andExpect(status().isInternalServerError());
-    }
+    mockMvc
+        .perform(delete("/client/shopping-cart").contentType("application/json").content(body))
+        .andExpect(status().isInternalServerError());
+  }
 
-    @Test
-    void delete_noAuth() throws Exception {
-        mockMvc.perform(delete("/client/shopping-cart")
-                        .contentType("application/json")
-                        .content(body))
-                .andExpect(status().isForbidden());
-    }
+  @Test
+  void delete_noAuth() throws Exception {
+    mockMvc
+        .perform(delete("/client/shopping-cart").contentType("application/json").content(body))
+        .andExpect(status().isForbidden());
+  }
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
-    void delete_calledTwice() throws Exception {
-        mockMvc.perform(delete("/client/shopping-cart").contentType("application/json").content(body));
-        mockMvc.perform(delete("/client/shopping-cart").contentType("application/json").content(body));
+  @Test
+  @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
+  void delete_calledTwice() throws Exception {
+    mockMvc.perform(delete("/client/shopping-cart").contentType("application/json").content(body));
+    mockMvc.perform(delete("/client/shopping-cart").contentType("application/json").content(body));
 
-        Mockito.verify(shoppingCartService, Mockito.times(2))
-                .deleteItems(Mockito.any());
-    }
+    Mockito.verify(shoppingCartService, Mockito.times(2)).deleteItems(Mockito.any());
+  }
 
-    @Test
-    @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
-    void delete_emptyBody() throws Exception {
-        mockMvc.perform(delete("/client/shopping-cart")
-                        .contentType("application/json")
-                        .content(""))
-                .andExpect(status().isBadRequest());
-    }
+  @Test
+  @WithMockUser(authorities = "PERMISSION_DELETE_CART_SHOPPING")
+  void delete_emptyBody() throws Exception {
+    mockMvc
+        .perform(delete("/client/shopping-cart").contentType("application/json").content(""))
+        .andExpect(status().isBadRequest());
+  }
 }
