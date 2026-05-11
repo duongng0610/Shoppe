@@ -25,7 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ActiveProfiles("test")
 public class AuthControllerTest {
@@ -961,5 +961,174 @@ public class AuthControllerTest {
         .andExpect(status().isBadRequest());
 
     Mockito.verify(authService, Mockito.never()).registerClient(Mockito.any());
+  }
+
+  // /////////////////////
+  // C. Logout           //
+  // /////////////////////
+
+  // =========================
+  // 1. SUCCESS
+  // =========================
+  @Test
+  void logout_success() throws Exception {
+
+    Mockito.when(cookieUtil.getAccessToken(any())).thenReturn("access-token");
+
+    mockMvc
+        .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/auth/logout"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("logout successfully"));
+
+    Mockito.verify(authService).logOut("access-token");
+    Mockito.verify(cookieUtil).saveToken(eq("access_token"), eq("0"), eq(0), any());
+  }
+
+  // =========================
+  // 2. SERVICE THROW EXCEPTION
+  // =========================
+  @Test
+  void logout_serviceThrow_returns500() throws Exception {
+
+    Mockito.when(cookieUtil.getAccessToken(any())).thenReturn("access-token");
+
+    Mockito.doThrow(new RuntimeException("logout error"))
+        .when(authService)
+        .logOut(any());
+
+    mockMvc
+        .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/auth/logout"))
+        .andExpect(status().isInternalServerError());
+
+    Mockito.verify(authService).logOut("access-token");
+    Mockito.verify(cookieUtil, Mockito.never()).saveToken(any(), any(), eq(0), any());
+  }
+
+  // =========================
+  // 3. GET ACCESS TOKEN THROW EXCEPTION
+  // =========================
+  @Test
+  void logout_getAccessTokenThrows_returns500() throws Exception {
+
+    Mockito.when(cookieUtil.getAccessToken(any()))
+        .thenThrow(new RuntimeException("cookie read error"));
+
+    mockMvc
+        .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/auth/logout"))
+        .andExpect(status().isInternalServerError());
+
+    Mockito.verify(authService, Mockito.never()).logOut(any());
+    Mockito.verify(cookieUtil, Mockito.never()).saveToken(any(), any(), eq(0), any());
+  }
+
+  // =========================
+  // 4. COOKIE CLEAR THROW EXCEPTION
+  // =========================
+  @Test
+  void logout_cookieClearThrows_returns500() throws Exception {
+
+    Mockito.when(cookieUtil.getAccessToken(any())).thenReturn("access-token");
+
+    Mockito.doThrow(new RuntimeException("cookie clear error"))
+        .when(cookieUtil)
+        .saveToken(eq("access_token"), eq("0"), eq(0), any());
+
+    mockMvc
+        .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/auth/logout"))
+        .andExpect(status().isInternalServerError());
+
+    Mockito.verify(authService).logOut("access-token");
+    Mockito.verify(cookieUtil).saveToken(eq("access_token"), eq("0"), eq(0), any());
+  }
+
+  // =========================
+  // 5. CALLED TWICE
+  // =========================
+  @Test
+  void logout_calledTwice() throws Exception {
+
+    Mockito.when(cookieUtil.getAccessToken(any())).thenReturn("access-token");
+
+    mockMvc
+        .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/auth/logout"))
+        .andExpect(status().isOk());
+
+    mockMvc
+        .perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get("/auth/logout"))
+        .andExpect(status().isOk());
+
+    Mockito.verify(authService, Mockito.times(2)).logOut("access-token");
+    Mockito.verify(cookieUtil, Mockito.times(2)).saveToken(eq("access_token"), eq("0"), eq(0), any());
+  }
+
+  // =========================
+  // 6. WRONG HTTP METHOD (POST)
+  // =========================
+  @Test
+  void logout_wrongMethod_returns405() throws Exception {
+    mockMvc
+        .perform(post("/auth/logout"))
+        .andExpect(status().isInternalServerError());
+
+    Mockito.verify(authService, Mockito.never()).logOut(any());
+  }
+
+  // =========================
+  // 7. NULL TOKEN IN COOKIE
+  // =========================
+  @Test
+  void logout_nullToken_callsServiceWithNull_returns200() throws Exception {
+
+    Mockito.when(cookieUtil.getAccessToken(any())).thenReturn(null);
+
+    mockMvc
+        .perform(
+            org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(
+                "/auth/logout"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("logout successfully"));
+
+    Mockito.verify(authService).logOut(null);
+    Mockito.verify(cookieUtil).saveToken(eq("access_token"), eq("0"), eq(0), any());
+  }
+
+  // =========================
+  // 8. WRONG HTTP METHOD (DELETE)
+  // =========================
+  @Test
+  void logout_deleteMethod_returns500() throws Exception {
+
+    mockMvc
+        .perform(
+            org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete(
+                "/auth/logout"))
+        .andExpect(status().isInternalServerError());
+
+    Mockito.verify(authService, Mockito.never()).logOut(any());
+  }
+
+  // =========================
+  // 9. SERVICE THROW — VERIFY RESPONSE BODY
+  // =========================
+  @Test
+  void logout_serviceThrow_responseBody_containsSuccessFalse() throws Exception {
+
+    Mockito.when(cookieUtil.getAccessToken(any())).thenReturn("access-token");
+
+    Mockito.doThrow(new RuntimeException("some internal error"))
+        .when(authService)
+        .logOut(any());
+
+    mockMvc
+        .perform(
+            org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get(
+                "/auth/logout"))
+        .andExpect(status().isInternalServerError())
+        .andExpect(jsonPath("$.success").value(false))
+        .andExpect(jsonPath("$.message").value("some internal error"));
+
+    Mockito.verify(cookieUtil, Mockito.never()).saveToken(any(), any(), eq(0), any());
   }
 }
