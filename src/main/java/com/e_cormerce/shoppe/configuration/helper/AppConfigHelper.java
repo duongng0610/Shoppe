@@ -106,7 +106,7 @@ public class AppConfigHelper {
         for (int i = 0; i < categories.length; i++) {
             String name = categories[i][0];
             String thumbnail = categories[i][1];
-            if (!categoryRepository.existsByVal(name)) {
+            if (categoryRepository.countCategoryByVal(name) == 0) {
                 Category category = Category.builder().val(name).thumbnail(thumbnail).build();
                 categoryRepository.save(category);
                 synonymsRepository.save(CategorySynonyms.builder().val(name).category(category).build());

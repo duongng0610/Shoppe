@@ -13,16 +13,19 @@ import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import com.e_cormerce.shoppe.event.order.OrderApproved;
 import com.e_cormerce.shoppe.event.order.OrderCancelledBySeller;
-import com.e_cormerce.shoppe.event.order.OrderShipping;
 import com.e_cormerce.shoppe.event.product.ProductHidden;
 import com.e_cormerce.shoppe.event.product.ProductUnhidden;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.order.OrderMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
+import com.e_cormerce.shoppe.projection.overview.OverviewOrderProductProjection;
+import com.e_cormerce.shoppe.projection.product.ProductAnalysisProjection;
+import com.e_cormerce.shoppe.projection.seller.SellerInformationProjection;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
+import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import com.e_cormerce.shoppe.service.ship.ShippingService;
@@ -52,6 +55,7 @@ public class SellerService {
     VariantRepository variantRepository;
     ProductRepository pRepository;
     WebClientService webClientService;
+    UserRepository userRepository;
     private final ShippingService shippingService;
 
 
@@ -216,8 +220,33 @@ public class SellerService {
         }
         order.setStatus(OrderStatus.SHIPPING);
         orderRepository.save(order);
-       return shippingService.createShipment(order).getData();
+        return shippingService.createShipment(order).getData();
 
+    }
+
+    public SellerInformationProjection getSellerInformation(String sellerId) {
+        return userRepository.getSellerInformation(sellerId);
+    }
+
+
+    public OverviewOrderProductProjection
+    getOverviewOrderProduct(
+            Integer days
+    ) {
+        String sellerId = authService.getUserId();
+        return userRepository
+                .getOverviewOrderProduct(
+                        sellerId,
+                        days
+                );
+    }
+
+    //public
+    public List<ProductAnalysisProjection> getProductsForSeller(
+            int limit, int offset
+    ) {
+        String sellerId = authService.getUserId();
+        return productRepository.getProductsOfSeller(sellerId, limit, offset);
     }
 
 

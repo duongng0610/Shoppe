@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.controller.home.product;
 
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
+import com.e_cormerce.shoppe.service.product.ProductAnalysisService;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,25 +14,27 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductController {
-  ProductService productService;
+    ProductService productService;
+    ProductAnalysisService productAnalysisService;
 
-  @GetMapping("")
-  public ResponseEntity<ApiResponse> getProductForHome(@RequestParam("limit") int limit, @RequestParam("offset") int offset) {
-    var result = productService.getProductForHome(limit, offset);
+    @GetMapping("")
+    public ResponseEntity<ApiResponse> getProductForHome(@RequestParam("limit") int limit, @RequestParam("offset") int offset, @RequestParam(defaultValue = "3") int days) {
+        var result = productAnalysisService.getTopSellingProducts(limit, offset, days);
 
-    return ResponseEntity.ok(
-        ApiResponse.builder()
-            .data(result)
-            .message("get product successfully")
-            .success(true)
-            .build());
-  }
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .data(result)
+                        .message("get product successfully")
+                        .success(true)
+                        .build());
+    }
 
-  @GetMapping("/{id}/details")
-  public ResponseEntity<ApiResponse> getDetailOfProduct(@PathVariable String id) {
-    var result = productService.getProductDetail(id);
 
-    return ResponseEntity.ok(
-        ApiResponse.builder().data(result).message("get product detail successfully").build());
-  }
+    @GetMapping("/{id}/details")
+    public ResponseEntity<ApiResponse> getDetailOfProduct(@PathVariable String id) {
+        var result = productService.getProductDetail(id);
+
+        return ResponseEntity.ok(
+                ApiResponse.builder().data(result).message("get product detail successfully").build());
+    }
 }

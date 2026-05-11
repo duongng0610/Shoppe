@@ -10,8 +10,10 @@ import com.e_cormerce.shoppe.event.product.ProductUnlocked;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
+import com.e_cormerce.shoppe.projection.overview.OverviewOrderProductProjection;
 import com.e_cormerce.shoppe.properties.JwtProperties;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
+import com.e_cormerce.shoppe.repository.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,85 +29,98 @@ import org.springframework.transaction.annotation.Transactional;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 public class AdminService {
-  ProductRepository productRepository;
-  ApplicationEventPublisher eventPublisher;
-  ProductMapper productMapper;
-  UserMapper userMapper;
+    ProductRepository productRepository;
+    ApplicationEventPublisher eventPublisher;
+    ProductMapper productMapper;
+    UserMapper userMapper;
+    UserRepository userRepository;
 
-  @Transactional
-  public void approveProducts(String productId) {
-    Product product =
-        productRepository
-            .findById(productId)
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
-    if (product.getStatus() != ProductStatus.PENDING) {
-      throw new AppException(ErrorCode.UNABLE_APPROVE_PRODUCT);
-    }
-    productRepository.updateStatus(productId, ProductStatus.ACTIVE.getValue());
-    eventPublisher.publishEvent(
-        ProductApproved.builder()
-            .product(productMapper.toProductCardDto(product))
-            .seller(userMapper.toDto(product.getSeller()))
-            .build());
-  }
-
-  @Transactional
-  public void rejectProducts(String productId) {
-    Product product =
-        productRepository
-            .findById(productId)
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
-
-    if (product.getStatus() != ProductStatus.PENDING) {
-      throw new AppException(ErrorCode.UNABLE_APPROVE_PRODUCT);
+    @Transactional
+    public void approveProducts(String productId) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
+        if (product.getStatus() != ProductStatus.PENDING) {
+            throw new AppException(ErrorCode.UNABLE_APPROVE_PRODUCT);
+        }
+        productRepository.updateStatus(productId, ProductStatus.ACTIVE.getValue());
+        eventPublisher.publishEvent(
+                ProductApproved.builder()
+                        .product(productMapper.toProductCardDto(product))
+                        .seller(userMapper.toDto(product.getSeller()))
+                        .build());
     }
 
-    productRepository.updateStatus(productId, ProductStatus.REJECTED.getValue());
+    @Transactional
+    public void rejectProducts(String productId) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
-    eventPublisher.publishEvent(
-        ProductRejected.builder()
-            .product(productMapper.toProductCardDto(product))
-            .seller(userMapper.toDto(product.getSeller()))
-            .build());
-  }
+        if (product.getStatus() != ProductStatus.PENDING) {
+            throw new AppException(ErrorCode.UNABLE_APPROVE_PRODUCT);
+        }
 
-  @Transactional
-  public void banProducts(String productId) {
-    Product product =
-        productRepository
-            .findById(productId)
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
+        productRepository.updateStatus(productId, ProductStatus.REJECTED.getValue());
 
-    if (product.getStatus() != ProductStatus.ACTIVE) {
-      throw new AppException(ErrorCode.UNABLE_BAN_PRODUCT);
+        eventPublisher.publishEvent(
+                ProductRejected.builder()
+                        .product(productMapper.toProductCardDto(product))
+                        .seller(userMapper.toDto(product.getSeller()))
+                        .build());
     }
 
-    productRepository.updateStatus(productId, ProductStatus.BANNED.getValue());
+    @Transactional
+    public void banProducts(String productId) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
-    eventPublisher.publishEvent(
-        ProductBanned.builder()
-            .product(productMapper.toProductCardDto(product))
-            .seller(userMapper.toDto(product.getSeller()))
-            .build());
-  }
+        if (product.getStatus() != ProductStatus.ACTIVE) {
+            throw new AppException(ErrorCode.UNABLE_BAN_PRODUCT);
+        }
 
-  @Transactional
-  public void unlockProducts(String productId) {
-    Product product =
-        productRepository
-            .findById(productId)
-            .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
+        productRepository.updateStatus(productId, ProductStatus.BANNED.getValue());
 
-    if (product.getStatus() != ProductStatus.BANNED) {
-      throw new AppException(ErrorCode.UNABLE_UNLOCK_PRODUCT);
+        eventPublisher.publishEvent(
+                ProductBanned.builder()
+                        .product(productMapper.toProductCardDto(product))
+                        .seller(userMapper.toDto(product.getSeller()))
+                        .build());
     }
 
-    productRepository.updateStatus(productId, ProductStatus.ACTIVE.getValue());
+    @Transactional
+    public void unlockProducts(String productId) {
+        Product product =
+                productRepository
+                        .findById(productId)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
 
-    eventPublisher.publishEvent(
-        ProductUnlocked.builder()
-            .product(productMapper.toProductCardDto(product))
-            .seller(userMapper.toDto(product.getSeller()))
-            .build());
-  }
+        if (product.getStatus() != ProductStatus.BANNED) {
+            throw new AppException(ErrorCode.UNABLE_UNLOCK_PRODUCT);
+        }
+
+        productRepository.updateStatus(productId, ProductStatus.ACTIVE.getValue());
+
+        eventPublisher.publishEvent(
+                ProductUnlocked.builder()
+                        .product(productMapper.toProductCardDto(product))
+                        .seller(userMapper.toDto(product.getSeller()))
+                        .build());
+    }
+
+    // admin
+    public OverviewOrderProductProjection
+    getOverviewOrderProductForAdmin(
+            Integer days
+    ) {
+
+        return userRepository
+                .getOverviewOrderProductForAdmin(
+                        days
+                );
+    }
 }

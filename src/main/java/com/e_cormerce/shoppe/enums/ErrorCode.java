@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 @Getter
 public enum ErrorCode {
+    ARGUMENT_TYPE_INVALID("Argument type is invalid", 997, HttpStatus.BAD_REQUEST),
+    NOT_CAST_TYPE("Not cast type in jpa", 998, HttpStatus.INTERNAL_SERVER_ERROR),
     UNCATEGORIZED("Uncategorized", 999, HttpStatus.INTERNAL_SERVER_ERROR),
     UNAUTHENTICATED("Unauthenticated", 1000, HttpStatus.UNAUTHORIZED),
     INVALID_FILE_FORMAT("Invalid File Format", 1001, HttpStatus.BAD_REQUEST),
@@ -90,7 +92,9 @@ public enum ErrorCode {
     RESERVATION_CONFLICT("Reservation conflict", 2018, HttpStatus.INTERNAL_SERVER_ERROR),
     UNABLE_GET_ORDER_SHIPPING("Unable to view order shipping", 2019, HttpStatus.FORBIDDEN),
     SHIPMENT_INVALID_REQUEST("Invalid shipment information", 2020, HttpStatus.BAD_REQUEST),
-    CREATE_SHOP_VALID_REQUEST("Invalid create shop request information", 2021, HttpStatus.BAD_REQUEST);
+    CREATE_SHOP_VALID_REQUEST("Invalid create shop request information", 2021, HttpStatus.BAD_REQUEST),
+    UNABLE_DELETE_CATEGORY("Unable to delete category", 2022, HttpStatus.BAD_REQUEST),
+    ;
 
     String message;
     int code;

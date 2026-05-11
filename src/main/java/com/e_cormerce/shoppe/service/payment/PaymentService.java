@@ -62,7 +62,7 @@ public class PaymentService {
                         .findById(userId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
 
-        orderService.handleVnpayResult(order, user, status);
+        //   orderService.handleVnpayResult(order, user, status);
 
         String totalPrice = request.getParameter("vnp_Amount");
 

@@ -56,4 +56,33 @@ public class SellerOrder {
                         .success(true)
                         .build());
     }
+
+    // =====================================
+    // SELLER
+    // =====================================
+
+    @GetMapping("revenue")
+    public ResponseEntity<ApiResponse> getSellerRevenue(
+            @RequestParam String sellerId,
+
+            @RequestParam(required = false)
+            String status,
+
+            @RequestParam(required = false)
+            Integer days
+    ) {
+
+        var result = orderService.getSellerRevenue(
+                sellerId,
+                status,
+                days
+        );
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .data(result)
+                        .message("get order revenue successfully")
+                        .success(true)
+                        .build());
+    }
+
 }

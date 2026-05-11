@@ -16,13 +16,14 @@ services:
   mysql-master:
     image: mysql:8.0
     container_name: mysql-master
-    command: --server-id=1 --log-bin=mysql-bin --binlog-format=row
+    command: --server-id=1 --log-bin=mysql-bin --binlog-format=row --default-time-zone='+07:00'
     environment:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_ROOT_HOST: "%"
       MYSQL_DATABASE: ecommerce
       MYSQL_USER: replication_user
       MYSQL_PASSWORD: 123456
+      TZ: Asia/Ho_Chi_Minh
     ports:
       - "3307:3306"
     volumes:
@@ -41,7 +42,7 @@ services:
   mysql-slave:
     image: mysql:8.0
     container_name: mysql-slave
-    command: --server-id=2 --log-bin=mysql-bin --binlog-format=row
+    command: --server-id=2 --log-bin=mysql-bin --binlog-format=row --binlog-format=row
     depends_on:
       mysql-master:
         condition: service_healthy   # ← slave chờ master healthy mới start
@@ -49,6 +50,7 @@ services:
       MYSQL_ROOT_PASSWORD: 123456
       MYSQL_ROOT_HOST: "%"
       MYSQL_DATABASE: ecommerce
+      TZ: Asia/Ho_Chi_Minh
     ports:
       - "3308:3306"
     volumes:

@@ -20,6 +20,7 @@ import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.CategoryMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
+import com.e_cormerce.shoppe.projection.product.ProductFullViewProjection;
 import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
@@ -74,7 +75,7 @@ public class ProductService {
                         .seller(user)
                         .build();
 
-        if (request.getExtraImageUrls()!= null && !request.getExtraImageUrls().isEmpty()) {
+        if (request.getExtraImageUrls() != null && !request.getExtraImageUrls().isEmpty()) {
             product.setProductExtraImages(
                     request.getExtraImageUrls().stream()
                             .map(url -> ProductExtraImage.builder().product(product).url(url).build())
@@ -93,7 +94,7 @@ public class ProductService {
 
             }
         } else {
-            product.addVariant(createProductHelper.createDefaultVariant(product,request));
+            product.addVariant(createProductHelper.createDefaultVariant(product, request));
         }
 
         product.setCategory(
@@ -113,6 +114,7 @@ public class ProductService {
         return products.stream().map(productMapper::toProductCardDto).toList();
     }
 
+    @Transactional(timeout = 5)
     public ProductDetailResponse getProductDetail(String id) {
         Product product =
                 productRepository
@@ -142,7 +144,7 @@ public class ProductService {
                 getProductDetailsHelper.createVariantDetail(variants);
         var typeResponses = getProductDetailsHelper.createTypesResponse(types);
 
-        eventPublisher.publishEvent(ProductViewed.builder().viewedAt(LocalDateTime.now()).productId(id).build());
+
 
         return ProductDetailResponse.builder()
                 .hasVariant(product.isHasVariant())
@@ -169,5 +171,22 @@ public class ProductService {
     public void updateQuantity(String variantId, String productId, int quantityOrdered) {
         variantRepository.updateQuantitySold(variantId, quantityOrdered);
         productRepository.updateQuantitySold(productId, quantityOrdered);
+    }
+
+    // =====================================
+    // PRODUCT FULL VIEW
+    // =====================================
+
+    public List<ProductFullViewProjection>
+    getProductFullViews(
+            Integer limit,
+            Integer offset
+    ) {
+
+        return productRepository
+                .getProductFullViews(
+                        limit,
+                        offset
+                );
     }
 }
