@@ -97,7 +97,8 @@ public enum ErrorCode {
   UNABLE_REJECT_SELLER_REGISTER(
       "This seller is unable to be rejected", 2025, HttpStatus.BAD_REQUEST),
   UNABLE_BAN_USER("This seller is unable to be banned", 2026, HttpStatus.BAD_REQUEST),
-  UNABLE_UNBAN_USER("This seller is unable to be unbanned", 2027, HttpStatus.BAD_REQUEST);
+  UNABLE_UNBAN_USER("This seller is unable to be unbanned", 2027, HttpStatus.BAD_REQUEST),
+    UNABLE_REVIEW_PRODUCT("Unable to review product because order is not existed", 2028, HttpStatus.BAD_REQUEST);
 
   String message;
   int code;

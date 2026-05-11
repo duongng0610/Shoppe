@@ -5,13 +5,13 @@ server:
 spring:
   master:
     datasource:
-      jdbcUrl: jdbc:mysql://mysql-master:3306/ecommerce
+      jdbcUrl: jdbc:mysql://localhost:3307/ecommerce
       username: root
       password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
   slave:
     datasource:
-      jdbcUrl: jdbc:mysql://mysql-slave:3306/ecommerce
+      jdbcUrl: jdbc:mysql://localhost:3308/ecommerce
       username: root
       password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
@@ -67,6 +67,7 @@ app:
         - /app/message
         - /app/topic/messages
         - /payment
+        - products/*/reviews
       public-urls-regex:
         - /auth/login
         - /auth/register/.*
