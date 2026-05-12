@@ -1,4 +1,4 @@
-package com.e_cormerce.shoppe.dto.response.ghn.order_ship;
+package com.e_cormerce.shoppe.dto.response.ghn.order_ship.create;
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;

@@ -3,11 +3,11 @@ package com.e_cormerce.shoppe.service.account;
 import com.e_cormerce.shoppe.dto.request.account.ChangePasswordRequest;
 import com.e_cormerce.shoppe.dto.request.account.ChangeUserProfileRequest;
 import com.e_cormerce.shoppe.dto.response.account.ChangeUserProfileResponse;
-import com.e_cormerce.shoppe.dto.response.account.UserProfileResponse;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.projection.user.UserWithDetailInfoProjection;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.account.helper.AccountServiceHelper;
 import lombok.AccessLevel;
@@ -18,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +55,7 @@ public class AccountService {
     }
 
 
-    public UserProfileResponse getUserProfile() {
+    public UserWithDetailInfoProjection getUserProfile() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println(authentication.getPrincipal());
         return userRepository

@@ -5,7 +5,6 @@ import com.e_cormerce.shoppe.dto.request.order.ShipCostOrderRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.dto.response.ghn.ship.GhnShipFeeDataResponse;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
-import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.service.order.OrderService;
 import com.e_cormerce.shoppe.service.ship.ShippingService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,7 +41,7 @@ public class OrderController {
                                 .build());
     }
 
-    @GetMapping("/ship-cost")
+    @PostMapping("/ship-cost")
     //  @PreAuthorize("hasAuthority('PERMISSION_GET_SHIP_COST')")
     public ResponseEntity<ApiResponse<GhnShipFeeDataResponse>> getShipCost(
             @RequestBody @Valid ShipCostOrderRequest request) {
@@ -65,25 +64,25 @@ public class OrderController {
                 .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
     }
 
-//    @PreAuthorize("hasAuthority('PERMISSION_GET_ORDER_SHIPPING_STATE')")
-//    @GetMapping("/{orderId}/trackings/current")
-//    public ResponseEntity<ApiResponse> getCurrentTracking(
-//            @PathVariable String orderId) {
-//        var result = orderService.getOrderShippingState(orderId);
-//        return ResponseEntity.ok(
-//                ApiResponse.<GetCurrentTrackingResponse>builder()
-//                        .data(result)
-//                        .message("get order tracking successfully")
-//                        .success(true)
-//                        .build());
-//    }
-
-    @GetMapping
-    @PreAuthorize("hasAuthority('PERMISSION_VIEW_CLIENT_ORDERS')")
-    public ResponseEntity<ApiResponse<GetOrderDetailResponse>> getClientOrders() {
-        var result = orderService.getOrdersByClient();
+    // @PreAuthorize("hasAuthority('PERMISSION_GET_ORDER_SHIPPING_STATE')")
+    @GetMapping("/{orderId}/shipment-state")
+    public ResponseEntity<ApiResponse> getCurrentTracking(
+            @PathVariable String orderId) {
+        var result = orderService.getOrderShipInfo(orderId);
         return ResponseEntity.ok(
-                ApiResponse.<GetOrderDetailResponse>builder()
+                ApiResponse.builder()
+                        .data(result)
+                        .message("get order tracking successfully")
+                        .success(true)
+                        .build());
+    }
+
+    @GetMapping("")
+//    @PreAuthorize("hasAuthority('PERMISSION_VIEW_CLIENT_ORDERS')")
+    public ResponseEntity<ApiResponse> getClientOrders(@RequestParam Integer limit, @RequestParam Integer offset) {
+        var result = orderService.getOrdersByClient(limit, offset);
+        return ResponseEntity.ok(
+                ApiResponse.builder()
                         .data(result)
                         .message("get orders successfully")
                         .success(true)
@@ -94,4 +93,6 @@ public class OrderController {
     public String submitOrder(@PathVariable String id, HttpServletRequest request) {
         return orderService.getUrlPaymentByOrder(id, request);
     }
+
+
 }

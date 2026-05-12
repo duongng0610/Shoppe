@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.repository.order;
 
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.projection.order.OrderRevenueProjection;
+import com.e_cormerce.shoppe.projection.user.OrderWithUserInfoProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -58,4 +59,29 @@ public interface OrderRepository extends JpaRepository<Order, String> {
             @Param("status") String status,
             @Param("days") Integer days
     );
+
+    @Query(value = """
+            SELECT *
+            FROM order_with_user_info
+            WHERE clientId = :clientId
+            LIMIT :limit OFFSET :offset
+            """, nativeQuery = true)
+    List<OrderWithUserInfoProjection> findOrdersByClientId(
+            @Param("clientId") String clientId,
+            @Param("limit") int limit,
+            @Param("offset") int offset
+    );
+
+    @Query(value = """
+            SELECT *
+            FROM order_with_user_info
+            WHERE sellerId = :sellerId
+            LIMIT :limit OFFSET :offset
+            """, nativeQuery = true)
+    List<OrderWithUserInfoProjection> findOrdersBySellerId(
+            @Param("sellerId") String sellerId,
+            @Param("limit") int limit,
+            @Param("offset") int offset
+    );
+
 }

@@ -69,7 +69,7 @@ public class AdminProductController {
     // PRODUCT FULL VIEW
     // =====================================
 
-    @GetMapping("/products")
+    @GetMapping("")
     public ResponseEntity<ApiResponse>
     getProductFullViews(
 

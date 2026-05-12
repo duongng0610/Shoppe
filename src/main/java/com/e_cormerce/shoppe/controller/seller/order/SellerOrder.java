@@ -1,7 +1,6 @@
 package com.e_cormerce.shoppe.controller.seller.order;
 
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
-import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.service.order.OrderService;
 import com.e_cormerce.shoppe.service.seller.SellerService;
 import lombok.AccessLevel;
@@ -44,13 +43,25 @@ public class SellerOrder {
                 .body(ApiResponse.builder().message("ship order successfully").data(res).success(true).build());
     }
 
+    @GetMapping("/{orderId}/shipment-state")
+    public ResponseEntity<ApiResponse> getCurrentTracking(
+            @PathVariable String orderId) {
+        var result = orderService.getOrderShipInfo(orderId);
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .data(result)
+                        .message("get order tracking successfully")
+                        .success(true)
+                        .build());
+    }
+
 
     @GetMapping("")
     @PreAuthorize("hasAuthority('PERMISSION_VIEW_SELLER_ORDERS')")
-    public ResponseEntity<ApiResponse<GetOrderDetailResponse>> getSellerOrders() {
-        var result = orderService.getOrdersBySeller();
+    public ResponseEntity<ApiResponse> getSellerOrders(@RequestParam Integer limit, @RequestParam Integer offset) {
+        var result = orderService.getOrdersBySeller(limit, offset);
         return ResponseEntity.ok(
-                ApiResponse.<GetOrderDetailResponse>builder()
+                ApiResponse.builder()
                         .data(result)
                         .message("get orders successfully")
                         .success(true)

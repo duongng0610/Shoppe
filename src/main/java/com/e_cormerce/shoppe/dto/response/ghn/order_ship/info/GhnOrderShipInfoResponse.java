@@ -1,4 +1,5 @@
-package com.e_cormerce.shoppe.dto.response.ghn.order_ship;
+package com.e_cormerce.shoppe.dto.response.ghn.order_ship.info;
+
 
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
@@ -11,12 +12,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
-public class GhnCreateShipmentDataResponse {
-    String orderCode;
-    String sortCode;
-    String transType;
-    String wardEncode;
-    String districtEncode;
-    String totalFee;
-    String expectedDeliveryTime;
+public class GhnOrderShipInfoResponse {
+    Integer code;
+    String message;
+    GhnOrderShipInfoDataResponse data;
 }

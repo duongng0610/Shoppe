@@ -1,9 +1,8 @@
 package com.e_cormerce.shoppe.service.order;
 
-import com.e_cormerce.shoppe.dto.common.order.OrderDetailDto;
 import com.e_cormerce.shoppe.dto.request.order.CreateOrderRequest;
+import com.e_cormerce.shoppe.dto.response.ghn.order_ship.info.GhnOrderShipInfoResponse;
 import com.e_cormerce.shoppe.dto.response.order.CreateOrderResponse;
-import com.e_cormerce.shoppe.dto.response.order.GetOrderDetailResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.entity.product.Variant;
@@ -18,10 +17,13 @@ import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.order.OrderMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.projection.order.OrderRevenueProjection;
+import com.e_cormerce.shoppe.projection.user.OrderWithUserInfoProjection;
 import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.repository.order.OrderReservationRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
+import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.order.helper.CreateOrderHelper;
+import com.e_cormerce.shoppe.service.ship.ShippingService;
 import com.e_cormerce.shoppe.service.vnpay.VnPayService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,7 +38,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +51,8 @@ public class OrderService {
     VariantRepository variantRepository;
     UserMapper userMapper;
     OrderReservationRepository orderReservationRepository;
+    AuthService authService;
+    ShippingService shippingService;
 
     @Transactional
     public CreateOrderResponse create(
@@ -114,27 +117,19 @@ public class OrderService {
 
 
     @Transactional(readOnly = true)
-    public GetOrderDetailResponse getOrdersByClient() {
+    public List<OrderWithUserInfoProjection> getOrdersByClient(int limit, int offset) {
         String clientId = createOrderHelper.getUserId();
+        return orderRepository.findOrdersByClientId(clientId, limit, offset);
 
-        List<OrderDetailDto> orderDetails =
-                orderRepository.findOrderOfClient(clientId).stream()
-                        .map(orderMapper::toOrderDetailResponse)
-                        .collect(Collectors.toList());
-
-        return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
     }
 
+
     @Transactional(readOnly = true)
-    public GetOrderDetailResponse getOrdersBySeller() {
+    public List<OrderWithUserInfoProjection> getOrdersBySeller(Integer limit, Integer offset) {
         String sellerId = createOrderHelper.getUserId();
 
-        List<OrderDetailDto> orderDetails =
-                orderRepository.findOrderOfSeller(sellerId).stream()
-                        .map(orderMapper::toOrderDetailResponse)
-                        .collect(Collectors.toList());
 
-        return GetOrderDetailResponse.builder().orderDetails(orderDetails).build();
+        return orderRepository.findOrdersBySellerId(sellerId, limit, offset);
     }
 
     public String getUrlPaymentByOrder(String id, HttpServletRequest request) {
@@ -170,6 +165,17 @@ public class OrderService {
         orderRepository.save(order);
     }
 
+    @Transactional
+    public void updateDeliverOrder(String id, OrderStatus orderStatus) {
+        Order order = orderRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+        if (order.getStatus() != OrderStatus.SHIPPING) {
+            throw new AppException(ErrorCode.UNABLE_UPDATE_ORDER_DELIVERY_STATE);
+        }
+        order.setStatus(orderStatus);
+        orderRepository.save(order);
+
+    }
+
     // =====================================
     // SELLER
     // =====================================
@@ -185,6 +191,19 @@ public class OrderService {
                 status,
                 days
         );
+    }
+
+
+    public GhnOrderShipInfoResponse getOrderShipInfo(String orderId) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
+        String userId = authService.getUserId();
+        if (!order.getSeller().getId().equals(userId) && !order.getClient().getId().equals(userId)) {
+            throw new AppException(ErrorCode.UNAUTHORIZED);
+        }
+        if (order.getStatus() != OrderStatus.SHIPPING) {
+            throw new AppException(ErrorCode.UNABLE_VIEW_ORDER_SHIPPING);
+        }
+        return shippingService.getShipInfo(orderId);
     }
 
     // =====================================

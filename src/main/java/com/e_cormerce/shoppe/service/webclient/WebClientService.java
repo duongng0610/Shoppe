@@ -3,7 +3,8 @@ package com.e_cormerce.shoppe.service.webclient;
 import com.e_cormerce.shoppe.dto.request.ghn.GhnCalculateShipFeeRequest;
 import com.e_cormerce.shoppe.dto.request.ghn.GhnCreateShipmentRequest;
 import com.e_cormerce.shoppe.dto.request.ghn.GhnCreateShopRequest;
-import com.e_cormerce.shoppe.dto.response.ghn.order_ship.GhnCreateShipmentResponse;
+import com.e_cormerce.shoppe.dto.response.ghn.order_ship.create.GhnCreateShipmentResponse;
+import com.e_cormerce.shoppe.dto.response.ghn.order_ship.info.GhnOrderShipInfoResponse;
 import com.e_cormerce.shoppe.dto.response.ghn.ship.GhnShipFeeResponse;
 import com.e_cormerce.shoppe.dto.response.ghn.shop.GhnCreateShopResponse;
 import com.e_cormerce.shoppe.enums.ErrorCode;
@@ -22,7 +23,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientService {
     GHNProperties ghnProperties;
 
-    public GhnShipFeeResponse calculateShipGhnApi(GhnCalculateShipFeeRequest req,String shopId ) {
+    public GhnShipFeeResponse calculateShipGhnApi(GhnCalculateShipFeeRequest req, String shopId) {
         var webClient = WebClient.create();
         return webClient
                 .post()
@@ -91,9 +92,36 @@ public class WebClientService {
         } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
             // Lỗi từ phía server (4xx, 5xx)
             if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                String body = e.getResponseBodyAsString();
-                System.out.println(body);
                 throw new AppException(ErrorCode.SHIPMENT_INVALID_REQUEST);
+            }
+            throw new AppException(ErrorCode.ERROR_EXTERNAL_API);
+        }
+    }
+
+    public GhnOrderShipInfoResponse getOrderShipInfo(String orderId) {
+        var webClient = WebClient.create();
+        try {
+            var response =
+                    webClient
+                            .post()
+                            .uri(ghnProperties.getCreateShipment())
+                            .headers(
+                                    h -> {
+                                        h.add("Token", ghnProperties.getToken());
+                                        h.add("Content-Type", "application/json");
+                                    })
+                            .bodyValue(orderId)
+                            .retrieve()
+                            .bodyToMono(GhnOrderShipInfoResponse.class)
+                            .block();
+
+            return response;
+
+        } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
+            // Lỗi từ phía server (4xx, 5xx)
+            if (e.getStatusCode() == HttpStatus.BAD_REQUEST) {
+
+                throw new AppException(ErrorCode.ORDER_SHIP_INVALID);
             }
             throw new AppException(ErrorCode.ERROR_EXTERNAL_API);
         }

@@ -12,8 +12,7 @@ public interface ProductCardProjection {
     Float getDiscountPercentage();
 
     BigDecimal getOriginPrice();
-
-    Float getPrice();
+    
 
     Float getRate();
 

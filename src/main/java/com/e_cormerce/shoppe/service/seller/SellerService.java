@@ -1,7 +1,7 @@
 package com.e_cormerce.shoppe.service.seller;
 
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
-import com.e_cormerce.shoppe.dto.response.ghn.order_ship.GhnCreateShipmentDataResponse;
+import com.e_cormerce.shoppe.dto.response.ghn.order_ship.create.GhnCreateShipmentDataResponse;
 import com.e_cormerce.shoppe.dto.response.product.MyProductResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
@@ -9,6 +9,7 @@ import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.entity.product.Variant;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
+import com.e_cormerce.shoppe.enums.order.OrderPaymentStatus;
 import com.e_cormerce.shoppe.enums.order.OrderStatus;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import com.e_cormerce.shoppe.event.order.OrderApproved;
@@ -151,7 +152,7 @@ public class SellerService {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
 
-        if (order.getStatus() != OrderStatus.PENDING) {
+        if (order.getStatus() != OrderStatus.PENDING || order.getPaymentStatus() != OrderPaymentStatus.SUCCESS) {
             throw new AppException(ErrorCode.UNABLE_APPROVE_ORDER);
         }
 

@@ -3,29 +3,30 @@ package com.e_cormerce.shoppe.service.product;
 import com.e_cormerce.shoppe.dto.common.catgory.CategoryDto;
 import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
+import com.e_cormerce.shoppe.dto.request.product.CreateProductReviewRequest;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductDetailResponse;
 import com.e_cormerce.shoppe.dto.response.product.VariantDetailResponse;
 import com.e_cormerce.shoppe.entity.category.Category;
-import com.e_cormerce.shoppe.entity.product.Product;
-import com.e_cormerce.shoppe.entity.product.ProductExtraImage;
-import com.e_cormerce.shoppe.entity.product.Type;
-import com.e_cormerce.shoppe.entity.product.Variant;
+import com.e_cormerce.shoppe.entity.order.Order;
+import com.e_cormerce.shoppe.entity.product.*;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
 import com.e_cormerce.shoppe.event.product.ProductCreated;
-import com.e_cormerce.shoppe.event.product.ProductViewed;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.CategoryMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.projection.product.ProductFullViewProjection;
 import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
+import com.e_cormerce.shoppe.repository.order.OrderRepository;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
+import com.e_cormerce.shoppe.repository.product.ProductReviewRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
 import com.e_cormerce.shoppe.service.product.helper.CreateProductHelper;
+import com.e_cormerce.shoppe.service.product.helper.CreateProductReviewHelper;
 import com.e_cormerce.shoppe.service.product.helper.GetProductDetailsHelper;
 import com.e_cormerce.shoppe.service.product.helper.ProductQueryDBHelper;
 import jakarta.validation.Valid;
@@ -59,6 +60,9 @@ public class ProductService {
     GetProductDetailsHelper getProductDetailsHelper;
     ApplicationEventPublisher eventPublisher;
     VariantRepository variantRepository;
+    OrderRepository orderRepository;
+    CreateProductReviewHelper createProductReviewHelper;
+    ProductReviewRepository productReviewRepository;
 
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
     public Product persistProduct(@Valid CreateProductRequest request) {
@@ -145,7 +149,6 @@ public class ProductService {
         var typeResponses = getProductDetailsHelper.createTypesResponse(types);
 
 
-
         return ProductDetailResponse.builder()
                 .hasVariant(product.isHasVariant())
                 .name(product.getName())
@@ -188,5 +191,29 @@ public class ProductService {
                         limit,
                         offset
                 );
+    }
+
+
+    @Transactional
+    public void createReview(@Valid CreateProductReviewRequest request) {
+        Order order = orderRepository.findById(request.getOrderId())
+                .orElseThrow(() -> new AppException(ErrorCode.UNABLE_REVIEW_PRODUCT));
+
+        User client = authService.getUserThroughAuthentication();
+
+        Product product = createProductReviewHelper.getProduct(order.getId());
+
+        ProductReview productReview = ProductReview.builder()
+                .rate(request.getRate())
+                .description(request.getDescription())
+                .client(client)
+                .product(product)
+                .build();
+
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            createProductReviewHelper.createProductReviewImage(request, productReview);
+        }
+
+        productReviewRepository.save(productReview);
     }
 }

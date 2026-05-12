@@ -1,8 +1,10 @@
 package com.e_cormerce.shoppe.service.admin;
 
 import com.e_cormerce.shoppe.entity.product.Product;
+import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.enums.product.ProductStatus;
+import com.e_cormerce.shoppe.enums.user.AccountStatus;
 import com.e_cormerce.shoppe.event.product.ProductApproved;
 import com.e_cormerce.shoppe.event.product.ProductBanned;
 import com.e_cormerce.shoppe.event.product.ProductRejected;
@@ -11,8 +13,11 @@ import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import com.e_cormerce.shoppe.projection.overview.OverviewOrderProductProjection;
+import com.e_cormerce.shoppe.projection.user.UserDetailManageInfoProjection;
+import com.e_cormerce.shoppe.projection.user.UserManageInfoProjection;
 import com.e_cormerce.shoppe.properties.JwtProperties;
 import com.e_cormerce.shoppe.repository.product.ProductRepository;
+import com.e_cormerce.shoppe.repository.user.AccountRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +27,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +41,7 @@ public class AdminService {
     ProductMapper productMapper;
     UserMapper userMapper;
     UserRepository userRepository;
+    AccountRepository accountRepository;
 
     @Transactional
     public void approveProducts(String productId) {
@@ -122,5 +130,52 @@ public class AdminService {
                 .getOverviewOrderProductForAdmin(
                         days
                 );
+    }
+
+
+    public List<UserManageInfoProjection> getClientInfo(int limit, int offset) {
+        return userRepository.getClientInfo(limit, offset);
+    }
+
+    public UserDetailManageInfoProjection getClientDetailInfo(String clientId) {
+        return userRepository.getClientDetailInfo(clientId);
+    }
+
+
+    public UserDetailManageInfoProjection getSellerDetailInfo(String sellerId) {
+        return userRepository.getRegisteredSellerDetailInfo(sellerId);
+    }
+
+    public List<UserManageInfoProjection> getSellerInfo(int limit, int offset) {
+        return userRepository.getSellerInfo(limit, offset);
+    }
+
+    @Transactional
+    public void banUser(String userId) {
+        Account account =
+                accountRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+
+        if (account.getStatus() != AccountStatus.INACTIVE
+                && account.getStatus() != AccountStatus.ACTIVE) {
+            throw new AppException((ErrorCode.UNABLE_BAN_USER));
+        }
+
+        accountRepository.setStatus(userId, AccountStatus.BANNED);
+    }
+
+    @Transactional
+    public void unbanUser(String userId) {
+        Account account =
+                accountRepository
+                        .findById(userId)
+                        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+
+        if (account.getStatus() != AccountStatus.BANNED) {
+            throw new AppException((ErrorCode.UNABLE_UNBAN_USER));
+        }
+
+        accountRepository.setStatus(userId, AccountStatus.INACTIVE);
     }
 }

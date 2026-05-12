@@ -19,10 +19,19 @@ import java.util.concurrent.CompletableFuture;
 public interface ProductRepository extends JpaRepository<Product, String> {
     Optional<Product> findById(String id);
 
+
     @Query(
             value = "SELECT * FROM products p  WHERE p.status = 'ACTIVE'  LIMIT :limit OFFSET :offset",
             nativeQuery = true)
     List<Product> findProductForHome(@Param("limit") int limit, @Param("offset") int offset);
+
+
+    @Query(value = "SELECT p.* FROM orders o " +
+            "INNER JOIN variants v ON o.variant_id = v.id " +
+            "INNER JOIN products p ON v.product_id = p.id " +
+            "WHERE o.id = :order_id",
+            nativeQuery = true)
+    Product findProductOfOrder(@Param("order_id") String orderId);
 
     @Query(
             value =
@@ -163,7 +172,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Query(
             value = """
                     SELECT *
-                    FROM product_full_view
+                    FROM product_with_seller_and_category
                     LIMIT :offset, :limit
                     """,
             nativeQuery = true

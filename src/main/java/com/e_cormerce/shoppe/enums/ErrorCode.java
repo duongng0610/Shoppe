@@ -92,8 +92,19 @@ public enum ErrorCode {
     RESERVATION_CONFLICT("Reservation conflict", 2018, HttpStatus.INTERNAL_SERVER_ERROR),
     UNABLE_GET_ORDER_SHIPPING("Unable to view order shipping", 2019, HttpStatus.FORBIDDEN),
     SHIPMENT_INVALID_REQUEST("Invalid shipment information", 2020, HttpStatus.BAD_REQUEST),
+
     CREATE_SHOP_VALID_REQUEST("Invalid create shop request information", 2021, HttpStatus.BAD_REQUEST),
     UNABLE_DELETE_CATEGORY("Unable to delete category", 2022, HttpStatus.BAD_REQUEST),
+    UNABLE_APPROVE_SELLER_REGISTER(
+            "This seller is unable to be approved", 2024, HttpStatus.BAD_REQUEST),
+    UNABLE_REJECT_SELLER_REGISTER(
+            "This seller is unable to be rejected", 2025, HttpStatus.BAD_REQUEST),
+    UNABLE_BAN_USER("This seller is unable to be banned", 2026, HttpStatus.BAD_REQUEST),
+    UNABLE_UNBAN_USER("This seller is unable to be unbanned", 2027, HttpStatus.BAD_REQUEST),
+    UNABLE_REVIEW_PRODUCT("Unable to review product because order is not existed", 2028, HttpStatus.BAD_REQUEST),
+    ORDER_SHIP_INVALID("Order ship is invalid", 2029, HttpStatus.BAD_REQUEST),
+    UNABLE_VIEW_ORDER_SHIPPING("Unable to view order shipping", 2030, HttpStatus.BAD_REQUEST),
+    UNABLE_UPDATE_ORDER_DELIVERY_STATE("Unable update order delivery state", 2031, HttpStatus.BAD_REQUEST),
     ;
 
     String message;

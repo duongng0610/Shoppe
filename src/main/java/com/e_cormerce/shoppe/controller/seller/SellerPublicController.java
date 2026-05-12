@@ -26,7 +26,7 @@ public class SellerPublicController {
     }
 
 
-    @GetMapping("/{sellerId}/information")
+    @GetMapping("/{sellerId}/info")
     public ResponseEntity<ApiResponse> getSellerInformation(
             @PathVariable String sellerId
     ) {
