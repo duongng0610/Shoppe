@@ -3,11 +3,11 @@ package com.e_cormerce.shoppe.service.account;
 import com.e_cormerce.shoppe.dto.request.account.ChangePasswordRequest;
 import com.e_cormerce.shoppe.dto.request.account.ChangeUserProfileRequest;
 import com.e_cormerce.shoppe.dto.response.account.ChangeUserProfileResponse;
-import com.e_cormerce.shoppe.dto.response.account.UserProfileResponse;
 import com.e_cormerce.shoppe.entity.user.Account;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.ErrorCode;
 import com.e_cormerce.shoppe.exception.AppException;
+import com.e_cormerce.shoppe.projection.user.UserWithDetailInfoProjection;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.account.helper.AccountServiceHelper;
 import lombok.AccessLevel;
@@ -24,41 +24,42 @@ import org.springframework.stereotype.Service;
 @Log4j2
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AccountService {
-  UserRepository userRepository;
-  BCryptPasswordEncoder bCryptPasswordEncoder;
-  AccountServiceHelper accountServiceHelper;
+    UserRepository userRepository;
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+    AccountServiceHelper accountServiceHelper;
 
-  public void changePassword(ChangePasswordRequest request) {
-    User user = accountServiceHelper.getUser();
-    Account account = accountServiceHelper.getAccount(user);
+    public void changePassword(ChangePasswordRequest request) {
+        User user = accountServiceHelper.getUser();
+        Account account = accountServiceHelper.getAccount(user);
 
-    if (!accountServiceHelper.isTrueOldPassword(request.getOldPassword(), account)) {
-      throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        if (!accountServiceHelper.isTrueOldPassword(request.getOldPassword(), account)) {
+            throw new AppException(ErrorCode.INCORRECT_PASSWORD);
+        }
+
+        accountServiceHelper.updatePassword(request.getNewPassword(), account);
     }
 
-    accountServiceHelper.updatePassword(request.getNewPassword(), account);
-  }
+    public ChangeUserProfileResponse updateProfile(ChangeUserProfileRequest request) {
+        User user = accountServiceHelper.getUser();
 
-  public ChangeUserProfileResponse updateProfile(ChangeUserProfileRequest request) {
-    User user = accountServiceHelper.getUser();
+        accountServiceHelper.applyProfileChanges(user, request);
+        accountServiceHelper.applyAvatarChange(user, request.getThumbnailUrl());
 
-    accountServiceHelper.applyProfileChanges(user, request);
-    accountServiceHelper.applyAvatarChange(user, request.getThumbnailUrl());
+        userRepository.save(user);
 
-    userRepository.save(user);
+        return ChangeUserProfileResponse.builder()
+                .dob(user.getDob())
+                .avatar(user.getAvatar())
+                .username(user.getUsername())
+                .build();
+    }
 
-    return ChangeUserProfileResponse.builder()
-        .dob(user.getDob())
-        .avatar(user.getAvatar())
-        .username(user.getUsername())
-        .build();
-  }
 
-  public UserProfileResponse getUserProfile() {
-    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-    System.out.println(authentication.getPrincipal());
-    return userRepository
-        .getUserProfileById(authentication.getPrincipal().toString())
-        .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
-  }
+    public UserWithDetailInfoProjection getUserProfile() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println(authentication.getPrincipal());
+        return userRepository
+                .getUserProfileById(authentication.getPrincipal().toString())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_USER));
+    }
 }

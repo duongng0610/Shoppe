@@ -2,6 +2,12 @@ socket-server:
   port: 8086
 server:
   port: 3000
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    max-connections: 1000
+    accept-count: 100
 spring:
   master:
     datasource:
@@ -15,7 +21,6 @@ spring:
       username: root
       password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
-
   jpa:
     properties:
       hibernate:
@@ -23,7 +28,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-    defer-datasource-initialization: true
   security:
     oauth2:
       client:
@@ -50,28 +54,28 @@ app:
       public-urls:
         - /auth/login
         - /auth/register/*
-        - /categories/default
-        - /categories/*/children
-        - /categories
+        - /categories/**
         - /products
         - /products/*/details
         - /search
-        - /categories/{id}/products
         - /seller/{id}/info
         - /seller/{id}/products
         - /chat/**
         - /app/message
         - /app/topic/messages
         - /payment
-        - products/*/reviews
+        - /address/**
+        - /seller/public/**
       public-urls-regex:
         - /auth/login
+        - /address/.*
         - /auth/register/.*
         - /categories/default
         - /categories/.*/children
         - /categories
         - /products
         - /products/.*/details
+        - /seller/public/.*
     cors:
       allowed-origins:
         - http://localhost:5173

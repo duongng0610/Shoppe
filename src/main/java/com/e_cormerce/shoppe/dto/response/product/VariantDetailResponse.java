@@ -1,10 +1,11 @@
 package com.e_cormerce.shoppe.dto.response.product;
 
 import com.e_cormerce.shoppe.dto.common.product.VariantAttributeDto;
+import lombok.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import lombok.*;
 
 @Data
 @Getter
@@ -13,11 +14,12 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class VariantDetailResponse {
-  String id;
-  BigDecimal price;
-  String thumbnail;
-  long quantity;
-  List<VariantAttributeDto> attributes;
-  long soldQuantity;
-  LocalDateTime createdAt;
+    String id;
+    BigDecimal price;
+    String thumbnail;
+
+    long quantity;
+    List<VariantAttributeDto> attributes;
+    long soldQuantity;
+    LocalDateTime createdAt;
 }
