@@ -33,9 +33,9 @@ public class ProductExtraImage {
   @Column(nullable = false)
   String url;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    Product product;
+  @ManyToOne
+  @JoinColumn(name = "product_id", nullable = false)
+  Product product;
 
   @CreationTimestamp
   @Column(

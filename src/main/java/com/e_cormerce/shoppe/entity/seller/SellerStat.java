@@ -1,33 +1,33 @@
-//package com.e_cormerce.shoppe.entity.seller;
+// package com.e_cormerce.shoppe.entity.seller;
 //
-//import com.e_cormerce.shoppe.entity.user.User;
-//import jakarta.persistence.*;
-//import jakarta.validation.constraints.DecimalMax;
-//import jakarta.validation.constraints.DecimalMin;
-//import lombok.*;
-//import lombok.experimental.FieldDefaults;
-//import org.hibernate.annotations.CreationTimestamp;
-//import org.hibernate.annotations.SQLDelete;
-//import org.hibernate.annotations.SQLRestriction;
-//import org.hibernate.annotations.UpdateTimestamp;
+// import com.e_cormerce.shoppe.entity.user.User;
+// import jakarta.persistence.*;
+// import jakarta.validation.constraints.DecimalMax;
+// import jakarta.validation.constraints.DecimalMin;
+// import lombok.*;
+// import lombok.experimental.FieldDefaults;
+// import org.hibernate.annotations.CreationTimestamp;
+// import org.hibernate.annotations.SQLDelete;
+// import org.hibernate.annotations.SQLRestriction;
+// import org.hibernate.annotations.UpdateTimestamp;
 //
-//import java.math.BigDecimal;
-//import java.time.LocalDateTime;
-//import java.util.Date;
+// import java.math.BigDecimal;
+// import java.time.LocalDateTime;
+// import java.util.Date;
 //
-//@Entity
-//@Table(
+// @Entity
+// @Table(
 //        name = "seller_stats",
 //        indexes = {@Index(name = "idx_seller_stat_seller", columnList = "id")})
-//@Getter
-//@Setter
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE)
-//@SQLDelete(sql = "UPDATE seller_info SET deleted=true where id=?")
-//@SQLRestriction("deleted = false")
-//public class SellerStat {
+// @Getter
+// @Setter
+// @Builder
+// @NoArgsConstructor
+// @AllArgsConstructor
+// @FieldDefaults(level = AccessLevel.PRIVATE)
+// @SQLDelete(sql = "UPDATE seller_info SET deleted=true where id=?")
+// @SQLRestriction("deleted = false")
+// public class SellerStat {
 //
 //    @Id
 //    @GeneratedValue(strategy = GenerationType.UUID)
@@ -66,16 +66,19 @@
 //    @Column(nullable = false, name = "arrived_orders", columnDefinition = "int default 0")
 //    int arrivedOrders;
 //
-//    @Column(nullable = false, name = "cancelled_orders_by_client", columnDefinition = "int default 0")
+//    @Column(nullable = false, name = "cancelled_orders_by_client", columnDefinition = "int default
+// 0")
 //    int cancelledOrdersByClient;
 //
-//    @Column(nullable = false, name = "cancelled_orders_by_seller", columnDefinition = "int default 0")
+//    @Column(nullable = false, name = "cancelled_orders_by_seller", columnDefinition = "int default
+// 0")
 //    int cancelledOrdersBySeller;
 //
 //    @Column(nullable = false, name = "completed_orders", columnDefinition = "int default 0")
 //    int completedOrders;
 //
-//    @Column(nullable = false, name = "refund_requested_orders", columnDefinition = "int default 0")
+//    @Column(nullable = false, name = "refund_requested_orders", columnDefinition = "int default
+// 0")
 //    int refundRequestedOrders;
 //
 //    @Column(nullable = false, name = "refunded_orders", columnDefinition = "int default 0")
@@ -84,7 +87,8 @@
 //    @Column(nullable = false, name = "failed_delivery_orders", columnDefinition = "int default 0")
 //    int failedDeliveryOrders;
 //
-//    @Column(name = "total_revenue", precision = 15, scale = 2, columnDefinition = "decimal default 0")
+//    @Column(name = "total_revenue", precision = 15, scale = 2, columnDefinition = "decimal default
+// 0")
 //    BigDecimal totalRevenue;
 //
 //    @CreationTimestamp
@@ -109,4 +113,4 @@
 //
 //    @Column(nullable = false)
 //    String shopId; // cho api ben thu 3 biet.
-//}
+// }

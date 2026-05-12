@@ -1,16 +1,16 @@
-//package com.e_cormerce.shoppe.repository.analytic;
+// package com.e_cormerce.shoppe.repository.analytic;
 //
-//import com.e_cormerce.shoppe.entity.analytic.product.all.ProductDaily;
-//import jakarta.transaction.Transactional;
-//import java.math.BigDecimal;
-//import java.time.LocalDate;
-//import org.springframework.data.jpa.repository.JpaRepository;
-//import org.springframework.data.jpa.repository.Modifying;
-//import org.springframework.data.jpa.repository.Query;
-//import org.springframework.stereotype.Repository;
+// import com.e_cormerce.shoppe.entity.analytic.product.all.ProductDaily;
+// import jakarta.transaction.Transactional;
+// import java.math.BigDecimal;
+// import java.time.LocalDate;
+// import org.springframework.data.jpa.repository.JpaRepository;
+// import org.springframework.data.jpa.repository.Modifying;
+// import org.springframework.data.jpa.repository.Query;
+// import org.springframework.stereotype.Repository;
 //
-//@Repository
-//public interface ProductDailyRepository extends JpaRepository<ProductDaily, Integer> {
+// @Repository
+// public interface ProductDailyRepository extends JpaRepository<ProductDaily, Integer> {
 //  @Modifying
 //  @Transactional
 //  @Query(
@@ -53,4 +53,4 @@
 //            """,
 //      nativeQuery = true)
 //  void increaseRevenue(String productId, BigDecimal orderAmount, LocalDate date);
-//}
+// }

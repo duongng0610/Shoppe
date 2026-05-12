@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GhnCreateShipmentResponse {
-    Integer code;
-    String message;
-    GhnCreateShipmentDataResponse data;
+  Integer code;
+  String message;
+  GhnCreateShipmentDataResponse data;
 }

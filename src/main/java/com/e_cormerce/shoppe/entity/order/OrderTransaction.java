@@ -3,15 +3,14 @@ package com.e_cormerce.shoppe.entity.order;
 import com.e_cormerce.shoppe.entity.user.User;
 import com.e_cormerce.shoppe.enums.transaction.TransactionStatus;
 import jakarta.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -23,36 +22,36 @@ import java.time.LocalDateTime;
 @SQLDelete(sql = "UPDATE transactions SET deleted=true where id=?")
 @Where(clause = "deleted = false")
 public class OrderTransaction {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  String id;
 
-    @Column(columnDefinition = "boolean default false")
-    boolean deleted;
+  @Column(columnDefinition = "boolean default false")
+  boolean deleted;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    User user;
+  @ManyToOne
+  @JoinColumn(name = "user_id", nullable = false)
+  User user;
 
-    @ManyToOne
-    @JoinColumn(name = "order_id", nullable = false)
-    Order order;
+  @ManyToOne
+  @JoinColumn(name = "order_id", nullable = false)
+  Order order;
 
-    @Column(name = "amount", precision = 15, scale = 2, nullable = false)
-    BigDecimal amount;
+  @Column(name = "amount", precision = 15, scale = 2, nullable = false)
+  BigDecimal amount;
 
-    @Enumerated(EnumType.STRING)
-    @Column(columnDefinition = "ENUM('SUCCESS','FAIL','ERROR')", nullable = false)
-    TransactionStatus status;
+  @Enumerated(EnumType.STRING)
+  @Column(columnDefinition = "ENUM('SUCCESS','FAIL','ERROR')", nullable = false)
+  TransactionStatus status;
 
-    @Column(
-            name = "created_at",
-            nullable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @CreationTimestamp
-    LocalDateTime createdAt;
+  @Column(
+      name = "created_at",
+      nullable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  @CreationTimestamp
+  LocalDateTime createdAt;
 
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    LocalDateTime updatedAt;
+  @UpdateTimestamp
+  @Column(name = "updated_at")
+  LocalDateTime updatedAt;
 }

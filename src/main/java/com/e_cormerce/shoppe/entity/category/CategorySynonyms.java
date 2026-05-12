@@ -29,20 +29,21 @@ public class CategorySynonyms {
   @Column(columnDefinition = "boolean default false")
   boolean deleted;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    Category category;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", nullable = false)
+  Category category;
 
-    @Column(nullable = false, unique = true)
-    String val;
+  @Column(nullable = false, unique = true)
+  String val;
 
+  @Column(
+      name = "created_at",
+      nullable = false,
+      columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+  @CreationTimestamp
+  LocalDateTime createdAt;
 
-    @Column(name = "created_at", nullable = false,
-            columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @CreationTimestamp
-    LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    LocalDateTime updatedAt;
+  @UpdateTimestamp
+  @Column(name = "updated_at")
+  LocalDateTime updatedAt;
 }
