@@ -1,12 +1,11 @@
 package com.e_cormerce.shoppe.projection.category;
 
 public interface CategoryProjection {
-    String getId();
+  String getId();
 
-    String getVal();
+  String getVal();
 
-    String getThumbnail();
+  String getThumbnail();
 
-    String getCreatedAt();
-
+  String getCreatedAt();
 }

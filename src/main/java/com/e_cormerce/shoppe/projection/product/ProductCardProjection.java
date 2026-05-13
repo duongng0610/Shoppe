@@ -3,25 +3,23 @@ package com.e_cormerce.shoppe.projection.product;
 import java.math.BigDecimal;
 
 public interface ProductCardProjection {
-    String getId();
+  String getId();
 
-    String getName();
+  String getName();
 
-    String getThumbnail();
+  String getThumbnail();
 
-    Float getDiscountPercentage();
+  Float getDiscountPercentage();
 
-    BigDecimal getOriginPrice();
-    
+  BigDecimal getOriginPrice();
 
-    Float getRate();
+  Float getRate();
 
-    String getSellerId();
+  String getSellerId();
 
-    Long getTotalQuantity();
+  Long getTotalQuantity();
 
-    Long getTotalQuantitySold();
+  Long getTotalQuantitySold();
 
-    Long getTotalOrders();
-
+  Long getTotalOrders();
 }

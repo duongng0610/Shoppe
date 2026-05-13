@@ -5,51 +5,51 @@ import java.time.LocalDateTime;
 
 public interface OrderWithUserInfoProjection {
 
-    String getId();
+  String getId();
 
-    String getAddressDetail();
+  String getAddressDetail();
 
-    LocalDateTime getCreatedAt();
+  LocalDateTime getCreatedAt();
 
-    Boolean getDeleted();
+  Boolean getDeleted();
 
-    String getShippingDistrict();
+  String getShippingDistrict();
 
-    String getOrderName();
+  String getOrderName();
 
-    String getOrderThumbnail();
+  String getOrderThumbnail();
 
-    String getPaymentStatus();
+  String getPaymentStatus();
 
-    BigDecimal getPriceEach();
+  BigDecimal getPriceEach();
 
-    String getShippingProvince();
+  String getShippingProvince();
 
-    Integer getQuantity();
+  Integer getQuantity();
 
-    BigDecimal getShipCost();
+  BigDecimal getShipCost();
 
-    String getShippingPhoneNumber();
+  String getShippingPhoneNumber();
 
-    String getStatus();
+  String getStatus();
 
-    BigDecimal getTotalPrice();
+  BigDecimal getTotalPrice();
 
-    LocalDateTime getUpdatedAt();
+  LocalDateTime getUpdatedAt();
 
-    String getVariantAttributes();
+  String getVariantAttributes();
 
-    String getShippingWard();
+  String getShippingWard();
 
-    String getClientId();
+  String getClientId();
 
-    String getSellerId();
+  String getSellerId();
 
-    String getClientUsername();
+  String getClientUsername();
 
-    String getClientAvatar();
+  String getClientAvatar();
 
-    String getSellerUsername();
+  String getSellerUsername();
 
-    String getSellerAvatar();
+  String getSellerAvatar();
 }

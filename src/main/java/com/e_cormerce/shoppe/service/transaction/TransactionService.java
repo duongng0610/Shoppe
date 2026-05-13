@@ -2,50 +2,35 @@ package com.e_cormerce.shoppe.service.transaction;
 
 import com.e_cormerce.shoppe.projection.transaction.TransactionUserViewProjection;
 import com.e_cormerce.shoppe.repository.transaction.TransactionRepository;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TransactionService {
-    TransactionRepository transactionRepository;
-    // =====================================
-    // TRANSACTION USER VIEW
-    // =====================================
+  TransactionRepository transactionRepository;
 
-    public List<TransactionUserViewProjection>
-    getTransactionUserViews(
-            Integer limit,
-            Integer offset
-    ) {
+  // =====================================
+  // TRANSACTION USER VIEW
+  // =====================================
 
-        return transactionRepository
-                .getTransactionViews(
-                        limit,
-                        offset
-                );
-    }
+  public List<TransactionUserViewProjection> getTransactionUserViews(
+      Integer limit, Integer offset) {
 
-    // =====================================
-    // TRANSACTION OF USER VIEW
-    // =====================================
+    return transactionRepository.getTransactionViews(limit, offset);
+  }
 
-    public List<TransactionUserViewProjection>
-    getTransactionOfUser(
-            String userId,
-            Integer limit,
-            Integer offset
-    ) {
+  // =====================================
+  // TRANSACTION OF USER VIEW
+  // =====================================
 
-        return transactionRepository
-                .getTransactionOfUser(
-                        limit,
-                        offset
-                );
-    }
+  public List<TransactionUserViewProjection> getTransactionOfUser(
+      String userId, Integer limit, Integer offset) {
+
+    return transactionRepository.getTransactionOfUser(limit, offset);
+  }
 }

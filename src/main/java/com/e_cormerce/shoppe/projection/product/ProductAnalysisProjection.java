@@ -4,25 +4,25 @@ import java.math.BigDecimal;
 
 public interface ProductAnalysisProjection {
 
-    String getId();
+  String getId();
 
-    String getName();
+  String getName();
 
-    String getThumbnail();
+  String getThumbnail();
 
-    String getStatus();
+  String getStatus();
 
-    Float getRate();
+  Float getRate();
 
-    Boolean getDeleted();
+  Boolean getDeleted();
 
-    String getSellerId();
+  String getSellerId();
 
-    Long getTotalQuantity();
+  Long getTotalQuantity();
 
-    Long getTotalQuantitySold();
+  Long getTotalQuantitySold();
 
-    Long getTotalOrders();
+  Long getTotalOrders();
 
-    BigDecimal getTotalRevenue();
+  BigDecimal getTotalRevenue();
 }

@@ -1,27 +1,27 @@
-//package com.e_cormerce.shoppe.entity.client;
+// package com.e_cormerce.shoppe.entity.client;
 //
-//import com.e_cormerce.shoppe.entity.user.User;
-//import jakarta.persistence.*;
-//import java.math.BigDecimal;
-//import java.time.LocalDateTime;
-//import lombok.*;
-//import lombok.experimental.FieldDefaults;
-//import org.hibernate.annotations.CreationTimestamp;
-//import org.hibernate.annotations.SQLDelete;
-//import org.hibernate.annotations.UpdateTimestamp;
-//import org.hibernate.annotations.Where;
+// import com.e_cormerce.shoppe.entity.user.User;
+// import jakarta.persistence.*;
+// import java.math.BigDecimal;
+// import java.time.LocalDateTime;
+// import lombok.*;
+// import lombok.experimental.FieldDefaults;
+// import org.hibernate.annotations.CreationTimestamp;
+// import org.hibernate.annotations.SQLDelete;
+// import org.hibernate.annotations.UpdateTimestamp;
+// import org.hibernate.annotations.Where;
 //
-//@Entity
-//@Getter
-//@Setter
-//@Builder
-//@NoArgsConstructor
-//@AllArgsConstructor
-//@FieldDefaults(level = AccessLevel.PRIVATE)
-//@Table(name = "client_stats")
-//@SQLDelete(sql = "UPDATE client_stats SET deleted=true where id=?")
-//@Where(clause = "deleted = false")
-//public class ClientStat {
+// @Entity
+// @Getter
+// @Setter
+// @Builder
+// @NoArgsConstructor
+// @AllArgsConstructor
+// @FieldDefaults(level = AccessLevel.PRIVATE)
+// @Table(name = "client_stats")
+// @SQLDelete(sql = "UPDATE client_stats SET deleted=true where id=?")
+// @Where(clause = "deleted = false")
+// public class ClientStat {
 //  @Id
 //  @GeneratedValue(strategy = GenerationType.UUID)
 //  String id;
@@ -74,4 +74,4 @@
 //  @UpdateTimestamp
 //  @Column(name = "updated_at")
 //  LocalDateTime updatedAt;
-//}
+// }

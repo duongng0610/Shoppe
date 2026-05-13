@@ -9,10 +9,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AddressCsv {
-    int district_id;
-    String district_name;
-    int province_id;
-    String province_name;
-    String ward_id;
-    String ward_name;
+  int district_id;
+  String district_name;
+  int province_id;
+  String province_name;
+  String ward_id;
+  String ward_name;
 }

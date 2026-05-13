@@ -3,12 +3,11 @@ package com.e_cormerce.shoppe.projection.category;
 import java.time.LocalDate;
 
 public interface CategoryDailyProjection {
-    String getCategoryId();
+  String getCategoryId();
 
-    LocalDate getDate();
+  LocalDate getDate();
 
-    Integer getTotalNewProducts();
+  Integer getTotalNewProducts();
 
-    Integer getTotalSearches();
-
+  Integer getTotalSearches();
 }

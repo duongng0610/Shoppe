@@ -17,84 +17,57 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminProductController {
-    ProductAnalysisService productAnalysisService;
-    AdminService adminService;
-    ProductService productService;
+  ProductAnalysisService productAnalysisService;
+  AdminService adminService;
+  ProductService productService;
 
-    @PreAuthorize("hasAuthority('PERMISSION_APPROVE_PRODUCTS')")
-    @PatchMapping(path = "/{id}/approve")
-    public ResponseEntity<ApiResponse> approveProducts(@PathVariable String id) {
-        adminService.approveProducts(id);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.builder().success(true).message("approve products successfully").build());
-    }
+  @PreAuthorize("hasAuthority('PERMISSION_APPROVE_PRODUCTS')")
+  @PatchMapping(path = "/{id}/approve")
+  public ResponseEntity<ApiResponse> approveProducts(@PathVariable String id) {
+    adminService.approveProducts(id);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(ApiResponse.builder().success(true).message("approve products successfully").build());
+  }
 
-    @PreAuthorize("hasAuthority('PERMISSION_REJECT_PRODUCTS')")
-    @PatchMapping(path = "/{id}/reject")
-    public ResponseEntity<ApiResponse> rejectProducts(@PathVariable String id) {
-        adminService.rejectProducts(id);
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message("reject products successfully")
-                        .build()
-        );
-    }
+  @PreAuthorize("hasAuthority('PERMISSION_REJECT_PRODUCTS')")
+  @PatchMapping(path = "/{id}/reject")
+  public ResponseEntity<ApiResponse> rejectProducts(@PathVariable String id) {
+    adminService.rejectProducts(id);
+    return ResponseEntity.ok(
+        ApiResponse.builder().success(true).message("reject products successfully").build());
+  }
 
-    @PreAuthorize("hasAuthority('PERMISSION_BAN_PRODUCTS')")
-    @PatchMapping(path = "/{id}/ban")
-    public ResponseEntity<ApiResponse> banProducts(@PathVariable String id) {
-        adminService.banProducts(id);
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message("ban products successfully")
-                        .build()
-        );
-    }
+  @PreAuthorize("hasAuthority('PERMISSION_BAN_PRODUCTS')")
+  @PatchMapping(path = "/{id}/ban")
+  public ResponseEntity<ApiResponse> banProducts(@PathVariable String id) {
+    adminService.banProducts(id);
+    return ResponseEntity.ok(
+        ApiResponse.builder().success(true).message("ban products successfully").build());
+  }
 
-    @PreAuthorize("hasAuthority('PERMISSION_UNLOCK_PRODUCTS')")
-    @PatchMapping(path = "/{id}/unlock")
-    public ResponseEntity<ApiResponse> unlockProducts(@PathVariable String id) {
-        adminService.unlockProducts(id);
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message("unlock products successfully")
-                        .build()
-        );
-    }
+  @PreAuthorize("hasAuthority('PERMISSION_UNLOCK_PRODUCTS')")
+  @PatchMapping(path = "/{id}/unlock")
+  public ResponseEntity<ApiResponse> unlockProducts(@PathVariable String id) {
+    adminService.unlockProducts(id);
+    return ResponseEntity.ok(
+        ApiResponse.builder().success(true).message("unlock products successfully").build());
+  }
 
-    // =====================================
-    // PRODUCT FULL VIEW
-    // =====================================
+  // =====================================
+  // PRODUCT FULL VIEW
+  // =====================================
 
-    @GetMapping("")
-    public ResponseEntity<ApiResponse>
-    getProductFullViews(
+  @GetMapping("")
+  public ResponseEntity<ApiResponse> getProductFullViews(
+      @RequestParam Integer limit, @RequestParam Integer offset) {
 
-            @RequestParam Integer limit,
+    var result = productService.getProductFullViews(limit, offset);
 
-            @RequestParam Integer offset
-    ) {
-
-        var result =
-                productService
-                        .getProductFullViews(
-                                limit,
-                                offset
-                        );
-
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message(
-                                "Get product full views successfully"
-                        )
-                        .data(result)
-                        .build()
-        );
-    }
-
-
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .success(true)
+            .message("Get product full views successfully")
+            .data(result)
+            .build());
+  }
 }

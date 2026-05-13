@@ -18,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc(addFilters = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 class DeleteItemTest {
 
   @Autowired MockMvc mockMvc;

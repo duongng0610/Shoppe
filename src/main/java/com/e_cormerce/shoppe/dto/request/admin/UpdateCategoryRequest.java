@@ -10,9 +10,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateCategoryRequest {
 
+  String val;
 
-    String val;
-
-
-    String thumbnail;
+  String thumbnail;
 }

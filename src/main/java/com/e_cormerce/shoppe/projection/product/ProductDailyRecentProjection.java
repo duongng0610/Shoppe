@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public interface ProductDailyRecentProjection {
-    String getProductId();
+  String getProductId();
 
-    LocalDate getDate();
+  LocalDate getDate();
 
-    Long getOrderAmount();
+  Long getOrderAmount();
 
-    BigDecimal getTotalRevenue();
+  BigDecimal getTotalRevenue();
 
-    Long getTotalUnitOrderAmount();
+  Long getTotalUnitOrderAmount();
 }

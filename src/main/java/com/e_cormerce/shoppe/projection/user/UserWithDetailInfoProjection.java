@@ -4,25 +4,25 @@ import java.util.Date;
 
 public interface UserWithDetailInfoProjection {
 
-    String getId();
+  String getId();
 
-    String getEmail();
+  String getEmail();
 
-    String getUsername();
+  String getUsername();
 
-    String getAvatar();
+  String getAvatar();
 
-    String getRole();
+  String getRole();
 
-    String getPhoneNumber();
+  String getPhoneNumber();
 
-    Date getBirthDate();
+  Date getBirthDate();
 
-    Date getCreatedAt();
+  Date getCreatedAt();
 
-    String getProvince();
+  String getProvince();
 
-    String getDistrict();
+  String getDistrict();
 
-    String getWard();
+  String getWard();
 }

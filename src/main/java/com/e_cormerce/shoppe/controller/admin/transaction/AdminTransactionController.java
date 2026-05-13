@@ -13,61 +13,33 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminTransactionController {
-    TransactionService transactionService;
+  TransactionService transactionService;
 
-    @GetMapping("")
-    public ResponseEntity<ApiResponse>
-    getTransactionViews(
+  @GetMapping("")
+  public ResponseEntity<ApiResponse> getTransactionViews(
+      @RequestParam Integer limit, @RequestParam Integer offset) {
 
-            @RequestParam Integer limit,
+    var result = transactionService.getTransactionUserViews(limit, offset);
 
-            @RequestParam Integer offset
-    ) {
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .success(true)
+            .message("Get transaction user views successfully")
+            .data(result)
+            .build());
+  }
 
-        var result =
-                transactionService
-                        .getTransactionUserViews(
-                                limit,
-                                offset
-                        );
+  @GetMapping("/{userId}")
+  public ResponseEntity<ApiResponse> getTransactionOfUser(
+      @PathVariable String userId, @RequestParam Integer limit, @RequestParam Integer offset) {
 
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message(
-                                "Get transaction user views successfully"
-                        )
-                        .data(result)
-                        .build()
-        );
-    }
+    var result = transactionService.getTransactionOfUser(userId, limit, offset);
 
-    @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse>
-    getTransactionOfUser(
-            @PathVariable String userId,
-
-            @RequestParam Integer limit,
-
-            @RequestParam Integer offset
-    ) {
-
-        var result =
-                transactionService
-                        .getTransactionOfUser(
-                                userId,
-                                limit,
-                                offset
-                        );
-
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message(
-                                "Get transaction user views successfully"
-                        )
-                        .data(result)
-                        .build()
-        );
-    }
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .success(true)
+            .message("Get transaction user views successfully")
+            .data(result)
+            .build());
+  }
 }

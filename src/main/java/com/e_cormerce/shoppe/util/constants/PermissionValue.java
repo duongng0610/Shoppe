@@ -24,7 +24,7 @@ public class PermissionValue {
           REQUEST_RETURN_ORDER,
           REVIEW_RECEIVED_ORDER,
           CANCEL_ORDER_BY_CLIENT,
-          REVIEW_PRODUCT    );
+          REVIEW_PRODUCT);
 
   public static final Set<PermissionEnum> SELLER_PERMISSIONS =
       Set.of(

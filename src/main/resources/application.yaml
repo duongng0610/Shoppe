@@ -112,5 +112,5 @@ ghn:
   calculate-ship-fee-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/fee
   create-shop-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shop/register
   create-order-ship-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create
-  get-order-ship-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail
+  get-order-ship-url: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/detail-by-client-code
   create-shipment: https://dev-online-gateway.ghn.vn/shiip/public-api/v2/shipping-order/create

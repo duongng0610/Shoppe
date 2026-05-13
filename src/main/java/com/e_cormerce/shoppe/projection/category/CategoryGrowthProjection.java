@@ -3,17 +3,17 @@ package com.e_cormerce.shoppe.projection.category;
 import java.math.BigDecimal;
 
 public interface CategoryGrowthProjection {
-    String getCategoryId();
+  String getCategoryId();
 
-    Integer getOldSearchCount();
+  Integer getOldSearchCount();
 
-    Integer getNewSearchCount();
+  Integer getNewSearchCount();
 
-    Integer getNewNewProductCount();
+  Integer getNewNewProductCount();
 
-    Integer getOldNewProductCount();
+  Integer getOldNewProductCount();
 
-    BigDecimal getSearchGrowthPercent();
+  BigDecimal getSearchGrowthPercent();
 
-    BigDecimal getNewProductGrowthPercent();
+  BigDecimal getNewProductGrowthPercent();
 }

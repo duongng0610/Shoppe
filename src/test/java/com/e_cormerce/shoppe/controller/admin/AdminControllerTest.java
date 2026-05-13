@@ -21,259 +21,244 @@ import org.springframework.test.web.servlet.MockMvc;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AdminControllerTest {
 
-    @Autowired
-    MockMvc mockMvc;
+  @Autowired MockMvc mockMvc;
 
-    @MockitoBean
-    AdminService adminService;
+  @MockitoBean AdminService adminService;
 
-    @MockitoBean
-    CategoryService categoryService;
+  @MockitoBean CategoryService categoryService;
 
-    // =========================
-    // 1. SUCCESS
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
-    void approveProduct_success() throws Exception {
-        String id = "123";
+  // =========================
+  // 1. SUCCESS
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
+  void approveProduct_success() throws Exception {
+    String id = "123";
 
-        mockMvc.perform(patch("/admin/products/{id}/approve", id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message").value("approve products successfully"));
+    mockMvc
+        .perform(patch("/admin/products/{id}/approve", id))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("approve products successfully"));
 
-        Mockito.verify(adminService).approveProducts(id);
-    }
+    Mockito.verify(adminService).approveProducts(id);
+  }
 
-    // =========================
-    // 2. SERVICE THROW EXCEPTION
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
-    void approveProduct_serviceThrowsException_returns500() throws Exception {
-        String id = "123";
+  // =========================
+  // 2. SERVICE THROW EXCEPTION
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
+  void approveProduct_serviceThrowsException_returns500() throws Exception {
+    String id = "123";
 
-        Mockito.doThrow(new RuntimeException("error"))
-                .when(adminService).approveProducts(id);
+    Mockito.doThrow(new RuntimeException("error")).when(adminService).approveProducts(id);
 
-        mockMvc.perform(patch("/admin/products/{id}/approve", id))
-                .andExpect(status().isInternalServerError());
+    mockMvc
+        .perform(patch("/admin/products/{id}/approve", id))
+        .andExpect(status().isInternalServerError());
 
-        Mockito.verify(adminService).approveProducts(id);
-    }
+    Mockito.verify(adminService).approveProducts(id);
+  }
 
-    // =========================
-    // 3. NULL ID (PATH MISSING)
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
-    void approveProduct_missingId_returns404() throws Exception {
-        mockMvc.perform(patch("/admin/products//approve"))
-                .andExpect(status().isInternalServerError());
+  // =========================
+  // 3. NULL ID (PATH MISSING)
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
+  void approveProduct_missingId_returns404() throws Exception {
+    mockMvc.perform(patch("/admin/products//approve")).andExpect(status().isInternalServerError());
 
-        Mockito.verify(adminService, Mockito.never())
-                .approveProducts(Mockito.any());
-    }
+    Mockito.verify(adminService, Mockito.never()).approveProducts(Mockito.any());
+  }
 
-    // =========================
-    // 4. EMPTY ID
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
-    void approveProduct_emptyId() throws Exception {
-        String id = "";
+  // =========================
+  // 4. EMPTY ID
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
+  void approveProduct_emptyId() throws Exception {
+    String id = "";
 
-        mockMvc.perform(patch("/admin/products/{id}/approve", id))
-                .andExpect(status().isInternalServerError()); // spring thường không match path
+    mockMvc
+        .perform(patch("/admin/products/{id}/approve", id))
+        .andExpect(status().isInternalServerError()); // spring thường không match path
 
-        Mockito.verify(adminService, Mockito.never())
-                .approveProducts(Mockito.any());
-    }
+    Mockito.verify(adminService, Mockito.never()).approveProducts(Mockito.any());
+  }
 
-    // =========================
-    // 5. VERY LONG ID
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
-    void approveProduct_longId_success() throws Exception {
-        String id = "a".repeat(100);
+  // =========================
+  // 5. VERY LONG ID
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
+  void approveProduct_longId_success() throws Exception {
+    String id = "a".repeat(100);
 
-        mockMvc.perform(patch("/admin/products/{id}/approve", id))
-                .andExpect(status().isOk());
+    mockMvc.perform(patch("/admin/products/{id}/approve", id)).andExpect(status().isOk());
 
-        Mockito.verify(adminService).approveProducts(id);
-    }
+    Mockito.verify(adminService).approveProducts(id);
+  }
 
-    // =========================
-    // 6. MULTIPLE CALL VERIFY
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
-    void approveProduct_calledTwice() throws Exception {
-        String id = "123";
+  // =========================
+  // 6. MULTIPLE CALL VERIFY
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
+  void approveProduct_calledTwice() throws Exception {
+    String id = "123";
 
-        mockMvc.perform(patch("/admin/products/{id}/approve", id))
-                .andExpect(status().isOk());
+    mockMvc.perform(patch("/admin/products/{id}/approve", id)).andExpect(status().isOk());
 
-        mockMvc.perform(patch("/admin/products/{id}/approve", id))
-                .andExpect(status().isOk());
+    mockMvc.perform(patch("/admin/products/{id}/approve", id)).andExpect(status().isOk());
 
-        Mockito.verify(adminService, Mockito.times(2))
-                .approveProducts(id);
-    }
-    // =========================
-    // Test API reject product
-    // 1. SUCCESS
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
-    void rejectProduct_success() throws Exception {
-        String id = "123";
+    Mockito.verify(adminService, Mockito.times(2)).approveProducts(id);
+  }
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.success").value(true))
-                .andExpect(jsonPath("$.message")
-                        .value("reject products successfully"));
+  // =========================
+  // Test API reject product
+  // 1. SUCCESS
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
+  void rejectProduct_success() throws Exception {
+    String id = "123";
 
-        Mockito.verify(adminService).rejectProducts(id);
-    }
-    // =========================
-    // 2. SERVICE THROW RUNTIME EXCEPTION
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
-    void rejectProduct_serviceThrowsRuntimeException_returns500() throws Exception {
-        String id = "123";
+    mockMvc
+        .perform(patch("/admin/products/{id}/reject", id))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("reject products successfully"));
 
-        Mockito.doThrow(new RuntimeException("database error"))
-                .when(adminService).rejectProducts(id);
+    Mockito.verify(adminService).rejectProducts(id);
+  }
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isInternalServerError());
+  // =========================
+  // 2. SERVICE THROW RUNTIME EXCEPTION
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
+  void rejectProduct_serviceThrowsRuntimeException_returns500() throws Exception {
+    String id = "123";
 
-        Mockito.verify(adminService).rejectProducts(id);
-    }
+    Mockito.doThrow(new RuntimeException("database error")).when(adminService).rejectProducts(id);
 
-    // =========================
-    // 3. SERVICE THROW ILLEGAL ARGUMENT
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
-    void rejectProduct_serviceThrowsIllegalArgument_returns500() throws Exception {
-        String id = "invalid-id";
+    mockMvc
+        .perform(patch("/admin/products/{id}/reject", id))
+        .andExpect(status().isInternalServerError());
 
-        Mockito.doThrow(new IllegalArgumentException("invalid product id"))
-                .when(adminService).rejectProducts(id);
+    Mockito.verify(adminService).rejectProducts(id);
+  }
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isInternalServerError());
+  // =========================
+  // 3. SERVICE THROW ILLEGAL ARGUMENT
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
+  void rejectProduct_serviceThrowsIllegalArgument_returns500() throws Exception {
+    String id = "invalid-id";
 
-        Mockito.verify(adminService).rejectProducts(id);
-    }
+    Mockito.doThrow(new IllegalArgumentException("invalid product id"))
+        .when(adminService)
+        .rejectProducts(id);
 
-    // =========================
-    // 4. MISSING ID
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
-    void rejectProduct_missingId_returns500() throws Exception {
+    mockMvc
+        .perform(patch("/admin/products/{id}/reject", id))
+        .andExpect(status().isInternalServerError());
 
-        mockMvc.perform(patch("/admin/products//reject"))
-                .andExpect(status().isInternalServerError());
+    Mockito.verify(adminService).rejectProducts(id);
+  }
 
-        Mockito.verify(adminService, Mockito.never())
-                .rejectProducts(Mockito.any());
-    }
+  // =========================
+  // 4. MISSING ID
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
+  void rejectProduct_missingId_returns500() throws Exception {
 
-    // =========================
-    // 5. EMPTY ID
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
-    void rejectProduct_emptyId_returns500() throws Exception {
-        String id = "";
+    mockMvc.perform(patch("/admin/products//reject")).andExpect(status().isInternalServerError());
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isInternalServerError());
+    Mockito.verify(adminService, Mockito.never()).rejectProducts(Mockito.any());
+  }
 
-        Mockito.verify(adminService, Mockito.never())
-                .rejectProducts(Mockito.any());
-    }
+  // =========================
+  // 5. EMPTY ID
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
+  void rejectProduct_emptyId_returns500() throws Exception {
+    String id = "";
 
-    // =========================
-    // 6. VERY LONG ID
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
-    void rejectProduct_longId_success() throws Exception {
-        String id = "a".repeat(200);
+    mockMvc
+        .perform(patch("/admin/products/{id}/reject", id))
+        .andExpect(status().isInternalServerError());
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isOk());
+    Mockito.verify(adminService, Mockito.never()).rejectProducts(Mockito.any());
+  }
 
-        Mockito.verify(adminService).rejectProducts(id);
-    }
+  // =========================
+  // 6. VERY LONG ID
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
+  void rejectProduct_longId_success() throws Exception {
+    String id = "a".repeat(200);
 
-    // =========================
-    // 7. SPECIAL CHARACTER ID
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
-    void rejectProduct_specialCharacterId_success() throws Exception {
-        String id = "@#$%^&*";
+    mockMvc.perform(patch("/admin/products/{id}/reject", id)).andExpect(status().isOk());
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isOk());
+    Mockito.verify(adminService).rejectProducts(id);
+  }
 
-        Mockito.verify(adminService).rejectProducts(id);
-    }
+  // =========================
+  // 7. SPECIAL CHARACTER ID
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
+  void rejectProduct_specialCharacterId_success() throws Exception {
+    String id = "@#$%^&*";
 
-    // =========================
-    // 8. CALLED TWICE
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
-    void rejectProduct_calledTwice() throws Exception {
-        String id = "123";
+    mockMvc.perform(patch("/admin/products/{id}/reject", id)).andExpect(status().isOk());
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isOk());
+    Mockito.verify(adminService).rejectProducts(id);
+  }
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isOk());
+  // =========================
+  // 8. CALLED TWICE
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_REJECT_PRODUCTS")
+  void rejectProduct_calledTwice() throws Exception {
+    String id = "123";
 
-        Mockito.verify(adminService, Mockito.times(2))
-                .rejectProducts(id);
-    }
+    mockMvc.perform(patch("/admin/products/{id}/reject", id)).andExpect(status().isOk());
 
-    // =========================
-    // 9. NO AUTHORITY
-    // =========================
-    @Test
-    @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
-    void rejectProduct_noAuthority_forbidden() throws Exception {
-        String id = "123";
+    mockMvc.perform(patch("/admin/products/{id}/reject", id)).andExpect(status().isOk());
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isForbidden());
+    Mockito.verify(adminService, Mockito.times(2)).rejectProducts(id);
+  }
 
-        Mockito.verify(adminService, Mockito.never())
-                .rejectProducts(Mockito.any());
-    }
+  // =========================
+  // 9. NO AUTHORITY
+  // =========================
+  @Test
+  @WithMockUser(authorities = "PERMISSION_APPROVE_PRODUCTS")
+  void rejectProduct_noAuthority_forbidden() throws Exception {
+    String id = "123";
 
-    // =========================
-    // 10. NO USER LOGIN
-    // =========================
-    @Test
-    void rejectProduct_unauthenticated_returnsForbidden() throws Exception {
-        String id = "123";
+    mockMvc.perform(patch("/admin/products/{id}/reject", id)).andExpect(status().isForbidden());
 
-        mockMvc.perform(patch("/admin/products/{id}/reject", id))
-                .andExpect(status().isForbidden());
+    Mockito.verify(adminService, Mockito.never()).rejectProducts(Mockito.any());
+  }
 
-        Mockito.verify(adminService, Mockito.never())
-                .rejectProducts(Mockito.any());
-    }
+  // =========================
+  // 10. NO USER LOGIN
+  // =========================
+  @Test
+  void rejectProduct_unauthenticated_returnsForbidden() throws Exception {
+    String id = "123";
+
+    mockMvc.perform(patch("/admin/products/{id}/reject", id)).andExpect(status().isForbidden());
+
+    Mockito.verify(adminService, Mockito.never()).rejectProducts(Mockito.any());
+  }
 }

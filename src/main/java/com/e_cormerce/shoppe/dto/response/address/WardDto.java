@@ -9,6 +9,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WardDto {
-    String id;
-    String name;
+  String id;
+  String name;
 }

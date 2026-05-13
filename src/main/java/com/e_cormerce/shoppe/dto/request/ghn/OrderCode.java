@@ -1,14 +1,13 @@
-package com.e_cormerce.shoppe.dto.response.address;
+package com.e_cormerce.shoppe.dto.request.ghn;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DistrictDto {
-  int id;
-  String name;
+public class OrderCode {
+  String client_order_code;
 }

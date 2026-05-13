@@ -20,17 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ClientProductController {
-    ProductService productService;
+  ProductService productService;
 
-    @PostMapping("/reviews")
-    @PreAuthorize("hasAuthority('PERMISSION_REVIEW_PRODUCT')")
-    public ResponseEntity<ApiResponse> createReview(@Valid @RequestBody CreateProductReviewRequest request) {
-        productService.createReview(request);
+  @PostMapping("/reviews")
+  @PreAuthorize("hasAuthority('PERMISSION_REVIEW_PRODUCT')")
+  public ResponseEntity<ApiResponse> createReview(
+      @Valid @RequestBody CreateProductReviewRequest request) {
+    productService.createReview(request);
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.builder()
-                        .message("review created successfully")
-                        .success(true)
-                        .build());
-    }
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ApiResponse.builder().message("review created successfully").success(true).build());
+  }
 }

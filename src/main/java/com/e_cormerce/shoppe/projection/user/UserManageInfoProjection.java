@@ -1,9 +1,9 @@
 package com.e_cormerce.shoppe.projection.user;
 
 public interface UserManageInfoProjection {
-    String getId();
+  String getId();
 
-    String getUsername();
+  String getUsername();
 
-    String getStatus();
+  String getStatus();
 }

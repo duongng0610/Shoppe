@@ -1,9 +1,9 @@
 package com.e_cormerce.shoppe.projection.category;
 
 public interface TopSearchedCategoryProjection {
-    String getId();
+  String getId();
 
-    String getVal();
+  String getVal();
 
-    Long getSearchedCount();
+  Long getSearchedCount();
 }

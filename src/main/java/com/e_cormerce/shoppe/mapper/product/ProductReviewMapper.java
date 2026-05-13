@@ -7,6 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface ProductReviewMapper {
-    @Mapping(target = "images", ignore = true)
-    ProductReviewResponse toResponse(ProductReview productReview);
+  @Mapping(target = "images", ignore = true)
+  ProductReviewResponse toResponse(ProductReview productReview);
 }

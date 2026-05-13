@@ -1,23 +1,23 @@
 package com.e_cormerce.shoppe.projection.overview;
 
 public interface OverviewOrderProductProjection {
-    String getSellerId();
+  String getSellerId();
 
-    Long getPendingProductCount();
+  Long getPendingProductCount();
 
-    Long getActiveProductCount();
+  Long getActiveProductCount();
 
-    Long getBannedProductCount();
+  Long getBannedProductCount();
 
-    Long getHiddenProductCount();
+  Long getHiddenProductCount();
 
-    Long getPendingOrderCount();
+  Long getPendingOrderCount();
 
-    Long getApprovedOrderCount();
+  Long getApprovedOrderCount();
 
-    Long getShippingOrderCount();
+  Long getShippingOrderCount();
 
-    Long getDeliveriedOrderCount();
+  Long getDeliveriedOrderCount();
 
-    Long getCancelledOrderCount();
+  Long getCancelledOrderCount();
 }

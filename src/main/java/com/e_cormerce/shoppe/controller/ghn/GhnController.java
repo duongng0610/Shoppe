@@ -17,23 +17,22 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GhnController {
-    OrderService orderService;
+  OrderService orderService;
 
+  //  @PreAuthorize("hasAuthority('PERMISSION_ACCEPT_ORDER')")
+  @PatchMapping("/{id}/success")
+  public ResponseEntity<ApiResponse> updateOrderDeliverSuccess(@PathVariable String id) {
+    orderService.updateDeliverOrder(id, OrderStatus.DELIVERED);
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder().message("update order : delivery success").success(true).build());
+  }
 
-    //  @PreAuthorize("hasAuthority('PERMISSION_ACCEPT_ORDER')")
-    @PatchMapping("/{id}/success")
-    public ResponseEntity<ApiResponse> updateOrderDeliverSuccess(@PathVariable String id) {
-        orderService.updateDeliverOrder(id, OrderStatus.DELIVERED);
-        return ResponseEntity.ok()
-                .body(ApiResponse.builder().message("update order : delivery success").success(true).build());
-    }
-
-    //  @PreAuthorize("hasAuthority('PERMISSION_ACCEPT_ORDER')")
-    @PatchMapping("/{id}/fail")
-    public ResponseEntity<ApiResponse> updateOrderDeliverFail(@PathVariable String id) {
-        orderService.updateDeliverOrder(id, OrderStatus.FAILED_DELIVERY);
-        return ResponseEntity.ok()
-                .body(ApiResponse.builder().message("update order : fail success").success(true).build());
-    }
-
+  //  @PreAuthorize("hasAuthority('PERMISSION_ACCEPT_ORDER')")
+  @PatchMapping("/{id}/fail")
+  public ResponseEntity<ApiResponse> updateOrderDeliverFail(@PathVariable String id) {
+    orderService.updateDeliverOrder(id, OrderStatus.FAILED_DELIVERY);
+    return ResponseEntity.ok()
+        .body(ApiResponse.builder().message("update order : fail success").success(true).build());
+  }
 }

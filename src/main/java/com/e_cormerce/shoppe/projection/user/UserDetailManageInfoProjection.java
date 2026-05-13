@@ -3,17 +3,17 @@ package com.e_cormerce.shoppe.projection.user;
 import com.e_cormerce.shoppe.dto.common.address.AddressDto;
 
 public interface UserDetailManageInfoProjection {
-    String getId();
+  String getId();
 
-    String getUsername();
+  String getUsername();
 
-    String getAvatar();
+  String getAvatar();
 
-    String getPhoneNumber();
+  String getPhoneNumber();
 
-    String getStatus();
+  String getStatus();
 
-    String getCreatedAt();
+  String getCreatedAt();
 
-    AddressDto getAddress();
+  AddressDto getAddress();
 }

@@ -24,6 +24,7 @@ public class GhnCreateShipmentRequest {
   String toDistrictName;
   String toProvinceName;
 
+  String clientOrderCode;
   Integer serviceTypeId = 1;
 
   Integer length = 1;

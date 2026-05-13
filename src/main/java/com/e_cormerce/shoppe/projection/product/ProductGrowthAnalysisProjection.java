@@ -3,23 +3,23 @@ package com.e_cormerce.shoppe.projection.product;
 import java.math.BigDecimal;
 
 public interface ProductGrowthAnalysisProjection {
-    String getProductId();
+  String getProductId();
 
-    Long getOldOrderAmount();
+  Long getOldOrderAmount();
 
-    Long getNewOrderAmount();
+  Long getNewOrderAmount();
 
-    BigDecimal getOrderGrowthPercent();
+  BigDecimal getOrderGrowthPercent();
 
-    Long getOldUnitOrderAmount();
+  Long getOldUnitOrderAmount();
 
-    Long getNewUnitOrderAmount();
+  Long getNewUnitOrderAmount();
 
-    BigDecimal getUnitGrowthPercent();
+  BigDecimal getUnitGrowthPercent();
 
-    BigDecimal getOldRevenue();
+  BigDecimal getOldRevenue();
 
-    BigDecimal getNewRevenue();
+  BigDecimal getNewRevenue();
 
-    BigDecimal getRevenueGrowthPercent();
+  BigDecimal getRevenueGrowthPercent();
 }

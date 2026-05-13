@@ -3,19 +3,19 @@ package com.e_cormerce.shoppe.projection.category;
 import java.math.BigDecimal;
 
 public interface CategoryStatisticsProjection {
-    String getId();
+  String getId();
 
-    String getVal();
+  String getVal();
 
-    Integer getActiveProductCount();
+  Integer getActiveProductCount();
 
-    Integer getBannedProductCount();
+  Integer getBannedProductCount();
 
-    Integer getHiddenProductCount();
+  Integer getHiddenProductCount();
 
-    Integer getPendingProductCount();
+  Integer getPendingProductCount();
 
-    Integer getRejectedProductCount();
+  Integer getRejectedProductCount();
 
-    BigDecimal getRevenue();
+  BigDecimal getRevenue();
 }

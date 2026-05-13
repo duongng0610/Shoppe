@@ -4,29 +4,29 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public interface SellerInformationProjection {
-    String getSellerId();
+  String getSellerId();
 
-    String getAvatar();
+  String getAvatar();
 
-    String getAvatarId();
+  String getAvatarId();
 
-    LocalDateTime getCreatedAt();
+  LocalDateTime getCreatedAt();
 
-    Boolean getDeleted();
+  Boolean getDeleted();
 
-    LocalDate getDob();
+  LocalDate getDob();
 
-    String getPhoneNumber();
+  String getPhoneNumber();
 
-    LocalDateTime getUpdatedAt();
+  LocalDateTime getUpdatedAt();
 
-    String getUsername();
+  String getUsername();
 
-    String getAddressId();
+  String getAddressId();
 
-    String getProvince();
+  String getProvince();
 
-    String getDistrict();
+  String getDistrict();
 
-    String getWard();
+  String getWard();
 }

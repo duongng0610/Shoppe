@@ -16,29 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SellerSystemController {
-    SellerService sellerService;
+  SellerService sellerService;
 
-    @GetMapping("/overview-order-product")
-    public ResponseEntity<ApiResponse>
-    getOverviewOrderProduct(
-            @RequestParam(required = false)
-            Integer days
-    ) {
+  @GetMapping("/overview-order-product")
+  public ResponseEntity<ApiResponse> getOverviewOrderProduct(
+      @RequestParam(required = false) Integer days) {
 
-        var result =
-                sellerService
-                        .getOverviewOrderProduct(
-                                days
-                        );
+    var result = sellerService.getOverviewOrderProduct(days);
 
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message(
-                                "Get overview order product successfully"
-                        )
-                        .data(result)
-                        .build()
-        );
-    }
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .success(true)
+            .message("Get overview order product successfully")
+            .data(result)
+            .build());
+  }
 }

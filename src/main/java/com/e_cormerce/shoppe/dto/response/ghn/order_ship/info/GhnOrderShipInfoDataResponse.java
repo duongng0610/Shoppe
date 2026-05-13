@@ -1,12 +1,10 @@
 package com.e_cormerce.shoppe.dto.response.ghn.order_ship.info;
 
-
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,59 +14,57 @@ import java.util.List;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GhnOrderShipInfoDataResponse {
 
-    String orderCode;
+  String orderCode;
 
-    String status;
+  String status;
 
-    String sortCode;
+  String sortCode;
 
-    String pickupTime;
+  String pickupTime;
 
-    String leadtime;
+  String leadtime;
 
-    String createdDate;
+  String createdDate;
 
-    String updatedDate;
+  String updatedDate;
 
-    String finishDate;
+  String finishDate;
 
-    String returnTime;
+  String returnTime;
 
-    String fromName;
+  String fromName;
 
-    String fromPhone;
+  String fromPhone;
 
-    String fromAddress;
+  String fromAddress;
 
-    String toName;
+  String toName;
 
-    String toPhone;
+  String toPhone;
 
-    String toAddress;
+  String toAddress;
 
-    Integer currentWarehouseId;
+  Integer currentWarehouseId;
 
-    Integer nextWarehouseId;
+  Integer nextWarehouseId;
 
-    Integer pickWarehouseId;
+  Integer pickWarehouseId;
 
-    Integer deliverWarehouseId;
+  Integer deliverWarehouseId;
 
-    Integer returnWarehouseId;
+  Integer returnWarehouseId;
 
-    Integer weight;
+  Integer weight;
 
-    Integer length;
+  Integer length;
 
-    Integer width;
+  Integer width;
 
-    Integer height;
+  Integer height;
 
-    Integer codAmount;
+  Integer codAmount;
 
-    String content;
+  String content;
 
-    List<String> tag;
-
-
+  List<String> tag;
 }

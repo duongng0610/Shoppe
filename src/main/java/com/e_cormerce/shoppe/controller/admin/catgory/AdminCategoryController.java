@@ -1,6 +1,5 @@
 package com.e_cormerce.shoppe.controller.admin.catgory;
 
-
 import com.e_cormerce.shoppe.dto.request.admin.CreateCategoryRequest;
 import com.e_cormerce.shoppe.dto.request.admin.UpdateCategoryRequest;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
@@ -20,102 +19,83 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminCategoryController {
-    CategoryService categoryService;
-    CategoryAnalysisService categoryAnalysisService;
+  CategoryService categoryService;
+  CategoryAnalysisService categoryAnalysisService;
 
-    @PreAuthorize("hasAuthority('PERMISSION_ADD_CATEGORY')")
-    @PostMapping(path = "")
-    public ResponseEntity<ApiResponse> create(
-            @Valid @RequestBody CreateCategoryRequest request) {
-        categoryService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.builder().success(true).message("create category successfully").build());
-    }
+  @PreAuthorize("hasAuthority('PERMISSION_ADD_CATEGORY')")
+  @PostMapping(path = "")
+  public ResponseEntity<ApiResponse> create(@Valid @RequestBody CreateCategoryRequest request) {
+    categoryService.create(request);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(ApiResponse.builder().success(true).message("create category successfully").build());
+  }
 
+  @DeleteMapping("/{id}")
+  public ResponseEntity<ApiResponse> deleteCategory(@PathVariable String id) {
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse> deleteCategory(
-            @PathVariable String id
+    var result = categoryService.deleteCategory(id);
 
-    ) {
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder()
+                .success(true)
+                .message("Delete category successfully")
+                .data(result)
+                .build());
+  }
 
-        var result = categoryService.deleteCategory(id);
+  @PutMapping("/{id}")
+  public ResponseEntity<ApiResponse> updateCategory(
+      @PathVariable String id, @Valid @RequestBody UpdateCategoryRequest request) {
 
-        return ResponseEntity.ok()
-                .body(
-                        ApiResponse.builder()
-                                .success(true)
-                                .message("Delete category successfully")
-                                .data(result)
-                                .build()
-                );
-    }
+    categoryService.update(id, request);
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateCategory(
-            @PathVariable String id,
-            @Valid @RequestBody UpdateCategoryRequest request
-    ) {
+    return ResponseEntity.ok(
+        ApiResponse.builder().success(true).message("Update category successfully").build());
+  }
 
-        categoryService.update(id, request);
+  //  @PreAuthorize("hasAuthority('PERMISSION_VIEW_CATEGORY')")
+  @GetMapping(path = "/statistic")
+  public ResponseEntity<ApiResponse> getCategories(
+      @RequestParam Integer limit, @RequestParam Integer offset) {
 
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message("Update category successfully")
-                        .build()
-        );
-    }
+    var result = categoryAnalysisService.getStatisticCategories(limit, offset);
 
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder()
+                .success(true)
+                .message("Get categories successfully")
+                .data(result)
+                .build());
+  }
 
-    //  @PreAuthorize("hasAuthority('PERMISSION_VIEW_CATEGORY')")
-    @GetMapping(path = "/statistic")
-    public ResponseEntity<ApiResponse> getCategories(@RequestParam Integer limit, @RequestParam Integer offset) {
+  @GetMapping("/{id}/daily-statistics")
+  public ResponseEntity<ApiResponse> getCategoryDailyStatistics(
+      @PathVariable String id, @RequestParam(defaultValue = "7") int days) {
 
-        var result = categoryAnalysisService.getStatisticCategories(limit, offset);
+    var result = categoryAnalysisService.getCategoryDailyRecent(id, days);
 
-        return ResponseEntity.ok()
-                .body(
-                        ApiResponse.builder()
-                                .success(true)
-                                .message("Get categories successfully")
-                                .data(result)
-                                .build()
-                );
-    }
+    return ResponseEntity.ok()
+        .body(
+            ApiResponse.builder()
+                .success(true)
+                .message("Get category daily statistics successfully")
+                .data(result)
+                .build());
+  }
 
-    @GetMapping("/{id}/daily-statistics")
-    public ResponseEntity<ApiResponse> getCategoryDailyStatistics(
-            @PathVariable String id,
-            @RequestParam(defaultValue = "7") int days
-    ) {
+  @GetMapping("{id}/analysis-growth")
+  public ResponseEntity<ApiResponse> getCategoryGrowthAnalysis(
+      @PathVariable String id, @RequestParam(defaultValue = "7") int days) {
 
-        var result = categoryAnalysisService.getCategoryDailyRecent(id, days);
+    var result = categoryAnalysisService.getCategoryGrowthAnalysis(id, days);
 
-        return ResponseEntity.ok()
-                .body(
-                        ApiResponse.builder()
-                                .success(true)
-                                .message("Get category daily statistics successfully")
-                                .data(result)
-                                .build()
-                );
-    }
-
-    @GetMapping("{id}/analysis-growth")
-    public ResponseEntity<ApiResponse> getCategoryGrowthAnalysis(
-            @PathVariable String id,
-            @RequestParam(defaultValue = "7") int days
-    ) {
-
-        var result = categoryAnalysisService.getCategoryGrowthAnalysis(id, days);
-
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message("Get category growth analysis successfully")
-                        .data(result)
-                        .build()
-        );
-    }
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .success(true)
+            .message("Get category growth analysis successfully")
+            .data(result)
+            .build());
+  }
 }
