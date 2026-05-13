@@ -7,89 +7,90 @@ import com.e_cormerce.shoppe.projection.seller.SellerInformationProjection;
 import com.e_cormerce.shoppe.projection.user.UserDetailManageInfoProjection;
 import com.e_cormerce.shoppe.projection.user.UserManageInfoProjection;
 import com.e_cormerce.shoppe.projection.user.UserWithDetailInfoProjection;
-import java.util.List;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, String> {
-  boolean existsByUsername(String username);
+    boolean existsByUsername(String username);
 
-  Optional<User> findById(String id);
+    Optional<User> findById(String id);
 
-  Optional<User> findByUsername(String username);
+    Optional<User> findByUsername(String username);
 
-  @Query(value = "SELECT * FROM ecommerce.user_with_detail_info where id =:id", nativeQuery = true)
-  Optional<UserWithDetailInfoProjection> getUserProfileById(String id);
+    @Query(value = "SELECT * FROM ecommerce.user_with_detail_info where id =:id", nativeQuery = true)
+    Optional<UserWithDetailInfoProjection> getUserProfileById(String id);
 
-  @Query(
-      value =
-          "SELECT  "
-              + "u.id, "
-              + "u.username, "
-              + "u.avatar, "
-              + "r.val AS role "
-              + "FROM users u "
-              + "JOIN accounts ac ON u.id = ac.id "
-              + "JOIN role r ON ac.role_id = r.id "
-              + "WHERE u.id = :id;",
-      nativeQuery = true)
-  Optional<UserDto> getUserDto(String id);
+    @Query(
+            value =
+                    "SELECT  "
+                            + "u.id, "
+                            + "u.username, "
+                            + "u.avatar, "
+                            + "r.val AS role "
+                            + "FROM users u "
+                            + "JOIN accounts ac ON u.id = ac.id "
+                            + "JOIN role r ON ac.role_id = r.id "
+                            + "WHERE u.id = :id;",
+            nativeQuery = true)
+    Optional<UserDto> getUserDto(String id);
 
-  @Query(
-      value =
-          """
-                    CALL get_seller_information(:sellerId)
-                    """,
-      nativeQuery = true)
-  SellerInformationProjection getSellerInformation(@Param("sellerId") String sellerId);
+    @Query(
+            value =
+                    """
+                            CALL get_seller_information(:sellerId)
+                            """,
+            nativeQuery = true)
+    SellerInformationProjection getSellerInformation(@Param("sellerId") String sellerId);
 
-  @Query(
-      value =
-          """
-                    CALL get_overview_order_product(
-                        :sellerId,
-                        :days
-                    )
-                    """,
-      nativeQuery = true)
-  OverviewOrderProductProjection getOverviewOrderProduct(
-      @Param("sellerId") String sellerId, @Param("days") Integer days);
+    @Query(
+            value =
+                    """
+                            CALL get_overview_order_product(
+                                :sellerId,
+                                :days
+                            )
+                            """,
+            nativeQuery = true)
+    OverviewOrderProductProjection getOverviewOrderProduct(
+            @Param("sellerId") String sellerId, @Param("days") Integer days);
 
-  // admin
-  @Query(
-      value =
-          """
-                    CALL get_overview_order_product(
-                        NULL,
-                        :days
-                    )
-                    """,
-      nativeQuery = true)
-  OverviewOrderProductProjection getOverviewOrderProductForAdmin(@Param("days") Integer days);
+    // admin
+    @Query(
+            value =
+                    """
+                            CALL get_overview_order_product(
+                                NULL,
+                                :days
+                            )
+                            """,
+            nativeQuery = true)
+    OverviewOrderProductProjection getOverviewOrderProductForAdmin(@Param("days") Integer days);
 
-  @Query(
-      value = "SELECT * FROM ecommerce.seller_detail_info_view WHERE id = :sellerId",
-      nativeQuery = true)
-  UserDetailManageInfoProjection getRegisteredSellerDetailInfo(@Param("sellerId") String sellerId);
+    @Query(
+            value = "SELECT * FROM ecommerce.user_with_detail_info WHERE id = :sellerId",
+            nativeQuery = true)
+    UserDetailManageInfoProjection getRegisteredSellerDetailInfo(@Param("sellerId") String sellerId);
 
-  @Query(
-      value = "SELECT * FROM ecommerce.client_detail_info_view WHERE id = :clientId",
-      nativeQuery = true)
-  UserDetailManageInfoProjection getClientDetailInfo(@Param("clientId") String clientId);
+    @Query(
+            value = "SELECT * FROM ecommerce.user_with_detail_info WHERE id = :clientId",
+            nativeQuery = true)
+    UserDetailManageInfoProjection getClientDetailInfo(@Param("clientId") String clientId);
 
-  @Query(
-      value = "SELECT * FROM ecommerce.seller_info_view LIMIT :limit OFFSET :offset",
-      nativeQuery = true)
-  List<UserManageInfoProjection> getSellerInfo(
-      @Param("limit") int limit, @Param("offset") int offset);
+    @Query(
+            value = "SELECT * FROM ecommerce.user_with_account_info LIMIT :limit OFFSET :offset",
+            nativeQuery = true)
+    List<UserManageInfoProjection> getSellerInfo(
+            @Param("limit") int limit, @Param("offset") int offset);
 
-  @Query(
-      value = "SELECT * FROM ecommerce.client_info_view LIMIT :limit OFFSET :offset",
-      nativeQuery = true)
-  List<UserManageInfoProjection> getClientInfo(
-      @Param("limit") int limit, @Param("offset") int offset);
+    @Query(
+            value = "SELECT * FROM ecommerce.user_with_account_info LIMIT :limit OFFSET :offset",
+            nativeQuery = true)
+    List<UserManageInfoProjection> getClientInfo(
+            @Param("limit") int limit, @Param("offset") int offset);
 }

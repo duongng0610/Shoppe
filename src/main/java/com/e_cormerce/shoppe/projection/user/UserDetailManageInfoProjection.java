@@ -1,19 +1,28 @@
 package com.e_cormerce.shoppe.projection.user;
 
-import com.e_cormerce.shoppe.dto.common.address.AddressDto;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public interface UserDetailManageInfoProjection {
-  String getId();
+    String getId();
 
-  String getUsername();
+    String getEmail();
 
-  String getAvatar();
+    String getUsername();
 
-  String getPhoneNumber();
+    String getAvatar();
 
-  String getStatus();
+    String getRole();
 
-  String getCreatedAt();
+    String getPhoneNumber();
 
-  AddressDto getAddress();
+    LocalDate getBirthDate();
+
+    LocalDateTime getCreatedAt();
+
+    String getProvince();
+
+    String getDistrict();
+
+    String getWard();
 }
