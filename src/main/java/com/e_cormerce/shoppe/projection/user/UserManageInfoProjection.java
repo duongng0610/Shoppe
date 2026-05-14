@@ -1,8 +1,6 @@
 package com.e_cormerce.shoppe.projection.user;
 
-import com.e_cormerce.shoppe.entity.user.Role;
-
-import java.security.Timestamp;
+import java.time.LocalDateTime;
 
 public interface UserManageInfoProjection {
     String getId();
@@ -11,11 +9,11 @@ public interface UserManageInfoProjection {
 
     String getAvatar();
 
-    Timestamp getCreatedAt();
+    LocalDateTime getCreatedAt();
 
     String getStatus();
 
     String getEmail();
 
-    Role getRole();
+    String getRole();
 }

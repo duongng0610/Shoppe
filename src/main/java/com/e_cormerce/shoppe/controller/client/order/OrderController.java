@@ -23,74 +23,74 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OrderController {
-  OrderService orderService;
-  ShippingService shippingService;
+    OrderService orderService;
+    ShippingService shippingService;
 
-  @PostMapping()
-  @PreAuthorize("hasAuthority('PERMISSION_CREATE_ORDER')")
-  public ResponseEntity<ApiResponse<CreateOrderResponse>> create(
-      @RequestBody @Valid CreateOrderRequest request, HttpServletRequest httpServletRequest)
-      throws JsonProcessingException {
-    var result = orderService.create(request, httpServletRequest);
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(
-            ApiResponse.<CreateOrderResponse>builder()
-                .success(true)
-                .message("create order successfully")
-                .data(result)
-                .build());
-  }
+    @PostMapping()
+    @PreAuthorize("hasAuthority('PERMISSION_CREATE_ORDER')")
+    public ResponseEntity<ApiResponse<CreateOrderResponse>> create(
+            @RequestBody @Valid CreateOrderRequest request, HttpServletRequest httpServletRequest)
+            throws JsonProcessingException {
+        var result = orderService.create(request, httpServletRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(
+                        ApiResponse.<CreateOrderResponse>builder()
+                                .success(true)
+                                .message("create order successfully")
+                                .data(result)
+                                .build());
+    }
 
-  @PostMapping("/ship-cost")
-  //  @PreAuthorize("hasAuthority('PERMISSION_GET_SHIP_COST')")
-  public ResponseEntity<ApiResponse<GhnShipFeeDataResponse>> getShipCost(
-      @RequestBody @Valid ShipCostOrderRequest request) {
+    @PostMapping("/ship-cost")
+    //  @PreAuthorize("hasAuthority('PERMISSION_GET_SHIP_COST')")
+    public ResponseEntity<ApiResponse<GhnShipFeeDataResponse>> getShipCost(
+            @RequestBody @Valid ShipCostOrderRequest request) {
 
-    var result = shippingService.getShipCost(request);
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(
-            ApiResponse.<GhnShipFeeDataResponse>builder()
-                .success(true)
-                .message("create order successfully")
-                .data(result)
-                .build());
-  }
+        var result = shippingService.getShipCost(request);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        ApiResponse.<GhnShipFeeDataResponse>builder()
+                                .success(true)
+                                .message("create order successfully")
+                                .data(result)
+                                .build());
+    }
 
-  @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_CLIENT')")
-  @PatchMapping("/{id}/cancel")
-  public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
-    orderService.cancelOrder(id);
-    return ResponseEntity.ok()
-        .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
-  }
+    @PreAuthorize("hasAuthority('PERMISSION_CANCEL_ORDER_BY_CLIENT')")
+    @PutMapping("/{id}/cancel")
+    public ResponseEntity<ApiResponse> cancelOrder(@PathVariable String id) {
+        orderService.cancelOrder(id);
+        return ResponseEntity.ok()
+                .body(ApiResponse.builder().message("cancel order successfully").success(true).build());
+    }
 
-  // @PreAuthorize("hasAuthority('PERMISSION_GET_ORDER_SHIPPING_STATE')")
-  @GetMapping("/{orderId}/shipment-state")
-  public ResponseEntity<ApiResponse> getCurrentTracking(@PathVariable String orderId) {
-    var result = orderService.getOrderShipInfo(orderId);
-    return ResponseEntity.ok(
-        ApiResponse.builder()
-            .data(result)
-            .message("get order tracking successfully")
-            .success(true)
-            .build());
-  }
+    // @PreAuthorize("hasAuthority('PERMISSION_GET_ORDER_SHIPPING_STATE')")
+    @GetMapping("/{orderId}/shipment-state")
+    public ResponseEntity<ApiResponse> getCurrentTracking(@PathVariable String orderId) {
+        var result = orderService.getOrderShipInfo(orderId);
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .data(result)
+                        .message("get order tracking successfully")
+                        .success(true)
+                        .build());
+    }
 
-  @GetMapping("")
-  //    @PreAuthorize("hasAuthority('PERMISSION_VIEW_CLIENT_ORDERS')")
-  public ResponseEntity<ApiResponse> getClientOrders(
-      @RequestParam Integer limit, @RequestParam Integer offset) {
-    var result = orderService.getOrdersByClient(limit, offset);
-    return ResponseEntity.ok(
-        ApiResponse.builder()
-            .data(result)
-            .message("get orders successfully")
-            .success(true)
-            .build());
-  }
+    @GetMapping("")
+    //    @PreAuthorize("hasAuthority('PERMISSION_VIEW_CLIENT_ORDERS')")
+    public ResponseEntity<ApiResponse> getClientOrders(
+            @RequestParam Integer limit, @RequestParam Integer offset) {
+        var result = orderService.getOrdersByClient(limit, offset);
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .data(result)
+                        .message("get orders successfully")
+                        .success(true)
+                        .build());
+    }
 
-  @PostMapping("{id}/payment")
-  public String submitOrder(@PathVariable String id, HttpServletRequest request) {
-    return orderService.getUrlPaymentByOrder(id, request);
-  }
+    @PostMapping("{id}/payment")
+    public String submitOrder(@PathVariable String id, HttpServletRequest request) {
+        return orderService.getUrlPaymentByOrder(id, request);
+    }
 }
