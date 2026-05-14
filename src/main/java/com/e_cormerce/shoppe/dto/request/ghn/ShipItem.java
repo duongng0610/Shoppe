@@ -11,7 +11,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ShipItemRequest {
+public class ShipItem {
   String name;
   Integer quantity;
   Integer price;

@@ -10,6 +10,7 @@ DROP VIEW IF EXISTS product_with_seller_and_category;
 DROP VIEW IF EXISTS transaction_user_view;
 DROP VIEW IF EXISTS user_with_account_info;
 DROP VIEW IF EXISTS user_with_detail_info;
+DROP VIEW IF EXISTS products_card_view;
 
 -- =========================================================
 -- VIEWS
@@ -75,6 +76,26 @@ LEFT JOIN users s
        ON o.seller_id = s.id;
 
 
+CREATE
+    ALGORITHM = UNDEFINED
+    DEFINER = `root`@`%`
+    SQL SECURITY DEFINER
+VIEW `ecommerce`.`products_card_view` AS
+SELECT
+    p.id AS id,
+    p.created_at AS createdAt,
+    p.discount_percentage AS discountPercentage,
+    p.deleted AS deleted,
+    p.name AS name,
+    p.origin_price AS originPrice,
+    p.rate AS rate,
+    p.status AS status,
+    p.thumbnail AS thumbnail,
+    p.total_quantity AS totalQuantity,
+    p.total_quantity_sold AS totalQuantitySold,
+    p.seller_id AS sellerId,
+    p.category_id AS categoryId
+FROM ecommerce.products p;
 
 
 
@@ -226,6 +247,21 @@ LEFT JOIN address ad
        ON ad.id = u.address_id;
 
 
-
-
+-- product
+CREATE OR REPLACE VIEW products_card_view AS
+SELECT
+    p.id AS id,
+    p.created_at AS createdAt,
+    p.discount_percentage AS discountPercentage,
+    p.deleted as deleted,
+    p.name AS name,
+    p.origin_price AS originPrice,
+    p.rate AS rate,
+    p.status AS status,
+    p.thumbnail AS thumbnail,
+    p.total_quantity AS totalQuantity,
+    p.total_quantity_sold AS totalQuantitySold,
+    p.seller_id AS sellerId,
+    p.category_id as categoryId
+FROM products p;
 

@@ -1,10 +1,13 @@
 package com.e_cormerce.shoppe.dto.response.ghn.order_ship.info;
 
+import com.e_cormerce.shoppe.dto.request.ghn.ShipItem;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
-import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -14,57 +17,46 @@ import lombok.experimental.FieldDefaults;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class GhnOrderShipInfoDataResponse {
 
-  String orderCode;
+    String orderCode;
 
-  String status;
+    String status;
 
-  String sortCode;
+    String pickupTime;
 
-  String pickupTime;
+    String leadtime;
 
-  String leadtime;
+    String createdDate;
 
-  String createdDate;
 
-  String updatedDate;
+    String finishDate;
 
-  String finishDate;
+    String returnTime;
 
-  String returnTime;
+    String fromName;
 
-  String fromName;
+    String fromPhone;
 
-  String fromPhone;
+    String fromAddress;
 
-  String fromAddress;
+    String toName;
 
-  String toName;
+    String toPhone;
 
-  String toPhone;
+    String toAddress;
 
-  String toAddress;
+    List<GhnOrderShipTag> tag;
 
-  Integer currentWarehouseId;
+    List<ShipItem> items;
+}
 
-  Integer nextWarehouseId;
-
-  Integer pickWarehouseId;
-
-  Integer deliverWarehouseId;
-
-  Integer returnWarehouseId;
-
-  Integer weight;
-
-  Integer length;
-
-  Integer width;
-
-  Integer height;
-
-  Integer codAmount;
-
-  String content;
-
-  List<String> tag;
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
+class GhnOrderShipTag {
+    String status;
+    Integer paymentTypeId;
+    LocalDateTime updatedAt;
 }

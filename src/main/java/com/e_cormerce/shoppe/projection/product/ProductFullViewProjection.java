@@ -4,45 +4,45 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public interface ProductFullViewProjection {
-  String getProductId();
+    String getId();
 
-  String getProductName();
+    String getProductName();
 
-  String getDescription();
+    String getDescription();
 
-  String getThumbnail();
+    String getThumbnail();
 
-  BigDecimal getOriginPrice();
+    BigDecimal getOriginPrice();
 
-  Float getDiscountPercentage();
+    Float getDiscountPercentage();
 
-  Float getRate();
+    Float getRate();
 
-  String getStatus();
+    String getStatus();
 
-  Integer getTotalQuantity();
+    Integer getTotalQuantity();
 
-  Float getTotalQuantitySold();
+    Float getTotalQuantitySold();
 
-  Boolean getHasVariant();
+    Boolean getHasVariant();
 
-  LocalDateTime getCreatedAt();
+    LocalDateTime getCreatedAt();
 
-  LocalDateTime getUpdatedAt();
+    LocalDateTime getUpdatedAt();
 
-  Boolean getDeleted();
+    Boolean getDeleted();
 
-  String getSellerId();
+    String getSellerId();
 
-  String getSellerUsername();
+    String getSellerUsername();
 
-  String getSellerAvatar();
+    String getSellerAvatar();
 
-  String getCategoryId();
+    String getCategoryId();
 
-  String getCategoryName();
+    String getCategoryName();
 
-  String getCategoryThumbnail();
+    String getCategoryThumbnail();
 
-  String getCategoryPathToParent();
+    String getCategoryPathToParent();
 }

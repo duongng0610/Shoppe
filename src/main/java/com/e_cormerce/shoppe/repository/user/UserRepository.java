@@ -83,14 +83,15 @@ public interface UserRepository extends JpaRepository<User, String> {
     UserDetailManageInfoProjection getClientDetailInfo(@Param("clientId") String clientId);
 
     @Query(
-            value = "SELECT * FROM ecommerce.user_with_account_info LIMIT :limit OFFSET :offset",
+            value = "SELECT * FROM ecommerce.user_with_account_info where role='SELLER' LIMIT :limit OFFSET :offset",
             nativeQuery = true)
     List<UserManageInfoProjection> getSellerInfo(
             @Param("limit") int limit, @Param("offset") int offset);
 
     @Query(
-            value = "SELECT * FROM ecommerce.user_with_account_info LIMIT :limit OFFSET :offset",
+            value = "SELECT * FROM ecommerce.user_with_account_info where role='CLIENT' LIMIT :limit OFFSET :offset",
             nativeQuery = true)
     List<UserManageInfoProjection> getClientInfo(
             @Param("limit") int limit, @Param("offset") int offset);
 }
+
