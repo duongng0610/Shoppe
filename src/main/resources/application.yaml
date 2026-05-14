@@ -2,24 +2,18 @@ socket-server:
   port: 8086
 server:
   port: 3000
-  tomcat:
-    threads:
-      max: 200
-      min-spare: 10
-    max-connections: 1000
-    accept-count: 100
 spring:
   master:
     datasource:
-      jdbcUrl: jdbc:mysql://localhost:3307/ecommerce
-      username: root
-      password: 123456
+      jdbcUrl: jdbc:mysql://mysql-master:3306/ecommerce
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
       driverClassName: com.mysql.cj.jdbc.Driver
   slave:
     datasource:
-      jdbcUrl: jdbc:mysql://localhost:3308/ecommerce
-      username: root
-      password: 123456
+      jdbcUrl: jdbc:mysql://mysql-slave:3306/ecommerce
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
       driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     properties:
@@ -28,23 +22,24 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
   security:
     oauth2:
       client:
         registration:
           google:
-            client-id: 77525743447-o1civ812em7pqos90ss5a52a60sv1edc.apps.googleusercontent.com
-            client-secret: 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
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
             scope: email, profile
 jwt:
-  access-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
+  access-token-secret: ${JWT_ACCESS_SECRET}
   access-token-expiration-time: 3600000
-  refresh-token-secret: uei7iTI9yFKPeu5wL2pAne0KX2J_sJPq7c4-lRIwF5E
+  refresh-token-secret: ${JWT_REFRESH_SECRET}
   refresh-token-expiration-time: 86400000
 cloudinary:
-  cloud-name: dhwxpgxzl
-  api-key: 683161372337227
-  secret-key: eKL1dtmtWHG6NwYiw52-Ubnt4-U
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  secret-key: ${CLOUDINARY_SECRET_KEY}
   image-width: 500
   image-height: 500
   crop: fit
@@ -54,10 +49,13 @@ app:
       public-urls:
         - /auth/login
         - /auth/register/*
-        - /categories/**
+        - /categories/default
+        - /categories/*/children
+        - /categories
         - /products
         - /products/*/details
         - /search
+        - /categories/{id}/products
         - /seller/{id}/info
         - /seller/{id}/products
         - /chat/**
@@ -65,20 +63,18 @@ app:
         - /app/topic/messages
         - /payment
         - /address/**
-        - /seller/public/**
       public-urls-regex:
         - /auth/login
-        - /address/.*
         - /auth/register/.*
         - /categories/default
         - /categories/.*/children
         - /categories
         - /products
         - /products/.*/details
-        - /seller/public/.*
+        - /address/.*
     cors:
       allowed-origins:
-        - http://localhost:5173
+        - ${CORS_ALLOWED_ORIGIN}
       allowed-headers:
         - Authorization
         - Content-Type
@@ -96,15 +92,15 @@ app:
       http-only: true
       path: /
   admin:
-    email: admin@gmail.com
-    password: admin123
-    username: admin123
+    email: ${ADMIN_EMAIL}
+    password: ${ADMIN_PASSWORD}
+    username: ${ADMIN_USERNAME}
   snapshot:
     delay: 30000
     file-path: ./data/snapshot.dat
 vn-pay:
-  tmn-code: QGXVIH4M
-  hash-secret: F31BKXHO8RNJ8M0ZLEEGANWVIVHXKJ2O
+  tmn-code: ${VNPAY_TMN_CODE}
+  hash-secret: ${VNPAY_HASH_SECRET}
   url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
   return-url: /payment
 ghn:
