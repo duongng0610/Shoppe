@@ -150,7 +150,7 @@ BEGIN
             SUM(CASE WHEN status = 'SHIPPING' THEN 1 ELSE 0 END) AS shippingOrderCount,
             SUM(CASE WHEN status = 'DELIVERED' THEN 1 ELSE 0 END) AS deliveredOrderCount,
             SUM(CASE WHEN status = 'FAILED' THEN 1 ELSE 0 END) AS failDeliveryOrderCount,
-            SUM(CASE WHEN status = 'DELIVERED' THEN TOTAL_PRICE ELSE 0 END) AS totalRevenue
+            SUM(CASE WHEN payment_status = 'SUCCESS' THEN TOTAL_PRICE ELSE 0 END) AS totalRevenue
          FROM `orders`
          WHERE (p_days IS NULL OR CREATED_AT >= DATE_SUB(NOW(), INTERVAL p_days DAY))
         ) o;
@@ -236,7 +236,9 @@ BEGIN
 
 END $$
 
-DROP PROCEDURE IF EXISTS `get_overview_order_product` $$
+
+DROP PROCEDURE IF EXISTS get_overview_order_product $$
+
 CREATE DEFINER=`root`@`%` PROCEDURE `get_overview_order_product`(
     IN p_seller_id VARCHAR(255),
     IN p_days INT
@@ -244,129 +246,49 @@ CREATE DEFINER=`root`@`%` PROCEDURE `get_overview_order_product`(
 BEGIN
 
     SELECT
-
         p_seller_id AS sellerId,
 
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN p.status = 'PENDING'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS pendingProductCount,
+        -- product counts
+        pStats.pendingProductCount,
+        pStats.activeProductCount,
+        pStats.bannedProductCount,
+        pStats.hiddenProductCount,
 
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN p.status = 'ACTIVE'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS activeProductCount,
+        -- order counts
+        oStats.pendingOrderCount,
+        oStats.approvedOrderCount,
+        oStats.shippingOrderCount,
+        oStats.deliveriedOrderCount,
+        oStats.cancelledOrderCount,
+        oStats.totalRevenue
 
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN p.status = 'BANNED'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS bannedProductCount,
+    FROM (
+        -- subquery 1: đếm product
+        SELECT
+            COALESCE(SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END), 0) AS pendingProductCount,
+            COALESCE(SUM(CASE WHEN status = 'ACTIVE'  THEN 1 ELSE 0 END), 0) AS activeProductCount,
+            COALESCE(SUM(CASE WHEN status = 'BANNED'  THEN 1 ELSE 0 END), 0) AS bannedProductCount,
+            COALESCE(SUM(CASE WHEN status = 'HIDDEN'  THEN 1 ELSE 0 END), 0) AS hiddenProductCount
+        FROM products
+        WHERE seller_id = p_seller_id
+    ) AS pStats
 
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN p.status = 'HIDDEN'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS hiddenProductCount,
-
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN o.status = 'PENDING'
-                     AND o.payment_status = 'SUCCESS'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS pendingOrderCount,
-
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN o.status = 'APPROVED'
-                     AND o.payment_status = 'SUCCESS'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS approvedOrderCount,
-
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN o.status = 'SHIPPING'
-                     AND o.payment_status = 'SUCCESS'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS shippingOrderCount,
-
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN o.status = 'DELIVERIED'
-                     AND o.payment_status = 'SUCCESS'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS deliveriedOrderCount,
-
-        COALESCE(
-            SUM(
-                CASE
-                    WHEN o.status = 'CANCELLED'
-                     AND o.payment_status = 'SUCCESS'
-                    THEN 1
-                    ELSE 0
-                END
-            ),
-            0
-        ) AS cancelledOrderCount
-
-    FROM products p
-
-    LEFT JOIN orders o
-           ON o.seller_id = p.seller_id
+    CROSS JOIN (
+        -- subquery 2: đếm order
+        SELECT
+            COALESCE(SUM(CASE WHEN status = 'PENDING'    AND payment_status = 'SUCCESS' THEN 1 ELSE 0 END), 0) AS pendingOrderCount,
+            COALESCE(SUM(CASE WHEN status = 'APPROVED'   AND payment_status = 'SUCCESS' THEN 1 ELSE 0 END), 0) AS approvedOrderCount,
+            COALESCE(SUM(CASE WHEN status = 'SHIPPING'   AND payment_status = 'SUCCESS' THEN 1 ELSE 0 END), 0) AS shippingOrderCount,
+            COALESCE(SUM(CASE WHEN status = 'DELIVERIED' AND payment_status = 'SUCCESS' THEN 1 ELSE 0 END), 0) AS deliveriedOrderCount,
+            COALESCE(SUM(CASE WHEN status = 'CANCELLED'  AND payment_status = 'SUCCESS' THEN 1 ELSE 0 END), 0) AS cancelledOrderCount,
+            COALESCE(SUM(CASE WHEN payment_status = 'SUCCESS' THEN price_each * quantity ELSE 0 END), 0)       AS totalRevenue
+        FROM orders
+        WHERE seller_id = p_seller_id
           AND (
                 p_days IS NULL
-                OR DATE(o.created_at) >= DATE_SUB(
-                        CURDATE(),
-                        INTERVAL p_days DAY
-                    )
+                OR DATE(created_at) >= DATE_SUB(CURDATE(), INTERVAL p_days DAY)
               )
-
-    WHERE (
-            p_seller_id IS NULL
-            OR p.seller_id = p_seller_id
-          );
+    ) AS oStats;
 
 END $$
 
@@ -661,6 +583,91 @@ BEGIN
 
     LIMIT p_limit OFFSET p_offset;
 
+END $$
+
+-- =============================================
+-- 1. Lấy danh sách quyền của user theo role
+-- =============================================
+DROP PROCEDURE IF EXISTS `get_user_permissions` $$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_user_permissions`(
+    IN p_user_id VARCHAR(255)
+)
+BEGIN
+    SELECT p.*
+    FROM permissions p
+    JOIN role_permission rp ON p.id = rp.permission_id
+    JOIN accounts a         ON a.role_id = rp.role_id
+    WHERE a.id     = p_user_id
+      AND p.deleted = 0;
+END $$
+
+
+-- =============================================
+-- 2. Đếm account mới theo role và ngày
+-- =============================================
+DROP FUNCTION IF EXISTS `count_new_account_in_date` $$
+
+CREATE DEFINER=`root`@`%` FUNCTION `count_new_account_in_date`(
+    p_role VARCHAR(255),
+    p_date DATE
+)
+RETURNS INT
+READS SQL DATA
+BEGIN
+    DECLARE total INT DEFAULT 0;
+
+    SELECT COUNT(*) INTO total
+    FROM accounts a
+    JOIN role r ON a.role_id = r.id
+    WHERE
+        (p_date IS NULL OR DATE(a.created_at) = p_date)
+        AND (
+            (p_role IS NULL AND r.val IN ('CLIENT', 'SELLER'))
+            OR r.val = p_role
+        );
+
+    RETURN total;
+END $$
+
+
+-- =============================================
+-- 3. Đếm account theo status và ngày
+-- =============================================
+DROP FUNCTION IF EXISTS `count_account_by_status` $$
+
+CREATE DEFINER=`root`@`%` FUNCTION `count_account_by_status`(
+    p_status VARCHAR(50),
+    p_date   DATE
+)
+RETURNS INT
+READS SQL DATA
+BEGIN
+    DECLARE total INT DEFAULT 0;
+
+    SELECT COUNT(*) INTO total
+    FROM accounts
+    WHERE status = p_status
+      AND (p_date IS NULL OR DATE(created_at) = p_date);
+
+    RETURN total;
+END $$
+
+
+-- =============================================
+-- 4. Trigger: soft delete permission
+--    → tự xóa các bản ghi liên quan trong role_permission
+-- =============================================
+DROP TRIGGER IF EXISTS `trg_after_soft_delete_permission` $$
+
+CREATE DEFINER=`root`@`%` TRIGGER `trg_after_soft_delete_permission`
+AFTER UPDATE ON `permissions`
+FOR EACH ROW
+BEGIN
+    IF OLD.deleted = 0 AND NEW.deleted = 1 THEN
+        DELETE FROM role_permission
+        WHERE permission_id = NEW.id;
+    END IF;
 END $$
 --
 --DELIMITER ;
