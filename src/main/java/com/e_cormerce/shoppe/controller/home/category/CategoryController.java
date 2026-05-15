@@ -58,7 +58,7 @@ public class CategoryController {
 
     @GetMapping("/top-searched")
     public ResponseEntity<ApiResponse> getTopSearchedCategories(
-            @RequestParam int days, @RequestParam(defaultValue = "10") int limit) {
+            @RequestParam int days, @RequestParam(defaultValue = "3") int limit) {
 
         var result = categoryAnalysisService.getTopSearchedCategories(days, limit);
         return ResponseEntity.ok()

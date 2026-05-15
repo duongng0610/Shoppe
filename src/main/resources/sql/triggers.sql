@@ -20,61 +20,97 @@ DROP TRIGGER IF EXISTS `trg_transaction_after_insert` $$
 -- =========================================================
 -- 1. AFTER INSERT variant
 -- =========================================================
+DROP TRIGGER IF EXISTS trg_variant_after_insert $$
 
-CREATE DEFINER=`root`@`%`
-TRIGGER `trg_variant_after_insert`
-AFTER INSERT ON `variants`
+CREATE TRIGGER trg_variant_after_insert
+AFTER INSERT ON variants
 FOR EACH ROW
 BEGIN
 
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+    BEGIN
+        INSERT INTO trigger_error_logs (
+            trigger_name,
+            entity_id,
+            error_time,
+            note
+        )
+        VALUES (
+            'trg_variant_after_insert',
+            NEW.id,
+            NOW(6),
+            'Failed to update product statistics'
+        );
+    END;
+
     UPDATE products
     SET
-        total_quantity      = total_quantity + NEW.quantity,
-        total_quantity_sold = total_quantity_sold + NEW.quantity_sold
+        total_quantity = total_quantity + NEW.quantity,
+        total_quantity_sold = total_quantity_sold + NEW.quantity_sold,
+        origin_price = CASE
+            WHEN origin_price IS NULL THEN NEW.price
+            WHEN NEW.price < origin_price THEN NEW.price
+            ELSE origin_price
+        END
     WHERE id = NEW.product_id;
 
 END $$
 
 
--- =========================================================
--- 2. AFTER UPDATE variant
--- =========================================================
+DROP TRIGGER IF EXISTS trg_variant_after_update $$
 
-CREATE DEFINER=`root`@`%`
-TRIGGER `trg_variant_after_update`
-AFTER UPDATE ON `variants`
+CREATE TRIGGER trg_variant_after_update
+AFTER UPDATE ON variants
 FOR EACH ROW
 BEGIN
+
+    DECLARE v_min_price DECIMAL(15,2);
+
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+    BEGIN
+        INSERT INTO trigger_error_logs (
+            trigger_name,
+            entity_id,
+            error_time,
+            note
+        )
+        VALUES (
+            'trg_variant_after_update',
+            NEW.id,
+            NOW(6),
+            'Failed to update product statistics'
+        );
+    END;
 
     IF NEW.deleted = 1 AND OLD.deleted = 0 THEN
 
         UPDATE products
         SET
-            total_quantity      = total_quantity - OLD.quantity,
+            total_quantity = total_quantity - OLD.quantity,
             total_quantity_sold = total_quantity_sold - OLD.quantity_sold
-        WHERE id = NEW.product_id;
+        WHERE id = OLD.product_id;
 
     ELSEIF NEW.deleted = 0 AND OLD.deleted = 1 THEN
 
         UPDATE products
         SET
-            total_quantity      = total_quantity + NEW.quantity,
+            total_quantity = total_quantity + NEW.quantity,
             total_quantity_sold = total_quantity_sold + NEW.quantity_sold
         WHERE id = NEW.product_id;
 
     ELSEIF NEW.deleted = 0 AND OLD.deleted = 0 THEN
 
-        IF NEW.product_id <> OLD.product_id THEN
+        IF NOT (NEW.product_id <=> OLD.product_id) THEN
 
             UPDATE products
             SET
-                total_quantity      = total_quantity - OLD.quantity,
+                total_quantity = total_quantity - OLD.quantity,
                 total_quantity_sold = total_quantity_sold - OLD.quantity_sold
             WHERE id = OLD.product_id;
 
             UPDATE products
             SET
-                total_quantity      = total_quantity + NEW.quantity,
+                total_quantity = total_quantity + NEW.quantity,
                 total_quantity_sold = total_quantity_sold + NEW.quantity_sold
             WHERE id = NEW.product_id;
 
@@ -82,7 +118,7 @@ BEGIN
 
             UPDATE products
             SET
-                total_quantity      = total_quantity + (NEW.quantity - OLD.quantity),
+                total_quantity = total_quantity + (NEW.quantity - OLD.quantity),
                 total_quantity_sold = total_quantity_sold + (NEW.quantity_sold - OLD.quantity_sold)
             WHERE id = NEW.product_id;
 
@@ -90,8 +126,51 @@ BEGIN
 
     END IF;
 
-END $$
+    IF NEW.deleted = 1 AND OLD.deleted = 0 THEN
 
+        SELECT MIN(price)
+        INTO v_min_price
+        FROM variants
+        WHERE product_id = NEW.product_id
+          AND deleted = 0;
+
+        UPDATE products
+        SET origin_price = v_min_price
+        WHERE id = NEW.product_id;
+
+    ELSEIF NEW.deleted = 0 AND (
+            NEW.price <> OLD.price
+            OR (NEW.deleted = 0 AND OLD.deleted = 1)
+            OR NOT (NEW.product_id <=> OLD.product_id)
+    ) THEN
+
+        SELECT MIN(price)
+        INTO v_min_price
+        FROM variants
+        WHERE product_id = NEW.product_id
+          AND deleted = 0;
+
+        UPDATE products
+        SET origin_price = v_min_price
+        WHERE id = NEW.product_id;
+
+        IF NOT (NEW.product_id <=> OLD.product_id) THEN
+
+            SELECT MIN(price)
+            INTO v_min_price
+            FROM variants
+            WHERE product_id = OLD.product_id
+              AND deleted = 0;
+
+            UPDATE products
+            SET origin_price = v_min_price
+            WHERE id = OLD.product_id;
+
+        END IF;
+
+    END IF;
+
+END $$
 
 -- =========================================================
 -- 3. AFTER DELETE variant
@@ -103,11 +182,55 @@ AFTER DELETE ON `variants`
 FOR EACH ROW
 BEGIN
 
+    DECLARE v_min_price DECIMAL(15,2);
+
+    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
+    BEGIN
+        INSERT INTO trigger_error_logs (
+            trigger_name,
+            entity_id,
+            error_time,
+            note
+        )
+        VALUES (
+            'trg_variant_after_delete',
+            OLD.id,
+            NOW(6),
+            'Failed to update product statistics after delete'
+        );
+    END;
+
+    /*
+     * Update quantity statistics
+     */
     UPDATE products
     SET
-        total_quantity      = total_quantity - OLD.quantity,
+        total_quantity = total_quantity - OLD.quantity,
         total_quantity_sold = total_quantity_sold - OLD.quantity_sold
     WHERE id = OLD.product_id;
+
+    /*
+     * Recalculate origin_price
+     * Only recalc when deleted variant price = current origin_price
+     */
+    SELECT origin_price
+    INTO v_min_price
+    FROM products
+    WHERE id = OLD.product_id;
+
+    IF v_min_price = OLD.price THEN
+
+        SELECT MIN(price)
+        INTO v_min_price
+        FROM variants
+        WHERE product_id = OLD.product_id
+          AND deleted = 0;
+
+        UPDATE products
+        SET origin_price = v_min_price
+        WHERE id = OLD.product_id;
+
+    END IF;
 
 END $$
 
@@ -143,118 +266,6 @@ BEGIN
 
 END $$
 
-
--- =========================================================
--- 5. AFTER INSERT variant
--- update origin_price
--- =========================================================
-
-CREATE DEFINER=`root`@`%`
-TRIGGER `trg_variant_price_after_insert`
-AFTER INSERT ON `variants`
-FOR EACH ROW
-BEGIN
-
-    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
-    BEGIN
-
-        INSERT INTO trigger_error_logs (
-            trigger_name,
-            entity_id,
-            error_time,
-            note
-        )
-        VALUES (
-            'trg_variant_price_after_insert',
-            NEW.id,
-            NOW(6),
-            'Failed to update product origin_price'
-        );
-
-    END;
-
-    UPDATE products
-    SET origin_price = CASE
-        WHEN origin_price IS NULL THEN NEW.price
-        WHEN NEW.price < origin_price THEN NEW.price
-        ELSE origin_price
-    END
-    WHERE id = NEW.product_id;
-
-END $$
-
-
--- =========================================================
--- 6. AFTER UPDATE variant
--- update origin_price
--- =========================================================
-
-CREATE DEFINER=`root`@`%`
-TRIGGER `trg_variant_price_after_update`
-AFTER UPDATE ON `variants`
-FOR EACH ROW
-BEGIN
-
-    DECLARE v_min_price DECIMAL(15,2);
-
-    DECLARE CONTINUE HANDLER FOR SQLEXCEPTION
-    BEGIN
-
-        INSERT INTO trigger_error_logs (
-            trigger_name,
-            entity_id,
-            error_time,
-            note
-        )
-        VALUES (
-            'trg_variant_price_after_update',
-            NEW.id,
-            NOW(6),
-            'Failed to update product origin_price'
-        );
-
-    END;
-
-    IF NEW.deleted = 1
-       AND OLD.deleted = 0 THEN
-
-        SELECT MIN(price)
-        INTO v_min_price
-        FROM variants
-        WHERE product_id = NEW.product_id
-          AND deleted = 0;
-
-        UPDATE products
-        SET origin_price = v_min_price
-        WHERE id = NEW.product_id;
-
-    ELSEIF NEW.deleted = 0
-        AND (
-            NEW.price <> OLD.price
-            OR (
-                NEW.deleted = 0
-                AND OLD.deleted = 1
-            )
-        ) THEN
-
-        UPDATE products
-        SET origin_price = CASE
-            WHEN origin_price IS NULL
-                 OR NEW.price <= origin_price
-            THEN NEW.price
-
-            ELSE (
-                SELECT MIN(v.price)
-                FROM variants v
-                WHERE v.product_id = NEW.product_id
-                  AND v.deleted = 0
-            )
-        END
-        WHERE id = NEW.product_id;
-
-    END IF;
-
-END $$
 
 
 -- =========================================================

@@ -92,4 +92,16 @@ public interface OrderRepository extends JpaRepository<Order, String> {
             nativeQuery = true)
     List<OrderWithUserInfoProjection> findOrdersBySellerId(
             @Param("sellerId") String sellerId, @Param("limit") int limit, @Param("offset") int offset);
+
+    @Query(
+            value =
+                    """
+                            SELECT *
+                            FROM ecommerce.order_with_user_info
+                             order by createdAt desc
+                            LIMIT :limit OFFSET :offset
+                            """,
+            nativeQuery = true)
+    List<OrderWithUserInfoProjection> findOrderSystem(
+            @Param("limit") int limit, @Param("offset") int offset);
 }

@@ -1,81 +1,79 @@
 package com.e_cormerce.shoppe.configuration;
 
 
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
+import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 
-@Configuration
+@Component
 public class SqlInitConfig {
 
-    @Bean
-    public ApplicationRunner initDatabase(
-            @Qualifier("masterDataSource") DataSource dataSource
+
+    public void initDatabase(
+            DataSource dataSource
     ) {
 
-        return args -> {
 
-            // =========================
-            // VIEWS
-            // =========================
-            ResourceDatabasePopulator viewPopulator =
-                    new ResourceDatabasePopulator();
+        // =========================
+        // FUNCTIONS / PROCEDURES
+        // =========================
+        ResourceDatabasePopulator functionPopulator =
+                new ResourceDatabasePopulator();
 
-            ResourceDatabasePopulator dataPopulator =
-                    new ResourceDatabasePopulator();
+        functionPopulator.setSeparator("$$");
 
-            viewPopulator.setSeparator(";");
+        functionPopulator.addScript(
+                new ClassPathResource("sql/functions.sql")
+        );
 
-            dataPopulator.setSeparator(";");
+        functionPopulator.addScript(
+                new ClassPathResource("sql/procedures.sql")
+        );
 
-            viewPopulator.addScript(
-                    new ClassPathResource("sql/views.sql")
-            );
+        functionPopulator.addScript(
+                new ClassPathResource("sql/triggers.sql")
+        );
 
-            dataPopulator.addScript(
-                    new ClassPathResource("sql/enums.sql")
-            );
+        DatabasePopulatorUtils.execute(
+                functionPopulator,
+                dataSource
+        );
+        // =========================
+        // VIEWS
+        // =========================
+        ResourceDatabasePopulator viewPopulator =
+                new ResourceDatabasePopulator();
 
-            DatabasePopulatorUtils.execute(
-                    viewPopulator,
-                    dataSource
-            );
+        ResourceDatabasePopulator dataPopulator =
+                new ResourceDatabasePopulator();
 
-            DatabasePopulatorUtils.execute(
-                    dataPopulator,
-                    dataSource
-            );
+        viewPopulator.setSeparator(";");
 
-            // =========================
-            // FUNCTIONS / PROCEDURES
-            // =========================
-            ResourceDatabasePopulator functionPopulator =
-                    new ResourceDatabasePopulator();
+        dataPopulator.setSeparator(";");
 
-            functionPopulator.setSeparator("$$");
+        viewPopulator.addScript(
+                new ClassPathResource("sql/views.sql")
+        );
 
-            functionPopulator.addScript(
-                    new ClassPathResource("sql/functions.sql")
-            );
+        dataPopulator.addScript(
+                new ClassPathResource("sql/enums.sql")
+        );
 
-            functionPopulator.addScript(
-                    new ClassPathResource("sql/procedures.sql")
-            );
+        DatabasePopulatorUtils.execute(
+                viewPopulator,
+                dataSource
+        );
 
-            functionPopulator.addScript(
-                    new ClassPathResource("sql/triggers.sql")
-            );
+        DatabasePopulatorUtils.execute(
+                dataPopulator,
+                dataSource
+        );
 
-            DatabasePopulatorUtils.execute(
-                    functionPopulator,
-                    dataSource
-            );
-        };
     }
+
+    ;
+
 }

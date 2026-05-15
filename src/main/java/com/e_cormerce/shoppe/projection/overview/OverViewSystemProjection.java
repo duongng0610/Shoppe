@@ -1,27 +1,39 @@
 package com.e_cormerce.shoppe.projection.overview;
 
-import java.math.BigDecimal;
+public interface OverViewSystemProjection {
+    Long getUserCount();
 
-public interface OverviewOrderProductProjection {
-    String getSellerId();
+
+    Long getActiveUserCount();
+
+
+    Long getBannedUserCount();
+
 
     Long getPendingProductCount();
 
+
     Long getActiveProductCount();
+
 
     Long getBannedProductCount();
 
-    Long getHiddenProductCount();
 
     Long getPendingOrderCount();
 
+
     Long getApprovedOrderCount();
+
 
     Long getShippingOrderCount();
 
-    Long getDeliveriedOrderCount();
 
-    Long getCancelledOrderCount();
+    Long getDeliveredOrderCount();
 
-    BigDecimal getTotalRevenue();
+
+    Long getFailDeliveryOrderCount();
+
+
+    Double getTotalRevenue();
+
 }

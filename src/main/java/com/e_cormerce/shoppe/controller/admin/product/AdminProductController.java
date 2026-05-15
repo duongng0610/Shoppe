@@ -21,6 +21,22 @@ public class AdminProductController {
     AdminService adminService;
     ProductService productService;
 
+    // @PreAuthorize("hasAuthority('PERMISSION_MANAGE_PRODUCT')")
+    @GetMapping("/{productId}/daily-recent")
+    public ResponseEntity<ApiResponse> getProductDailyRecent(
+            @PathVariable String productId,
+            @RequestParam(required = false, defaultValue = "7") Integer days) {
+
+        var result = productAnalysisService.getProductDailyRecent(productId, days);
+
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("Get product daily recent successfully")
+                        .data(result)
+                        .build());
+    }
+
     @PreAuthorize("hasAuthority('PERMISSION_APPROVE_PRODUCTS')")
     @PutMapping(path = "/{id}/approve")
     public ResponseEntity<ApiResponse> approveProducts(@PathVariable String id) {
@@ -66,6 +82,32 @@ public class AdminProductController {
                 ApiResponse.builder()
                         .success(true)
                         .message("Get product full views successfully")
+                        .data(result)
+                        .build());
+    }
+
+    @GetMapping("/overview")
+    public ResponseEntity<ApiResponse> getProductOverview(
+    ) {
+        var result = productService.getProductSystems();
+
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("Get product full views successfully")
+                        .data(result)
+                        .build());
+    }
+
+    @GetMapping("/statistic")
+    public ResponseEntity<ApiResponse> getStatisticProduct(
+            @RequestParam Integer limit, @RequestParam Integer offset) {
+        var result = productAnalysisService.getAllProductsForAdmin(limit, offset);
+
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("Get statistic product successfully")
                         .data(result)
                         .build());
     }

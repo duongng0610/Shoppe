@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.repository.user;
 
 import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.projection.overview.OverViewSystemProjection;
 import com.e_cormerce.shoppe.projection.overview.OverviewOrderProductProjection;
 import com.e_cormerce.shoppe.projection.seller.SellerInformationProjection;
 import com.e_cormerce.shoppe.projection.user.UserDetailManageInfoProjection;
@@ -72,15 +73,11 @@ public interface UserRepository extends JpaRepository<User, String> {
             nativeQuery = true)
     OverviewOrderProductProjection getOverviewOrderProductForAdmin(@Param("days") Integer days);
 
-    @Query(
-            value = "SELECT * FROM ecommerce.user_with_detail_info WHERE id = :sellerId",
-            nativeQuery = true)
-    UserDetailManageInfoProjection getRegisteredSellerDetailInfo(@Param("sellerId") String sellerId);
 
     @Query(
-            value = "SELECT * FROM ecommerce.user_with_detail_info WHERE id = :clientId",
+            value = "SELECT * FROM ecommerce.user_with_detail_info WHERE id = :userId",
             nativeQuery = true)
-    UserDetailManageInfoProjection getClientDetailInfo(@Param("clientId") String clientId);
+    UserDetailManageInfoProjection getInfoUser(String userId);
 
     @Query(
             value = "SELECT * FROM ecommerce.user_with_account_info where role='SELLER' LIMIT :limit OFFSET :offset",
@@ -93,5 +90,16 @@ public interface UserRepository extends JpaRepository<User, String> {
             nativeQuery = true)
     List<UserManageInfoProjection> getClientInfo(
             @Param("limit") int limit, @Param("offset") int offset);
+
+    @Query(
+            value =
+                    """
+                            CALL get_overview_system(
+                               :days
+                            )
+                            """,
+            nativeQuery = true)
+    OverViewSystemProjection getOverviewSystemForAdmin(@Param("days") Integer days);
+
 }
 

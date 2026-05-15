@@ -59,10 +59,9 @@ public class SellerOrder {
     }
 
     @GetMapping("")
-    @PreAuthorize("hasAuthority('PERMISSION_VIEW_SELLER_ORDERS')")
-    public ResponseEntity<ApiResponse> getSellerOrders(
+    public ResponseEntity<ApiResponse> getOrderSystem(
             @RequestParam Integer limit, @RequestParam Integer offset) {
-        var result = orderService.getOrdersBySeller(limit, offset);
+        var result = orderService.getSystemOrder(limit, offset);
         return ResponseEntity.ok(
                 ApiResponse.builder()
                         .data(result)
