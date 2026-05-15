@@ -5,6 +5,7 @@ import com.e_cormerce.shoppe.dto.request.ghn.GhnCreateShipmentRequest;
 import com.e_cormerce.shoppe.dto.request.ghn.GhnCreateShopRequest;
 import com.e_cormerce.shoppe.dto.request.ghn.OrderCode;
 import com.e_cormerce.shoppe.dto.response.ghn.order_ship.create.GhnCreateShipmentResponse;
+import com.e_cormerce.shoppe.dto.response.ghn.order_ship.info.GhnOrderShipInfoDataResponse;
 import com.e_cormerce.shoppe.dto.response.ghn.order_ship.info.GhnOrderShipInfoResponse;
 import com.e_cormerce.shoppe.dto.response.ghn.ship.GhnShipFeeResponse;
 import com.e_cormerce.shoppe.dto.response.ghn.shop.GhnCreateShopResponse;
@@ -99,7 +100,7 @@ public class WebClientService {
         }
     }
 
-    public GhnOrderShipInfoResponse getOrderShipInfo(String orderId) {
+    public GhnOrderShipInfoDataResponse getOrderShipInfo(String orderId) {
         var webClient = WebClient.create();
         try {
             var response =
@@ -116,7 +117,7 @@ public class WebClientService {
                             .bodyToMono(GhnOrderShipInfoResponse.class)
                             .block();
 
-            return response;
+            return response.getData();
 
         } catch (org.springframework.web.reactive.function.client.WebClientResponseException e) {
             // Lỗi từ phía server (4xx, 5xx)

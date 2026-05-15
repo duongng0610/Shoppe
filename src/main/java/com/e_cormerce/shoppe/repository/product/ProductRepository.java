@@ -3,6 +3,7 @@ package com.e_cormerce.shoppe.repository.product;
 import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.product.Product;
 import com.e_cormerce.shoppe.entity.user.User;
+import com.e_cormerce.shoppe.projection.overview.OverviewProductSystem;
 import com.e_cormerce.shoppe.projection.product.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -90,7 +91,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
                               LIMIT :limit OFFSET :offset
                             """,
             nativeQuery = true)
-    List<ProductAnalysisProjection> getAllProductsForAdmin(int limit, int offset);
+    List<ProductAnalysisProjection> getStatisticProductsForAdmin(int limit, int offset);
 
     @Query(
             value =
@@ -101,14 +102,14 @@ public interface ProductRepository extends JpaRepository<Product, String> {
                              LIMIT :limit OFFSET :offset
                             """,
             nativeQuery = true)
-    List<ProductAnalysisProjection> getProductsOfSeller(
+    List<ProductAnalysisProjection> getStatisticProductsForSeller(
             @Param("sellerId") String sellerId, int limit, int offset);
 
     // admin
     @Query(
             value =
                     """
-                            select * from products_card_view where deleted = false and status="ACTIVE" order by createdAt LIMIT :limit offset :offset
+                            select * from products_card_view where deleted = false and status="ACTIVE" order by createdAt desc LIMIT :limit offset :offset
                             """,
             nativeQuery = true)
     List<ProductCardProjection> getProductsInHomePage(
@@ -158,7 +159,7 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     @Query(
             value =
                     """
-                            select * from products_card_view where deleted = false where status="APPROVED" and sellerId= :sellerId order by createdAt LIMIT :limit offset :offset
+                            select * from products_card_view where deleted = false and status="ACTIVE" and sellerId= :sellerId order by createdAt LIMIT :limit offset :offset
                             """,
             nativeQuery = true)
     List<ProductCardProjection> getProductsInSellerPage(
@@ -199,9 +200,21 @@ public interface ProductRepository extends JpaRepository<Product, String> {
                     """
                             SELECT *
                             FROM product_with_seller_and_category
+                            order by createdAt
                             LIMIT :offset, :limit
                             """,
             nativeQuery = true)
     List<ProductFullViewProjection> getProductFullViews(
             @Param("limit") Integer limit, @Param("offset") Integer offset);
+
+
+    @Query(
+            value =
+                    """
+                            CALL sp_get_product_overview();
+                            """,
+            nativeQuery = true)
+    OverviewProductSystem getProductOverview();
+
+
 }

@@ -99,6 +99,107 @@ BEGIN
 END $$
 
 
+DROP PROCEDURE IF EXISTS `get_overview_system` $$
+
+CREATE DEFINER=`root`@`%` PROCEDURE `get_overview_system`(
+    IN p_days INT
+)
+BEGIN
+
+    SELECT
+        -- Thống kê ACCOUNTS
+        COALESCE(u.userCount, 0) AS userCount,
+        COALESCE(u.activeUserCount, 0) AS activeUserCount,
+        COALESCE(u.bannedUserCount, 0) AS bannedUserCount,
+
+        -- Thống kê PRODUCTS
+        COALESCE(p.pendingProductCount, 0) AS pendingProductCount,
+        COALESCE(p.activeProductCount, 0) AS activeProductCount,
+        COALESCE(p.bannedProductCount, 0) AS bannedProductCount,
+
+        -- Thống kê ORDERS
+        COALESCE(o.pendingOrderCount, 0) AS pendingOrderCount,
+        COALESCE(o.approvedOrderCount, 0) AS approvedOrderCount,
+        COALESCE(o.shippingOrderCount, 0) AS shippingOrderCount,
+        COALESCE(o.deliveredOrderCount, 0) AS deliveredOrderCount,
+        COALESCE(o.failDeliveryOrderCount, 0) AS failDeliveryOrderCount,
+        COALESCE(o.totalRevenue, 0) AS totalRevenue
+
+    FROM
+        (SELECT
+            COUNT(*) AS userCount,
+            SUM(CASE WHEN status = 'ACTIVE' THEN 1 ELSE 0 END) AS activeUserCount,
+            SUM(CASE WHEN status = 'BANNED' THEN 1 ELSE 0 END) AS bannedUserCount
+         FROM `accounts`
+         WHERE (p_days IS NULL OR CREATED_AT >= DATE_SUB(NOW(), INTERVAL p_days DAY))
+        ) u
+
+    CROSS JOIN
+        (SELECT
+            SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) AS pendingProductCount,
+            SUM(CASE WHEN status = 'ACTIVE' THEN 1 ELSE 0 END) AS activeProductCount,
+            SUM(CASE WHEN status = 'BANNED' THEN 1 ELSE 0 END) AS bannedProductCount
+         FROM `products`
+         WHERE (p_days IS NULL OR CREATED_AT >= DATE_SUB(NOW(), INTERVAL p_days DAY))
+        ) p
+
+    CROSS JOIN
+        (SELECT
+            SUM(CASE WHEN status = 'PENDING' THEN 1 ELSE 0 END) AS pendingOrderCount,
+            SUM(CASE WHEN status = 'APPROVED' THEN 1 ELSE 0 END) AS approvedOrderCount,
+            SUM(CASE WHEN status = 'SHIPPING' THEN 1 ELSE 0 END) AS shippingOrderCount,
+            SUM(CASE WHEN status = 'DELIVERED' THEN 1 ELSE 0 END) AS deliveredOrderCount,
+            SUM(CASE WHEN status = 'FAILED' THEN 1 ELSE 0 END) AS failDeliveryOrderCount,
+            SUM(CASE WHEN status = 'DELIVERED' THEN TOTAL_PRICE ELSE 0 END) AS totalRevenue
+         FROM `orders`
+         WHERE (p_days IS NULL OR CREATED_AT >= DATE_SUB(NOW(), INTERVAL p_days DAY))
+        ) o;
+
+END $$
+
+
+DROP PROCEDURE IF EXISTS sp_get_product_overview $$
+
+CREATE PROCEDURE sp_get_product_overview()
+BEGIN
+
+    SELECT
+        COUNT(*) AS totalProductCount,
+
+        SUM(
+            CASE
+                WHEN status = 'PENDING' THEN 1
+                ELSE 0
+            END
+        ) AS pendingProductCount,
+
+        SUM(
+            CASE
+                WHEN status = 'ACTIVE' THEN 1
+                ELSE 0
+            END
+        ) AS activeProductCount,
+
+        SUM(
+            CASE
+                WHEN status = 'BANNED' THEN 1
+                ELSE 0
+            END
+        ) AS bannedProductCount,
+
+        SUM(
+                    CASE
+                        WHEN status = 'HIDDEN' THEN 1
+                        ELSE 0
+                    END
+                ) AS hiddenProductCount
+
+    FROM products
+    WHERE deleted = 0;
+
+END $$
+
+
 DROP PROCEDURE IF EXISTS `get_category_daily_recent` $$
 CREATE DEFINER=`root`@`%` PROCEDURE `get_category_daily_recent`(
     IN p_category_id VARCHAR(255),

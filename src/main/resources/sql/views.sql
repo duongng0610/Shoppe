@@ -20,9 +20,9 @@ CREATE VIEW category_statistics_view AS
 SELECT
     c.id AS id,
     c.val AS val,
+    c.thumbnail as thumbnail,
     c.deleted AS deleted,
     c.created_at AS createdAt,
-    c.thumbnail AS thumbnail,
 
     COUNT_PRODUCTS_BY_STATUS_OF_CATEGORY(c.id, 'ACTIVE') AS activeProductCount,
     COUNT_PRODUCTS_BY_STATUS_OF_CATEGORY(c.id, 'BANNED') AS bannedProductCount,
@@ -182,7 +182,7 @@ SELECT
     t.amount AS amount,
     t.status AS status,
     t.created_at AS createdAt,
-
+    t.order_id as orderId,
     u.id AS userId,
     u.username AS username,
     u.avatar AS avatar

@@ -4,17 +4,19 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public interface TransactionUserViewProjection {
-  String getTransactionId();
+    String getTransactionId();
 
-  BigDecimal getAmount();
+    BigDecimal getAmount();
 
-  String getStatus();
+    String getOrderId();
 
-  LocalDateTime getCreatedAt();
+    String getStatus();
 
-  String getUserId();
+    LocalDateTime getCreatedAt();
 
-  String getUsername();
+    String getUserId();
 
-  String getAvatar();
+    String getUsername();
+
+    String getAvatar();
 }

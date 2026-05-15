@@ -19,7 +19,13 @@ public class ProductAnalysisService {
 
     // public
     public List<ProductAnalysisProjection> getAllProductsForAdmin(int limit, int offset) {
-        return productRepository.getAllProductsForAdmin(limit, offset);
+        return productRepository.getStatisticProductsForAdmin(limit, offset);
+    }
+
+    // public
+    public List<ProductAnalysisProjection> getAllProductsForSeller(String sellerId, int limit, int offset) {
+
+        return productRepository.getStatisticProductsForSeller(sellerId, limit, offset);
     }
 
 

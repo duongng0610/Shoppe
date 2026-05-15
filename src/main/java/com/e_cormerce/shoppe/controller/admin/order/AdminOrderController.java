@@ -13,39 +13,51 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminOrderController {
-  OrderService orderService;
+    OrderService orderService;
 
-  // =====================================
-  // ADMIN
-  // =====================================
+    // =====================================
+    // ADMIN
+    // =====================================
 
-  @GetMapping("revenue")
-  public ResponseEntity<ApiResponse> getAdminRevenue(
-      @RequestParam(required = false) String status, @RequestParam(required = false) Integer days) {
+    @GetMapping("revenue")
+    public ResponseEntity<ApiResponse> getAdminRevenue(
+            @RequestParam(required = false) String status, @RequestParam(required = false) Integer days) {
 
-    var result = orderService.getAdminRevenue(status, days);
+        var result = orderService.getAdminRevenue(status, days);
 
-    return ResponseEntity.ok(
-        ApiResponse.builder()
-            .success(true)
-            .message("Get system revenue successfully")
-            .data(result)
-            .build());
-  }
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("Get system revenue successfully")
+                        .data(result)
+                        .build());
+    }
 
-  @GetMapping("seller/id/revenue")
-  public ResponseEntity<ApiResponse> getSellerRevenue(
-      @PathVariable String id,
-      @RequestParam(required = false) String status,
-      @RequestParam(required = false) Integer days) {
+    @GetMapping("seller/id/revenue")
+    public ResponseEntity<ApiResponse> getSellerRevenue(
+            @PathVariable String id,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Integer days) {
 
-    var result = orderService.getSellerRevenue(id, status, days);
+        var result = orderService.getSellerRevenue(id, status, days);
 
-    return ResponseEntity.ok(
-        ApiResponse.builder()
-            .success(true)
-            .message("Get seller revenue successfully")
-            .data(result)
-            .build());
-  }
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .success(true)
+                        .message("Get seller revenue successfully")
+                        .data(result)
+                        .build());
+    }
+
+    @GetMapping("")
+    public ResponseEntity<ApiResponse> getSystemOrders(
+            @RequestParam Integer limit, @RequestParam Integer offset) {
+        var result = orderService.getOrderByAdmin(limit, offset);
+        return ResponseEntity.ok(
+                ApiResponse.builder()
+                        .data(result)
+                        .message("get orders successfully")
+                        .success(true)
+                        .build());
+    }
 }

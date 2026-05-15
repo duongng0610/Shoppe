@@ -18,6 +18,7 @@ import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.CategoryMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
 import com.e_cormerce.shoppe.mapper.user.UserMapper;
+import com.e_cormerce.shoppe.projection.overview.OverviewProductSystem;
 import com.e_cormerce.shoppe.projection.product.ProductCardProjection;
 import com.e_cormerce.shoppe.projection.product.ProductFullViewProjection;
 import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
@@ -224,5 +225,9 @@ public class ProductService {
     public List<ProductCardProjection> getProductsInSellerPage(
             String sellerId, int limit, int offset) {
         return productRepository.getProductsInSellerPage(sellerId, limit, offset);
+    }
+
+    public OverviewProductSystem getProductSystems() {
+        return productRepository.getProductOverview();
     }
 }

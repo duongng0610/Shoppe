@@ -5,7 +5,7 @@ import com.e_cormerce.shoppe.dto.request.ghn.GhnCreateShipmentRequest;
 import com.e_cormerce.shoppe.dto.request.ghn.ShipItem;
 import com.e_cormerce.shoppe.dto.request.order.ShipCostOrderRequest;
 import com.e_cormerce.shoppe.dto.response.ghn.order_ship.create.GhnCreateShipmentResponse;
-import com.e_cormerce.shoppe.dto.response.ghn.order_ship.info.GhnOrderShipInfoResponse;
+import com.e_cormerce.shoppe.dto.response.ghn.order_ship.info.GhnOrderShipInfoDataResponse;
 import com.e_cormerce.shoppe.dto.response.ghn.ship.GhnShipFeeDataResponse;
 import com.e_cormerce.shoppe.entity.order.Order;
 import com.e_cormerce.shoppe.enums.ErrorCode;
@@ -83,7 +83,7 @@ public class ShippingService {
         return webClientService.createOrderShipApi(request, order.getSeller().getId());
     }
 
-    public GhnOrderShipInfoResponse getShipInfo(String orderId) {
+    public GhnOrderShipInfoDataResponse getShipInfo(String orderId) {
 
         return webClientService.getOrderShipInfo(orderId);
     }
