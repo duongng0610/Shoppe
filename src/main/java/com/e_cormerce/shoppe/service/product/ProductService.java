@@ -4,6 +4,7 @@ import com.e_cormerce.shoppe.dto.common.catgory.CategoryDto;
 import com.e_cormerce.shoppe.dto.common.user.UserDto;
 import com.e_cormerce.shoppe.dto.request.product.CreateProductRequest;
 import com.e_cormerce.shoppe.dto.request.product.CreateProductReviewRequest;
+import com.e_cormerce.shoppe.dto.response.product.MyProductResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductDetailResponse;
 import com.e_cormerce.shoppe.dto.response.product.VariantDetailResponse;
@@ -35,6 +36,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -45,6 +47,7 @@ import org.springframework.validation.annotation.Validated;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,6 +69,7 @@ public class ProductService {
     CreateProductReviewHelper createProductReviewHelper;
     ProductReviewRepository productReviewRepository;
 
+
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, timeout = 10)
     public Product persistProduct(@Valid CreateProductRequest request) {
         var user = authService.getUserThroughAuthentication();
@@ -85,7 +89,7 @@ public class ProductService {
             product.setProductExtraImages(
                     request.getExtraImageUrls().stream()
                             .map(url -> ProductExtraImage.builder().product(product).url(url).build())
-                            .toList());
+                            .collect(Collectors.toSet()));
         }
 
         if (request.getTypes() != null && !request.getTypes().isEmpty()) {
@@ -125,7 +129,15 @@ public class ProductService {
         return products.stream().map(productMapper::toProductCardDto).toList();
     }
 
+    //b1: conver mapper product=>product
+    @Transactional(readOnly = true)
+    public MyProductResponse cleanGetProductDetails(String id) {
+        var product = productRepository.findFetchProductById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_PRODUCT));
+        return productMapper.toMyProductDTO(product);
+    }
+
     @Transactional(timeout = 5)
+    @Cacheable(value = "products", key = "#id")
     public ProductDetailResponse getProductDetail(String id) {
         Product product =
                 productRepository

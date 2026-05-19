@@ -3,6 +3,7 @@ package com.e_cormerce.shoppe.controller.seller.order;
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
 import com.e_cormerce.shoppe.service.order.OrderService;
 import com.e_cormerce.shoppe.service.seller.SellerService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class SellerOrder {
     SellerService sellerService;
     OrderService orderService;
+
 
     @PreAuthorize("hasAuthority('PERMISSION_ACCEPT_ORDER')")
     @PutMapping("/{id}/approve")
@@ -87,5 +89,12 @@ public class SellerOrder {
                         .message("get order revenue successfully")
                         .success(true)
                         .build());
+    }
+
+
+    @GetMapping("/export_csv")
+    public void getExportCsv(HttpServletResponse response) {
+        sellerService.exportOrderCsv(response);
+
     }
 }

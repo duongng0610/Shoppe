@@ -1,6 +1,7 @@
 package com.e_cormerce.shoppe.controller.home.product;
 
 import com.e_cormerce.shoppe.dto.response.ApiResponse;
+import com.e_cormerce.shoppe.service.cache.ProductCacheService;
 import com.e_cormerce.shoppe.service.product.ProductAnalysisService;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import lombok.AccessLevel;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductController {
     ProductService productService;
+    ProductCacheService productCacheService;
     ProductAnalysisService productAnalysisService;
 
     @GetMapping("")
@@ -33,7 +35,7 @@ public class ProductController {
 
     @GetMapping("/{id}/details")
     public ResponseEntity<ApiResponse> getDetailOfProduct(@PathVariable String id) {
-        var result = productService.getProductDetail(id);
+        var result = productCacheService.cachingGetProductDetails(id);
 
         return ResponseEntity.ok(
                 ApiResponse.builder().data(result).message("get product detail successfully").build());

@@ -4,6 +4,7 @@ import com.e_cormerce.shoppe.dto.common.catgory.CategoryDto;
 import com.e_cormerce.shoppe.dto.request.admin.CreateCategoryRequest;
 import com.e_cormerce.shoppe.dto.request.admin.UpdateCategoryRequest;
 import com.e_cormerce.shoppe.dto.response.category.CategoryDetailResponse;
+import com.e_cormerce.shoppe.dto.response.category.CategoryWithChildrenResponse;
 import com.e_cormerce.shoppe.entity.category.Category;
 import com.e_cormerce.shoppe.entity.category.CategorySynonyms;
 import com.e_cormerce.shoppe.enums.ErrorCode;
@@ -11,7 +12,6 @@ import com.e_cormerce.shoppe.event.catgory.CategorySearched;
 import com.e_cormerce.shoppe.exception.AppException;
 import com.e_cormerce.shoppe.mapper.product.CategoryMapper;
 import com.e_cormerce.shoppe.mapper.product.ProductMapper;
-import com.e_cormerce.shoppe.projection.category.CategoryProjection;
 import com.e_cormerce.shoppe.projection.product.ProductCardProjection;
 import com.e_cormerce.shoppe.repository.catgory.CategoryRepository;
 import com.e_cormerce.shoppe.repository.catgory.SynonymsRepository;
@@ -93,9 +93,10 @@ public class CategoryService {
                 .orElseThrow(() -> new AppException(ErrorCode.EXISTED_CATEGORY));
     }
 
-    public List<CategoryProjection> getChildren(String id) {
+    public CategoryWithChildrenResponse getChildren(String id) {
+        Category c = categoryRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_CATEGORY));
         var children = categoryRepository.findChildren(id);
-        return children;
+        return CategoryWithChildrenResponse.builder().id(id).val(c.getVal()).thumbnail(c.getThumbnail()).children(children).build();
     }
 
     public List<Category> getDefault() {

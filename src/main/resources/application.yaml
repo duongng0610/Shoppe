@@ -6,7 +6,7 @@ server:
     threads:
       max: 200
       min-spare: 10
-    max-connections: 1000
+    max-connections: 400
     accept-count: 100
 spring:
   master:
@@ -29,6 +29,13 @@ spring:
       ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: redis
   sql:
     init:
       mode: never
@@ -70,6 +77,8 @@ app:
         - /payment
         - /address/**
         - /seller/public/**
+        - /admin/**
+        - /seller/**
       public-urls-regex:
         - /auth/login
         - /address/.*

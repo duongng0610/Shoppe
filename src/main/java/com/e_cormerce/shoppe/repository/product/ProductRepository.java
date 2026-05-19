@@ -217,4 +217,20 @@ public interface ProductRepository extends JpaRepository<Product, String> {
     OverviewProductSystem getProductOverview();
 
 
+    @Query("""
+            SELECT DISTINCT p
+            FROM Product p
+            JOIN FETCH p.seller
+            JOIN FETCH p.category
+            LEFT JOIN FETCH p.variants
+            LEFT JOIN FETCH p.productExtraImages
+            LEFT JOIN FETCH p.types
+            WHERE p.id = :id
+            """)
+    Optional<Product> findFetchProductById(@Param("id") String id);
+
+
+    @Query(value = "SELECT v.id from variants v where v.product_id= :id", nativeQuery = true)
+    List<String> getVariantIdsByProductId(@Param("id") String id);
+
 }

@@ -30,9 +30,11 @@ import com.e_cormerce.shoppe.repository.product.ProductRepository;
 import com.e_cormerce.shoppe.repository.product.VariantRepository;
 import com.e_cormerce.shoppe.repository.user.UserRepository;
 import com.e_cormerce.shoppe.service.auth.AuthService;
+import com.e_cormerce.shoppe.service.export.ExportService;
 import com.e_cormerce.shoppe.service.product.ProductService;
 import com.e_cormerce.shoppe.service.ship.ShippingService;
 import com.e_cormerce.shoppe.service.webclient.WebClientService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -60,6 +62,7 @@ public class SellerService {
     ProductRepository pRepository;
     WebClientService webClientService;
     UserRepository userRepository;
+    ExportService exportService;
     private final ShippingService shippingService;
 
     public List<MyProductResponse> getMyProducts(int limit, int offset) {
@@ -93,9 +96,17 @@ public class SellerService {
         if (!p.getSeller().getId().equals(authService.getUserId())) {
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
+        var idVariants = productRepository.getVariantIdsByProductId(productId);
+
         var variantsEntity = new ArrayList<Variant>();
         for (UpdateVariantRequest req : request.getVariants()) {
-            var variant = variantRepository.findById(req.getId()).orElseThrow();
+            //B1 check thuoc product
+            if (!idVariants.contains(req.getId())) {
+                throw new AppException(ErrorCode.NOT_EXIST_VARIANT);
+            }
+            //B2:Check ton tai
+            var variant = variantRepository.findById(req.getId()).orElseThrow(() -> new AppException(ErrorCode.NOT_EXIST_VARIANT));
+
             //validate check quantity r
             variant.setQuantity(req.getNewQuantity());
             variantsEntity.add(variant);
@@ -264,6 +275,11 @@ public class SellerService {
     public OverviewOrderProductProjection getOverviewOrderProduct(Integer days) {
         String sellerId = authService.getUserId();
         return userRepository.getOverviewOrderProduct(sellerId, days);
+    }
+
+    public void exportOrderCsv(HttpServletResponse response) {
+        String sellerId = authService.getUserId();
+        exportService.exportOrdersCsv(response, sellerId);
     }
 
 

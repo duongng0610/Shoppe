@@ -31,6 +31,7 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -145,7 +146,7 @@ public class OrderService {
         }
         String baseUrl =
                 request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
-        
+
         String vnpayUrl =
                 vnPayService.createUrlPayment(
                         order.getTotalPrice().intValue(),
@@ -189,15 +190,16 @@ public class OrderService {
         return orderRepository.getSellerRevenue(sellerId, status, days);
     }
 
+    @Cacheable(value = "order_ships", key = "#orderId")
     public GhnOrderShipInfoDataResponse getOrderShipInfo(String orderId) {
         Order order =
                 orderRepository
                         .findById(orderId)
                         .orElseThrow(() -> new AppException(ErrorCode.NOT_EXISTED_ORDER));
-        String userId = authService.getUserId();
-        if (!order.getSeller().getId().equals(userId) && !order.getClient().getId().equals(userId)) {
-            throw new AppException(ErrorCode.UNAUTHORIZED);
-        }
+//        String userId = authService.getUserId();
+//        if (!order.getSeller().getId().equals(userId) && !order.getClient().getId().equals(userId)) {
+//            throw new AppException(ErrorCode.UNAUTHORIZED);
+//        }
         if (order.getStatus() != OrderStatus.SHIPPING) {
             throw new AppException(ErrorCode.UNABLE_VIEW_ORDER_SHIPPING);
         }

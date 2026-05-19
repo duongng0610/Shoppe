@@ -22,7 +22,7 @@ public interface CategoryRepository extends JpaRepository<Category, String> {
     @Query(value = "SELECT * FROM categories WHERE path_to_parent IS NULL", nativeQuery = true)
     List<Category> findDefault();
 
-    @Query(value = "call ecommerce.get_all_children_of_category(:id)", nativeQuery = true)
+    @Query(value = "call ecommerce.get_direct_children_of_category(:id)", nativeQuery = true)
     List<CategoryProjection> findChildren(@Param("id") String id);
 
     @Query(
