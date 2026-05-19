@@ -16,21 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminTransactionController {
-    TransactionService transactionService;
+  TransactionService transactionService;
 
-    @GetMapping("")
-    public ResponseEntity<ApiResponse> getTransactionViews(
-            @RequestParam Integer limit, @RequestParam Integer offset) {
+  @GetMapping("")
+  public ResponseEntity<ApiResponse> getTransactionViews(
+      @RequestParam Integer limit, @RequestParam Integer offset) {
 
-        var result = transactionService.getTransactionUserViews(limit, offset);
+    var result = transactionService.getTransactionUserViews(limit, offset);
 
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message("Get transaction user views successfully")
-                        .data(result)
-                        .build());
-    }
-
-
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .success(true)
+            .message("Get transaction user views successfully")
+            .data(result)
+            .build());
+  }
 }

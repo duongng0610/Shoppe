@@ -7,6 +7,8 @@ import com.e_cormerce.shoppe.dto.request.product.VariantRequest;
 import com.e_cormerce.shoppe.entity.product.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,15 +18,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CreateProductHelper {
-
-  public void addVariant(Variant variant, Product product) {
-    var variants = product.getVariants();
-    if (variants == null) {
-      variants = new ArrayList<>();
-    }
-    variants.add(variant);
-    variant.setProduct(product);
-  }
 
   public Variant createDefaultVariant(Product product, CreateProductRequest request) {
     return Variant.builder()
@@ -36,9 +29,9 @@ public class CreateProductHelper {
         .build();
   }
 
-  public List<Type> createType(List<TypeDto> typeDtos, Product product) {
+  public Set<Type> createType(List<TypeDto> typeDtos, Product product) {
 
-    List<Type> types =
+    var types =
         typeDtos.stream()
             .map(
                 typeDto -> {
@@ -47,12 +40,12 @@ public class CreateProductHelper {
                   type.setTypeValues(createTypeValues(typeDto, type));
                   return type;
                 })
-            .toList();
+            .collect(Collectors.toSet());
 
     return types;
   }
 
-  private List<TypeValue> createTypeValues(TypeDto typeDto, Type type) {
+  private Set<TypeValue> createTypeValues(TypeDto typeDto, Type type) {
     List<TypeValue> typeValues = new ArrayList<>();
 
     for (String typeValueVal : typeDto.getValues()) {
@@ -61,7 +54,7 @@ public class CreateProductHelper {
       typeValues.add(typeValue);
     }
 
-    return typeValues;
+    return typeValues.stream().collect(Collectors.toSet());
   }
 
   public Variant createVariant(VariantRequest variantRequest, Product product) {
@@ -86,7 +79,7 @@ public class CreateProductHelper {
       variantValues.add(variantValue);
     }
 
-    variant.setVariantValues(variantValues);
+    variant.setVariantValues(variantValues.stream().collect(Collectors.toSet()));
     return variant;
   }
 

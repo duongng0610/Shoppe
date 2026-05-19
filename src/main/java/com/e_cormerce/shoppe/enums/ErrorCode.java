@@ -108,6 +108,7 @@ public enum ErrorCode {
   UNABLE_VIEW_ORDER_SHIPPING("Unable to view order shipping", 2030, HttpStatus.BAD_REQUEST),
   UNABLE_UPDATE_ORDER_DELIVERY_STATE(
       "Unable update order delivery state", 2031, HttpStatus.BAD_REQUEST),
+  ERROR_EXPORT_CSV("Error export csv", 2032, HttpStatus.INTERNAL_SERVER_ERROR),
   ;
 
   String message;

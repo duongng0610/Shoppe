@@ -4,27 +4,27 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public interface ProductCardProjection {
-    String getId();
+  String getId();
 
-    LocalDateTime getCreatedAt();
+  LocalDateTime getCreatedAt();
 
-    Float getDiscountPercentage();
+  Float getDiscountPercentage();
 
-    String getName();
+  String getName();
 
-    BigDecimal getOriginPrice();
+  BigDecimal getOriginPrice();
 
-    Float getRate();
+  Float getRate();
 
-    String getStatus();
+  String getStatus();
 
-    String getThumbnail();
+  String getThumbnail();
 
-    Integer getTotalQuantity();
+  Integer getTotalQuantity();
 
-    Float getTotalQuantitySold();
+  Float getTotalQuantitySold();
 
-    String getSellerId();
+  String getSellerId();
 
-    String getCategoryId();
+  String getCategoryId();
 }

@@ -1,4 +1,8 @@
-## 🚀 Hướng dẫn chạy project
+
+## 🚀 Hướng dẫn chạy project bằng IDE
+- Pull image redis: 
+  + B1: Pull redis-stack image :  docker pull redis/redis-stack-server
+  + B2: Chạy container từ image:  docker run -d --name redis-stack -p 6379:6379 -p 8001:8001 redis/redis-stack:latest
 
 ### 🔧 Chạy ứng dụng bằng Docker
 

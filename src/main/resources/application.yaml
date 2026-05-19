@@ -6,18 +6,18 @@ server:
     threads:
       max: 200
       min-spare: 10
-    max-connections: 1000
+    max-connections: 400
     accept-count: 100
 spring:
   master:
     datasource:
-      jdbcUrl: jdbc:mysql://localhost:3307/ecommerce
+      jdbcUrl: jdbc:mysql://localhost:3307/ecommerce?useCursorFetch = true&serverTimezone=Asia/Ho_Chi_Minh
       username: root
       password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
   slave:
     datasource:
-      jdbcUrl: jdbc:mysql://localhost:3308/ecommerce
+      jdbcUrl: jdbc:mysql://localhost:3308/ecommerce?useCursorFetch = true&serverTimezone=Asia/Ho_Chi_Minh
       username: root
       password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
@@ -29,6 +29,13 @@ spring:
       ddl-auto: update
     show-sql: true
     defer-datasource-initialization: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  cache:
+    type: redis
   sql:
     init:
       mode: never
@@ -70,6 +77,8 @@ app:
         - /payment
         - /address/**
         - /seller/public/**
+        - /admin/**
+        - /seller/**
       public-urls-regex:
         - /auth/login
         - /address/.*

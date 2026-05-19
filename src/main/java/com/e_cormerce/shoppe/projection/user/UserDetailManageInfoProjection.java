@@ -4,25 +4,25 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public interface UserDetailManageInfoProjection {
-    String getId();
+  String getId();
 
-    String getEmail();
+  String getEmail();
 
-    String getUsername();
+  String getUsername();
 
-    String getAvatar();
+  String getAvatar();
 
-    String getRole();
+  String getRole();
 
-    String getPhoneNumber();
+  String getPhoneNumber();
 
-    LocalDate getBirthDate();
+  LocalDate getBirthDate();
 
-    LocalDateTime getCreatedAt();
+  LocalDateTime getCreatedAt();
 
-    String getProvince();
+  String getProvince();
 
-    String getDistrict();
+  String getDistrict();
 
-    String getWard();
+  String getWard();
 }

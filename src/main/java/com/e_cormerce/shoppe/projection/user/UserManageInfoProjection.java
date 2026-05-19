@@ -3,17 +3,17 @@ package com.e_cormerce.shoppe.projection.user;
 import java.time.LocalDateTime;
 
 public interface UserManageInfoProjection {
-    String getId();
+  String getId();
 
-    String getUsername();
+  String getUsername();
 
-    String getAvatar();
+  String getAvatar();
 
-    LocalDateTime getCreatedAt();
+  LocalDateTime getCreatedAt();
 
-    String getStatus();
+  String getStatus();
 
-    String getEmail();
+  String getEmail();
 
-    String getRole();
+  String getRole();
 }

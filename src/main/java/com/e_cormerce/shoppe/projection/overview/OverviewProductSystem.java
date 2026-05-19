@@ -1,15 +1,13 @@
 package com.e_cormerce.shoppe.projection.overview;
 
 public interface OverviewProductSystem {
-    Long getTotalProductCount();
+  Long getTotalProductCount();
 
-    Long getPendingProductCount();
+  Long getPendingProductCount();
 
+  Long getActiveProductCount();
 
-    Long getActiveProductCount();
+  Long getBannedProductCount();
 
-
-    Long getBannedProductCount();
-
-    Long getHiddenProductCount();
+  Long getHiddenProductCount();
 }

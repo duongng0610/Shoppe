@@ -16,37 +16,33 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminSystemController {
-    AdminService adminService;
+  AdminService adminService;
 
-    @GetMapping("/overview-order-product")
-    public ResponseEntity<ApiResponse> getOverviewOrderProductForAdmin(
-            @RequestParam(required = false) Integer days) {
+  @GetMapping("/overview-order-product")
+  public ResponseEntity<ApiResponse> getOverviewOrderProductForAdmin(
+      @RequestParam(required = false) Integer days) {
 
-        var result = adminService.getOverviewOrderProductForAdmin(days);
+    var result = adminService.getOverviewOrderProductForAdmin(days);
 
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message("Get system overview successfully")
-                        .data(result)
-                        .build());
-    }
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .success(true)
+            .message("Get system overview successfully")
+            .data(result)
+            .build());
+  }
 
-    @GetMapping("/overview-system")
-    public ResponseEntity<ApiResponse> getOverviewSystemForAdmin(
-            @RequestParam(required = false) Integer days) {
+  @GetMapping("/overview-system")
+  public ResponseEntity<ApiResponse> getOverviewSystemForAdmin(
+      @RequestParam(required = false) Integer days) {
 
+    var result = adminService.getOverViewSystemForAdmin(days);
 
-        var result = adminService.getOverViewSystemForAdmin(days);
-
-
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .success(true)
-                        .message("Get system overview successfully")
-                        .data(result)
-                        .build());
-    }
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .success(true)
+            .message("Get system overview successfully")
+            .data(result)
+            .build());
+  }
 }
-
-

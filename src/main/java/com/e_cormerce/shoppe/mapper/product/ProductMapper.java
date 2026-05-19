@@ -7,19 +7,19 @@ import com.e_cormerce.shoppe.dto.response.product.MyProductResponse;
 import com.e_cormerce.shoppe.dto.response.product.MyVariantResponse;
 import com.e_cormerce.shoppe.dto.response.product.ProductCardResponse;
 import com.e_cormerce.shoppe.entity.product.*;
+import com.e_cormerce.shoppe.mapper.user.UserMapper;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(
     componentModel = "spring",
-    uses = {VariantMapper.class})
+    uses = {VariantMapper.class, CategoryMapper.class, UserMapper.class})
 public interface ProductMapper {
   ProductCardResponse toProductCardDto(Product product);
 
   BaseProductResponse toBaseProductDTO(Product product);
 
-  @Mapping(source = "variants", target = "variants")
   MyProductResponse toMyProductDTO(Product product);
 
   @Mapping(source = "variantValues", target = "attributes")
@@ -53,6 +53,6 @@ public interface ProductMapper {
   }
 
   default String mapTypeValue(TypeValue typeValue) {
-    return typeValue.getType().getVal();
+    return typeValue.getVal();
   }
 }

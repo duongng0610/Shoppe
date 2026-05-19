@@ -8,9 +8,9 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
@@ -97,7 +97,7 @@ public class Product {
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.LAZY)
-  List<Type> types;
+  Set<Type> types;
 
   // inverse side
   @OneToMany(
@@ -105,11 +105,11 @@ public class Product {
       cascade = CascadeType.ALL,
       orphanRemoval = true,
       fetch = FetchType.LAZY)
-  List<Variant> variants;
+  Set<Variant> variants;
 
   // inverse side
   @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-  List<ProductExtraImage> productExtraImages;
+  Set<ProductExtraImage> productExtraImages;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "seller_id", nullable = false)
@@ -117,7 +117,7 @@ public class Product {
 
   public void addVariant(Variant variant) {
     if (variants == null) {
-      variants = new ArrayList<>();
+      variants = new HashSet<>();
     }
     variants.add(variant);
   }
