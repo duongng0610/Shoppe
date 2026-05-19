@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductCacheService {
-    ProductService productService;
+  ProductService productService;
 
-    @Cacheable(value = "products", key = "#id", sync = true)
-    public MyProductResponse cachingGetProductDetails(String id) {
-        return productService.cleanGetProductDetails(id);
-    }
+  @Cacheable(value = "products", key = "#id", sync = true)
+  public MyProductResponse cachingGetProductDetails(String id) {
+    return productService.cleanGetProductDetails(id);
+  }
 }

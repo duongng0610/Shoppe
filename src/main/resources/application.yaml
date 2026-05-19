@@ -11,13 +11,13 @@ server:
 spring:
   master:
     datasource:
-      jdbcUrl: jdbc:mysql://localhost:3307/ecommerce
+      jdbcUrl: jdbc:mysql://localhost:3307/ecommerce?useCursorFetch = true&serverTimezone=Asia/Ho_Chi_Minh
       username: root
       password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver
   slave:
     datasource:
-      jdbcUrl: jdbc:mysql://localhost:3308/ecommerce
+      jdbcUrl: jdbc:mysql://localhost:3308/ecommerce?useCursorFetch = true&serverTimezone=Asia/Ho_Chi_Minh
       username: root
       password: 123456
       driverClassName: com.mysql.cj.jdbc.Driver

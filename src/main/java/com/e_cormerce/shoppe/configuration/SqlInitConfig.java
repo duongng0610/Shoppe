@@ -1,79 +1,48 @@
 package com.e_cormerce.shoppe.configuration;
 
-
+import javax.sql.DataSource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.stereotype.Component;
 
-import javax.sql.DataSource;
-
 @Component
 public class SqlInitConfig {
 
+  public void initDatabase(DataSource dataSource) {
 
-    public void initDatabase(
-            DataSource dataSource
-    ) {
+    // =========================
+    // FUNCTIONS / PROCEDURES
+    // =========================
+    ResourceDatabasePopulator functionPopulator = new ResourceDatabasePopulator();
 
+    functionPopulator.setSeparator("$$");
 
-        // =========================
-        // FUNCTIONS / PROCEDURES
-        // =========================
-        ResourceDatabasePopulator functionPopulator =
-                new ResourceDatabasePopulator();
+    functionPopulator.addScript(new ClassPathResource("sql/functions.sql"));
 
-        functionPopulator.setSeparator("$$");
+    functionPopulator.addScript(new ClassPathResource("sql/procedures.sql"));
 
-        functionPopulator.addScript(
-                new ClassPathResource("sql/functions.sql")
-        );
+    functionPopulator.addScript(new ClassPathResource("sql/triggers.sql"));
 
-        functionPopulator.addScript(
-                new ClassPathResource("sql/procedures.sql")
-        );
+    DatabasePopulatorUtils.execute(functionPopulator, dataSource);
+    // =========================
+    // VIEWS
+    // =========================
+    ResourceDatabasePopulator viewPopulator = new ResourceDatabasePopulator();
 
-        functionPopulator.addScript(
-                new ClassPathResource("sql/triggers.sql")
-        );
+    ResourceDatabasePopulator dataPopulator = new ResourceDatabasePopulator();
 
-        DatabasePopulatorUtils.execute(
-                functionPopulator,
-                dataSource
-        );
-        // =========================
-        // VIEWS
-        // =========================
-        ResourceDatabasePopulator viewPopulator =
-                new ResourceDatabasePopulator();
+    viewPopulator.setSeparator(";");
 
-        ResourceDatabasePopulator dataPopulator =
-                new ResourceDatabasePopulator();
+    dataPopulator.setSeparator(";");
 
-        viewPopulator.setSeparator(";");
+    viewPopulator.addScript(new ClassPathResource("sql/views.sql"));
 
-        dataPopulator.setSeparator(";");
+    dataPopulator.addScript(new ClassPathResource("sql/enums.sql"));
 
-        viewPopulator.addScript(
-                new ClassPathResource("sql/views.sql")
-        );
+    DatabasePopulatorUtils.execute(viewPopulator, dataSource);
 
-        dataPopulator.addScript(
-                new ClassPathResource("sql/enums.sql")
-        );
-
-        DatabasePopulatorUtils.execute(
-                viewPopulator,
-                dataSource
-        );
-
-        DatabasePopulatorUtils.execute(
-                dataPopulator,
-                dataSource
-        );
-
-    }
-
-    ;
-
+    DatabasePopulatorUtils.execute(dataPopulator, dataSource);
+  }
+  ;
 }

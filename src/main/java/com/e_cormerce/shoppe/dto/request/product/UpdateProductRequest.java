@@ -1,9 +1,8 @@
 package com.e_cormerce.shoppe.dto.request.product;
 
+import java.util.List;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -11,6 +10,5 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateProductRequest {
-    List<UpdateVariantRequest> variants;
-
+  List<UpdateVariantRequest> variants;
 }

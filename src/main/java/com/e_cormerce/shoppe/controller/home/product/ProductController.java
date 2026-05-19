@@ -15,29 +15,28 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ProductController {
-    ProductService productService;
-    ProductCacheService productCacheService;
-    ProductAnalysisService productAnalysisService;
+  ProductService productService;
+  ProductCacheService productCacheService;
+  ProductAnalysisService productAnalysisService;
 
-    @GetMapping("")
-    public ResponseEntity<ApiResponse> getProductForHome(
-            @RequestParam("limit") int limit,
-            @RequestParam("offset") int offset) {
-        var result = productService.getProductsInHomePage(limit, offset);
+  @GetMapping("")
+  public ResponseEntity<ApiResponse> getProductForHome(
+      @RequestParam("limit") int limit, @RequestParam("offset") int offset) {
+    var result = productService.getProductsInHomePage(limit, offset);
 
-        return ResponseEntity.ok(
-                ApiResponse.builder()
-                        .data(result)
-                        .message("get product successfully")
-                        .success(true)
-                        .build());
-    }
+    return ResponseEntity.ok(
+        ApiResponse.builder()
+            .data(result)
+            .message("get product successfully")
+            .success(true)
+            .build());
+  }
 
-    @GetMapping("/{id}/details")
-    public ResponseEntity<ApiResponse> getDetailOfProduct(@PathVariable String id) {
-        var result = productCacheService.cachingGetProductDetails(id);
+  @GetMapping("/{id}/details")
+  public ResponseEntity<ApiResponse> getDetailOfProduct(@PathVariable String id) {
+    var result = productCacheService.cachingGetProductDetails(id);
 
-        return ResponseEntity.ok(
-                ApiResponse.builder().data(result).message("get product detail successfully").build());
-    }
+    return ResponseEntity.ok(
+        ApiResponse.builder().data(result).message("get product detail successfully").build());
+  }
 }

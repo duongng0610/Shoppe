@@ -1,39 +1,27 @@
 package com.e_cormerce.shoppe.projection.overview;
 
 public interface OverViewSystemProjection {
-    Long getUserCount();
+  Long getUserCount();
 
+  Long getActiveUserCount();
 
-    Long getActiveUserCount();
+  Long getBannedUserCount();
 
+  Long getPendingProductCount();
 
-    Long getBannedUserCount();
+  Long getActiveProductCount();
 
+  Long getBannedProductCount();
 
-    Long getPendingProductCount();
+  Long getPendingOrderCount();
 
+  Long getApprovedOrderCount();
 
-    Long getActiveProductCount();
+  Long getShippingOrderCount();
 
+  Long getDeliveredOrderCount();
 
-    Long getBannedProductCount();
+  Long getFailDeliveryOrderCount();
 
-
-    Long getPendingOrderCount();
-
-
-    Long getApprovedOrderCount();
-
-
-    Long getShippingOrderCount();
-
-
-    Long getDeliveredOrderCount();
-
-
-    Long getFailDeliveryOrderCount();
-
-
-    Double getTotalRevenue();
-
+  Double getTotalRevenue();
 }

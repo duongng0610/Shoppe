@@ -12,10 +12,10 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateVariantRequest {
-    @NotBlank(message = "variant id is required")
-    String id;
+  @NotBlank(message = "variant id is required")
+  String id;
 
-    @NotNull(message = "new quantity  is required")
-    @PositiveOrZero
-    Integer newQuantity;
+  @NotNull(message = "new quantity  is required")
+  @PositiveOrZero
+  Integer newQuantity;
 }

@@ -2,6 +2,7 @@ package com.e_cormerce.shoppe.configuration;
 
 import com.e_cormerce.shoppe.configuration.helper.AppConfigHelper;
 import com.e_cormerce.shoppe.properties.AdminProperties;
+import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -12,8 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import javax.sql.DataSource;
-
 @RequiredArgsConstructor
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -21,21 +20,21 @@ import javax.sql.DataSource;
 @Profile("!test")
 public class AppConfig {
 
-    AppConfigHelper appConfigHelper;
-    AdminProperties appConfigProperties;
-    SqlInitConfig sqlInitConfig;
+  AppConfigHelper appConfigHelper;
+  AdminProperties appConfigProperties;
+  SqlInitConfig sqlInitConfig;
 
-    @Bean
-    CommandLineRunner initData(@Qualifier("masterDataSource") DataSource dataSource) {
-        return args -> {
-            sqlInitConfig.initDatabase(dataSource);
-            appConfigHelper.createRoles();
-            appConfigHelper.createAdmin(
-                    appConfigProperties.getEmail(),
-                    appConfigProperties.getPassword(),
-                    appConfigProperties.getUsername());
-            appConfigHelper.createDefaultCategories();
-            appConfigHelper.createDefaultAddress();
-        };
-    }
+  @Bean
+  CommandLineRunner initData(@Qualifier("masterDataSource") DataSource dataSource) {
+    return args -> {
+      sqlInitConfig.initDatabase(dataSource);
+      appConfigHelper.createRoles();
+      appConfigHelper.createAdmin(
+          appConfigProperties.getEmail(),
+          appConfigProperties.getPassword(),
+          appConfigProperties.getUsername());
+      appConfigHelper.createDefaultCategories();
+      appConfigHelper.createDefaultAddress();
+    };
+  }
 }
